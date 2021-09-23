@@ -22,7 +22,7 @@ private:
     Ui::MainWindow *ui;
     Database *db;
     bool adminMode;
-    DictionaryForm *df;
+    DictionaryForm *dictionaryForm;
 private slots:
     void employeesTriggered();
     void scheduleTriggered();

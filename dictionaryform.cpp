@@ -4,7 +4,7 @@
 
 #include "dictionaryform.h"
 #include "ui_dictionaryform.h"
-#include "importdialog.h"
+#include "importform.h"
 
 
 DictionaryForm::DictionaryForm(QWidget *parent) :
@@ -266,20 +266,19 @@ void DictionaryForm::inputAccepted()
 
 void DictionaryForm::importBtnClicked()
 {
-    importDlg = new ImportDialog(this);
+    importForm = new ImportForm();
 
-    importDlg->setDatabase(db);
-    importDlg->setHeaders(headers);
-    importDlg->setFields(fields);
-    importDlg->setTable(dbTable);
-    importDlg->setModal(true);
-    connect(importDlg, &ImportDialog::finished, this, &DictionaryForm::importDlgFinished);
-    importDlg->open();
+    importForm->setDatabase(db);
+    importForm->setHeaders(headers);
+    importForm->setFields(fields);
+    importForm->setTable(dbTable);
+    connect(importForm, &ImportForm::closed, this, &DictionaryForm::importFormClosed);
+    importForm->show();
 }
 
-void DictionaryForm::importDlgFinished(int result)
+void DictionaryForm::importFormClosed()
 {
-    disconnect(importDlg, &ImportDialog::finished, this, &DictionaryForm::importDlgFinished);
-    delete importDlg;
-    importDlg = nullptr;
+    disconnect(importForm, &ImportForm::closed, this, &DictionaryForm::importFormClosed);
+    delete importForm;
+    importForm = nullptr;
 }

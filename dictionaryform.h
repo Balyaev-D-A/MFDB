@@ -8,7 +8,7 @@
 
 #include "database.h"
 #include "fieldeditor.h"
-#include "importdialog.h"
+#include "importform.h"
 
 enum Dictionary {
     EMPLOYEES,
@@ -41,7 +41,7 @@ private slots:
     void inputRejected();
     void updateData();
     void importBtnClicked();
-    void importDlgFinished(int result);
+    void importFormClosed();
 
 private:
     QString explodeFields(unsigned char from);
@@ -55,7 +55,7 @@ private:
     unsigned char sortingColumn;
     Qt::SortOrder sortingOrder;
     FieldEditor *editor;
-    ImportDialog *importDlg;
+    ImportForm *importForm;
 };
 
 #endif // DICTIONARYFORM_H

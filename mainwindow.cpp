@@ -11,8 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     db = new Database;
-    df = new DictionaryForm();
-    df->setDatabase(db);
+    dictionaryForm = new DictionaryForm();
+    dictionaryForm->setDatabase(db);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -32,6 +32,7 @@ void MainWindow::showEvent(QShowEvent *event)
     if (!connectDB("127.0.0.1", "itcrk", "itcrk", "123321")) {
         QMessageBox::critical(this, "Ошибка", "Невозможно подключиться к базе");
     }
+    QMainWindow::showEvent(event);
 }
 
 bool MainWindow::connectDB(QString host, QString dbname, QString user, QString password)
@@ -47,18 +48,18 @@ bool MainWindow::connectDB(QString host, QString dbname, QString user, QString p
 
 void MainWindow::employeesTriggered()
 {
-    df->setDictionary(EMPLOYEES);
-    df->show();
+    dictionaryForm->setDictionary(EMPLOYEES);
+    dictionaryForm->show();
 }
 
 void MainWindow::scheduleTriggered()
 {
-    df->setDictionary(SCHEDULE);
-    df->show();
+    dictionaryForm->setDictionary(SCHEDULE);
+    dictionaryForm->show();
 }
 
 void MainWindow::unitsTriggered()
 {
-    df->setDictionary(UNITS);
-    df->show();
+    dictionaryForm->setDictionary(UNITS);
+    dictionaryForm->show();
 }
