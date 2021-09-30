@@ -14,13 +14,13 @@ ImportForm::ImportForm(QWidget *parent) :
     connect(ui->readButton, &QPushButton::clicked, this, &ImportForm::readButtonClicked);
     connect(ui->importButton, &QPushButton::clicked, this, &ImportForm::importButtonClicked);
     connect(ui->cancelButton, &QPushButton::clicked, this, &ImportForm::close);
-
-    usedHeaders.clear();
+    hcb.setParent(ui->table->horizontalHeader());
+    hcb.hide();
+    connect(&hcb, &QComboBox::currentTextChanged, this, &ImportForm::cbTextChanged);
 }
 
 ImportForm::~ImportForm()
 {
-    delete hcb;
     delete ui;
 }
 
@@ -38,7 +38,7 @@ void ImportForm::readButtonClicked()
         QMessageBox::critical(this, "Ошибка!!!", "Ошибка открытия файла!");
         return;
     }
-
+    while (ui->table->rowCount()>0) ui->table->removeRow(0);
     while (!reader.atEnd())
     {
         row = reader.readNextRow();
@@ -56,7 +56,6 @@ void ImportForm::readButtonClicked()
     hHeader = ui->table->horizontalHeader();
     hHeader->setSectionsClickable(true);
     connect(ui->table->horizontalHeader(), &QHeaderView::sectionClicked, this, &ImportForm::headerSectionClicked);
-    qDebug() << "Connected";
     reader.closeFile();
 }
 
@@ -67,6 +66,40 @@ void ImportForm::cancelButtonClicked()
 
 void ImportForm::importButtonClicked()
 {
+    QMap<QString, int> fieldsmap;
+    QString field;
+    QString query;
+    QStringList usedfields;
+    for (int i=0; i<ui->table->horizontalHeader()->count(); i++)
+    {
+        if (ui->table->horizontalHeaderItem(i)->text() != "-") {
+            field = fields[headers.indexOf(ui->table->horizontalHeaderItem(i)->text())];
+            fieldsmap[field] = i;
+        }
+    }
+    db->pdb->transaction();
+    usedfields = fieldsmap.keys();
+    for (int i=0; i<ui->table->rowCount(); i++)
+    {
+        query = "insert into " + dbTable + " (";
+        if (dbTable == "schedule")
+            query += "sch_unit, ";
+        query += db->explodeFields(usedfields, 0) + ") values (";
+        if (dbTable == "schedule")
+            query += ui->unitBox->currentData().toString() + ", ";
+        for (int j=0; j<usedfields.count(); j++)
+        {
+            query += "'" + ui->table->item(i,fieldsmap[usedfields[j]])->text() + "'";
+            if (j!=usedfields.count()-1) query += ", ";
+        }
+        query +=")";
+        if (!db->pq->exec(query)) {
+            QMessageBox::critical(this, "Ошибка выполнения запроса!", "Ошибка выполнения запроса: " + db->pq->lastError().text());
+            db->pdb->rollback();
+            return;
+        }
+    }
+    db->pdb->commit();
     close();
 }
 
@@ -104,27 +137,35 @@ void ImportForm::setTable(QString table)
 
  void ImportForm::headerSectionClicked(int index)
  {
-        ui->table->horizontalHeaderItem(index)->setText("clicked");
-        return;
-     hcb = new QComboBox(ui->table->horizontalHeader());
-   //  hcb->hide();
-     hcb->clear();
-     hcb->addItem("-");
+     comboCurrent = index;
+     QStringList usedHeaders;
+     usedHeaders.clear();
+     for (int i = 0; i<ui->table->horizontalHeader()->count(); i++)
+     {
+         if (ui->table->horizontalHeaderItem(i)->text() != "-")
+             usedHeaders.append(ui->table->horizontalHeaderItem(i)->text());
+     }
+
+     hcb.clear();
+
+     hcb.addItem("-");
      for (int i = 1; i<headers.count(); i++)
      {
+         if (i == 1 && dbTable == "schedule") continue;
          if (!usedHeaders.contains(headers[i]))
-             hcb->addItem(headers[i]);
+             hcb.addItem(headers[i]);
      }
-     hcb->setGeometry(ui->table->horizontalHeader()->sectionViewportPosition(index),
+     hcb.setGeometry(ui->table->horizontalHeader()->sectionViewportPosition(index),
                       0, ui->table->horizontalHeader()->sectionSize(index),
                       ui->table->horizontalHeader()->height());
-     hcb->show();
-     hcb->setFocus();
+     hcb.showPopup();
+     hcb.setFocus();
  }
 
- void ImportForm::cbTextChoosed(QString text)
+ void ImportForm::cbTextChanged(const QString &text)
  {
-
+    ui->table->horizontalHeaderItem(comboCurrent)->setText(text);
+    hcb.hide();
  }
 
  void ImportForm::closeEvent(QCloseEvent *event)

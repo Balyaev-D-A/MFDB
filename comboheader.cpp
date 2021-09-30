@@ -9,6 +9,15 @@ ComboHeader::ComboHeader(Qt::Orientation orientation, QWidget *parent)
     margins.bottom = 0;
 }
 
+ComboHeader::~ComboHeader()
+{
+    for (int i=0; i<comboList.count(); i++)
+    {
+        delete comboList[i];
+        comboList[i] = nullptr;
+    }
+}
+
 void ComboHeader::onSectionCountChanged(int oCount, int nCount)
 {
 
@@ -35,8 +44,17 @@ void ComboHeader::onSectionCountChanged(int oCount, int nCount)
 void ComboHeader::onSectionResized(int lIndex, int oSize, int nSize)
 {
 
-    comboList[lIndex].setGeometry(sectionViewportPosition(lIndex) + margins.left,
+    comboList[lIndex]->setGeometry(sectionViewportPosition(lIndex) + margins.left,
                                   margins.top, nSize - margins.right,
                                   height() - margins.bottom);
 }
 
+void ComboHeader::setHeaders(QStringList headers)
+{
+    this->headers = headers;
+}
+
+void ComboHeader::onComboCurrentTextChanged(const QString &text)
+{
+
+}

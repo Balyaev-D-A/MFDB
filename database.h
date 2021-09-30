@@ -15,11 +15,11 @@ public:
     QSqlError lastError();
     bool deployTables();
     bool isConnected();
+    QString explodeFields(QStringList fields, unsigned char from);
     QSqlQuery *pq;
     QSqlDatabase *pdb;
 private:
     QSqlDatabase db;
-   // QSqlQuery *pq;
 
 };
 

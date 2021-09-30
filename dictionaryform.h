@@ -44,7 +44,6 @@ private slots:
     void importFormClosed();
 
 private:
-    QString explodeFields(unsigned char from);
     Ui::DictionaryForm *ui;
     Dictionary dict;
     Database *db;

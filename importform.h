@@ -2,8 +2,8 @@
 #define IMPORTFORM_H
 
 #include <QWidget>
-#include <QComboBox>
 #include <QHeaderView>
+#include <QComboBox>
 #include "database.h"
 
 namespace Ui {
@@ -28,9 +28,9 @@ private:
     QStringList headers;
     QStringList fields;
     QString dbTable;
-    QComboBox *hcb;
-    QStringList usedHeaders;
+    QComboBox hcb;
     QHeaderView *hHeader;
+    int comboCurrent;
 
 private slots:
     void fileButtonClicked();
@@ -38,7 +38,7 @@ private slots:
     void importButtonClicked();
     void cancelButtonClicked();
     void headerSectionClicked(int index);
-    void cbTextChoosed(QString text);
+    void cbTextChanged(const QString &text);
 
 protected:
     void closeEvent(QCloseEvent *event);

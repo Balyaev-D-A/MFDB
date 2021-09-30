@@ -28,18 +28,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::showEvent(QShowEvent *event)
 {
-    event->accept();
     if (!connectDB("127.0.0.1", "itcrk", "itcrk", "123321")) {
         QMessageBox::critical(this, "Ошибка", "Невозможно подключиться к базе");
     }
+    ui->raspDateEdit->setDate(QDate::currentDate());
+    ui->taskDateEdit->setDate(QDate::currentDate());
+    db->pq->exec("select emp_name, emp_id from employees where emp_metrolog='false'");
+    while (db->pq->next())
+        ui->employeeBox->addItem(db->pq->value(0).toString(), db->pq->value(1));
     QMainWindow::showEvent(event);
 }
 
 bool MainWindow::connectDB(QString host, QString dbname, QString user, QString password)
 {
     if (!db->open(host, dbname, user, password)) return false;
-    qDebug() << db->pdb->isValid();
-//    if (!db->deployTables()) return false;
+    if (!db->deployTables()) return false;
     //TODO: нужно сделать авторизацию пользователя по ТЛД, если админов в базе нет, перейти в режим админа
     //db->pq->exec("select * from employees where emp_admin=true");
     adminMode = true;

@@ -55,6 +55,8 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fields.append("emp_group");
         fields.append("emp_tld");
         fields.append("emp_admin");
+        fields.append("emp_metrolog");
+        fields.append("emp_hidden");
         fieldTypes.append("int");
         fieldTypes.append("int");
         fieldTypes.append("string");
@@ -62,13 +64,17 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fieldTypes.append("int1");
         fieldTypes.append("int");
         fieldTypes.append("bool");
+        fieldTypes.append("bool");
+        fieldTypes.append("bool");
         headers.append("id");
         headers.append("Табельный номер");
-        headers.append("ФИО");
+        headers.append("Фамилия И. О.");
         headers.append("Должность");
         headers.append("Группа ЭБ");
         headers.append("Номер ТЛД");
         headers.append("Админ");
+        headers.append("Метролог");
+        headers.append("Скрыт");
         break;
     case SCHEDULE:
         dbTable = "schedule";
@@ -83,6 +89,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fields.append("sch_worktype");
         fields.append("sch_hours");
         fields.append("sch_executor");
+        fields.append("sch_state");
         fieldTypes.append("int");
         fieldTypes.append("int");
         fieldTypes.append("string");
@@ -94,6 +101,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fieldTypes.append("string");
         fieldTypes.append("real");
         fieldTypes.append("string");
+        fieldTypes.append("int");
         headers.append("id");
         headers.append("Блок");
         headers.append("Обозначение");
@@ -105,6 +113,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("Тип работ");
         headers.append("Трудозатраты");
         headers.append("Исполнитель");
+        headers.append("Состояние");
         break;
 
     case UNITS:
@@ -123,7 +132,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
     ui->table->setHorizontalHeaderLabels(headers);
     ui->table->hideColumn(0);
     ui->table->verticalHeader()->hide();
-    sortingColumn = 2;
+    sortingColumn = 1;
     sortingOrder = Qt::AscendingOrder;
     updateData();
 }
@@ -131,7 +140,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
 void DictionaryForm::updateData()
 {
     while (ui->table->rowCount()>0) ui->table->removeRow(0);
-    db->pq->exec("select " + explodeFields(0) + " from " + dbTable);
+    db->pq->exec("select " + db->explodeFields(fields, 0) + " from " + dbTable);
     for (int i = 0; db->pq->next(); i++)
     {
         ui->table->insertRow(i);
@@ -148,10 +157,10 @@ void DictionaryForm::updateData()
             } else
                 ui->table->setItem(i, j, new QTableWidgetItem(db->pq->value(j).toString()));
         }
-        ui->table->resizeColumnsToContents();
-        ui->table->sortItems(sortingColumn, sortingOrder);
-        ui->table->selectRow(0);
     }
+    ui->table->resizeColumnsToContents();
+    ui->table->sortItems(sortingColumn, sortingOrder);
+    ui->table->selectRow(0);
 }
 
 void DictionaryForm::addRecord()
@@ -192,16 +201,6 @@ void DictionaryForm::deleteRecord()
         ui->table->removeRow(cr);
     else
         qDebug() << "Ошибка выполнения запроса";//TODO: Обработка ошибки
-}
-
-QString DictionaryForm::explodeFields(unsigned char from)
-{
-    QString result = "";
-    for (int i=from; i<fields.count(); i++ ) {
-        if (i>from) result += ", ";
-        result += fields.at(i);
-    }
-    return result;
 }
 
 void DictionaryForm::cellDoubleClicked(int row, int column)
@@ -281,4 +280,5 @@ void DictionaryForm::importFormClosed()
     disconnect(importForm, &ImportForm::closed, this, &DictionaryForm::importFormClosed);
     delete importForm;
     importForm = nullptr;
+    updateData();
 }

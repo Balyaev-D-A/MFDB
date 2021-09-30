@@ -9,6 +9,7 @@ class ComboHeader : public QHeaderView
     Q_OBJECT
 public:
     ComboHeader(Qt::Orientation orientation, QWidget *parent);
+    ~ComboHeader();
     void setHeaders(QStringList headers);
 
 private:
@@ -27,6 +28,7 @@ protected:
 private slots:
     void onSectionCountChanged(int oCount, int nCount);
     void onSectionResized(int lIndex, int oSize, int nSize);
+    void onComboCurrentTextChanged(const QString &text);
 
 
 };

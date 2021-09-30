@@ -15,9 +15,12 @@ SOURCES += \
     database.cpp \
     dictionaryform.cpp \
     fieldeditor.cpp \
+    headercombobox.cpp \
     importform.cpp \
     main.cpp \
     mainwindow.cpp \
+    progressform.cpp \
+    raspform.cpp \
     settings.cpp
 
 HEADERS += \
@@ -26,14 +29,19 @@ HEADERS += \
     database.h \
     dictionaryform.h \
     fieldeditor.h \
+    headercombobox.h \
     importform.h \
     mainwindow.h \
+    progressform.h \
+    raspform.h \
     settings.h
 
 FORMS += \
     dictionaryform.ui \
     importform.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    progressform.ui \
+    raspform.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
