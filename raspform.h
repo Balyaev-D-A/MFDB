@@ -15,6 +15,7 @@ public:
     explicit RaspForm(QWidget *parent = nullptr);
     ~RaspForm();
 
+
 private:
     Ui::RaspForm *ui;
 };

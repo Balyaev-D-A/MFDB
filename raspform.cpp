@@ -6,6 +6,7 @@ RaspForm::RaspForm(QWidget *parent) :
     ui(new Ui::RaspForm)
 {
     ui->setupUi(this);
+
 }
 
 RaspForm::~RaspForm()
