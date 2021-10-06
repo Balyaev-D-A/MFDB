@@ -47,6 +47,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
     headers.clear();
     switch (dict) {
     case EMPLOYEES:
+        setWindowTitle("Справочник: Работники");
         dbTable = "employees";
         fields.append("emp_id");
         fields.append("emp_num");
@@ -77,6 +78,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("Скрыт");
         break;
     case SCHEDULE:
+        setWindowTitle("Справочник: График работ");
         dbTable = "schedule";
         fields.append("sch_id");
         fields.append("sch_unit");
@@ -117,6 +119,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         break;
 
     case UNITS:
+        setWindowTitle("Справочник: Блоки");
         dbTable = "units";
         fields.append("unit_id");
         fields.append("unit_name");
@@ -125,15 +128,25 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("id");
         headers.append("Наименование");
         break;
+    case LOCATIONS:
+        setWindowTitle("Справочник: Размещение оборудования");
+        dbTable = "locations";
+        fields.append("loc_kks");
+        fields.append("loc_location");
+        fieldTypes.append("string");
+        fieldTypes.append("string");
+        headers.append("Обозначение");
+        headers.append("Размещение");
+        break;
     }
 
     ui->table->setColumnCount(fields.count());
     ui->table->horizontalHeader()->setFont(QFont(QFont().defaultFamily(), -1, QFont::Bold));
     ui->table->setHorizontalHeaderLabels(headers);
-    ui->table->hideColumn(0);
+    if (headers[0] == "id")
+        ui->table->hideColumn(0);
     ui->table->verticalHeader()->hide();
-    sortingColumn = 1;
-    sortingOrder = Qt::AscendingOrder;
+    ui->table->setSortingEnabled(true);
     updateData();
 }
 
@@ -159,7 +172,10 @@ void DictionaryForm::updateData()
         }
     }
     ui->table->resizeColumnsToContents();
-    ui->table->sortItems(sortingColumn, sortingOrder);
+    if (headers[0] == "id")
+        ui->table->sortItems(1);
+    else
+        ui->table->sortItems(0);
     ui->table->selectRow(0);
 }
 

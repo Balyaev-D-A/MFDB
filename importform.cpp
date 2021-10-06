@@ -139,6 +139,7 @@ void ImportForm::setTable(QString table)
  {
      comboCurrent = index;
      QStringList usedHeaders;
+     int firstField;
      usedHeaders.clear();
      for (int i = 0; i<ui->table->horizontalHeader()->count(); i++)
      {
@@ -149,7 +150,11 @@ void ImportForm::setTable(QString table)
      hcb.clear();
 
      hcb.addItem("-");
-     for (int i = 1; i<headers.count(); i++)
+     if (headers[0] == "id")
+         firstField = 1;
+     else
+         firstField = 0;
+     for (int i = firstField; i<headers.count(); i++)
      {
          if (i == 1 && dbTable == "schedule") continue;
          if (!usedHeaders.contains(headers[i]))

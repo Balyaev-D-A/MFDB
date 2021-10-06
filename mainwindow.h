@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "database.h"
 #include "dictionaryform.h"
+#include "raspform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,6 +28,9 @@ private slots:
     void employeesTriggered();
     void scheduleTriggered();
     void unitsTriggered();
+    void locationsTriggered();
+    void addRaspClicked();
+    void raspFormClosed(RaspForm *sender);
 
 protected:
     void showEvent(QShowEvent *event);

@@ -50,11 +50,17 @@ bool Database::deployTables()
 
     if (!pq->exec("create table if not exists schedule (sch_id serial primary key, sch_unit integer references units(unit_id), "
                   "sch_kks varchar(50), sch_name varchar(255), sch_type varchar(50), sch_tdoc varchar(255), sch_date varchar(10), "
-                  "sch_reportdate varchar(10), sch_worktype char(2), sch_hours decimal(5,2), sch_executor char(10), sch_state integer default 0)")) return false;
+                  "sch_reportdate varchar(10), sch_worktype char(2), sch_hours decimal(5,2), sch_executor char(10), sch_state integer default 0, "
+                  "sch_note varchar(1000))")) return false;
+
+    if (!pq->exec("create table if not exists locations (loc_kks varchar(50) primary key, loc_location varchar(100))")) return false;
+
+    if (!pq->exec("create table if not exists issuers (iss_id serial primary key, iss_name varchar(50), iss_loc varchar(20), "
+                  "iss_default bool default false)")) return false;
 
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
-    if (!pq->exec("create table if not exists rasp (rasp_id serial primary key, rasp_num char(6) default '', rasp_date char(10), rasp_btime char(5),"
-                  " rasp_etime char(5), rasp_issuing char(100), rasp_executor integer references employees(emp_id))")) return false;
+    if (!pq->exec("create table if not exists rasp (rasp_id serial primary key, rasp_num char(6), rasp_date char(10), rasp_btime char(5),"
+                  " rasp_etime char(5), rasp_issuer integer references issuers(iss_id), rasp_executor integer references employees(emp_id))")) return false;
 
     if (!pq->exec("create table if not exists rmembers (rm_id serial primary key, rm_rasp integer references rasp(rasp_id), "
                   "rm_emp integer references employees(emp_id))")) return false;

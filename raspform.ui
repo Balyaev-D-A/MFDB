@@ -2,11 +2,14 @@
 <ui version="4.0">
  <class>RaspForm</class>
  <widget class="QWidget" name="RaspForm">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1214</width>
+    <width>1132</width>
     <height>679</height>
    </rect>
   </property>
@@ -16,10 +19,19 @@
   <layout class="QVBoxLayout" name="verticalLayout_15">
    <item>
     <widget class="QSplitter" name="splitter_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QWidget" name="">
+     <property name="handleWidth">
+      <number>4</number>
+     </property>
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout_11">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -33,7 +45,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit">
+            <widget class="QLineEdit" name="numEdit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -51,6 +63,9 @@
              </property>
              <property name="text">
               <string>000/00</string>
+             </property>
+             <property name="cursorPosition">
+              <number>6</number>
              </property>
             </widget>
            </item>
@@ -80,7 +95,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QTimeEdit" name="timeEdit"/>
+            <widget class="QTimeEdit" name="bTimeEdit"/>
            </item>
           </layout>
          </item>
@@ -94,7 +109,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QTimeEdit" name="timeEdit_2"/>
+            <widget class="QTimeEdit" name="eTimeEdit"/>
            </item>
           </layout>
          </item>
@@ -108,7 +123,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBox_3">
+            <widget class="QComboBox" name="issuerBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -116,10 +131,10 @@
               </sizepolicy>
              </property>
              <property name="editable">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="currentText">
-              <string>Сергеев Д. В.   ЗНОРБр</string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -132,10 +147,21 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QTableWidget" name="tableWidget">
+            <widget class="QTableWidget" name="currWorkTable">
+             <property name="sortingEnabled">
+              <bool>true</bool>
+             </property>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Id</string>
+              </property>
+             </column>
              <column>
               <property name="text">
                <string>Обозначение</string>
@@ -204,13 +230,18 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QTreeWidget" name="treeWidget">
+            <widget class="QTreeWidget" name="teamTree">
              <column>
               <property name="text">
                <string>Состав бригады</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Id</string>
               </property>
              </column>
             </widget>
@@ -260,7 +291,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QListWidget" name="listWidget"/>
+            <widget class="QListWidget" name="teamList"/>
            </item>
           </layout>
          </widget>
@@ -268,7 +299,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout_14">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -297,6 +328,18 @@
            </item>
            <item>
             <widget class="QComboBox" name="monthBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>0</height>
+              </size>
+             </property>
              <item>
               <property name="text">
                <string>Весь год</string>
@@ -362,12 +405,20 @@
                <string>Декабрь</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>ППР</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetMinimumSize</enum>
+           </property>
            <item>
             <widget class="QLabel" name="label_8">
              <property name="text">
@@ -376,7 +427,13 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="NewCheckBox">
+            <widget class="QCheckBox" name="newCheckBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>Новые</string>
              </property>
@@ -386,6 +443,9 @@
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_12">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetMinimumSize</enum>
+           </property>
            <item>
             <widget class="QLabel" name="label_9">
              <property name="text">
@@ -394,7 +454,13 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="InworkCheckBox">
+            <widget class="QCheckBox" name="inworkCheckBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>В работе</string>
              </property>
@@ -404,6 +470,9 @@
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_13">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetMinimumSize</enum>
+           </property>
            <item>
             <widget class="QLabel" name="label_10">
              <property name="text">
@@ -412,7 +481,13 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="CompletedCheckBox">
+            <widget class="QCheckBox" name="completedCheckBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>Завершённые</string>
              </property>
@@ -425,11 +500,28 @@
        <item>
         <widget class="QTableWidget" name="workTable">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Id</string>
+          </property>
+         </column>
          <column>
           <property name="text">
            <string>Обозначение</string>

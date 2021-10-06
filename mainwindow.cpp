@@ -17,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
     connect(ui->aUnits, &QAction::triggered, this, &MainWindow::unitsTriggered);
+    connect(ui->aLocations, &QAction::triggered, this, &MainWindow::locationsTriggered);
+    connect(ui->addRaspButton, &QToolButton::clicked, this, &MainWindow::addRaspClicked);
 
 }
 
@@ -65,4 +67,25 @@ void MainWindow::unitsTriggered()
 {
     dictionaryForm->setDictionary(UNITS);
     dictionaryForm->show();
+}
+
+void MainWindow::locationsTriggered()
+{
+    dictionaryForm->setDictionary(LOCATIONS);
+    dictionaryForm->show();
+}
+
+void MainWindow::addRaspClicked()
+{
+    RaspForm *rf = new RaspForm();
+    rf->setDatabase(db);
+    connect(rf, &RaspForm::closed, this, &MainWindow::raspFormClosed);
+    rf->newRasp();
+    rf->show();
+}
+
+void MainWindow::raspFormClosed(RaspForm *sender)
+{
+    disconnect(sender, &RaspForm::closed, this, &MainWindow::raspFormClosed);
+    delete sender;
 }
