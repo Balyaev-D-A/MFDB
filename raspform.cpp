@@ -1,6 +1,7 @@
 #include "raspform.h"
 #include "ui_raspform.h"
 #include <QMessageBox>
+#include <QTextStream>
 
 RaspForm::RaspForm(QWidget *parent) :
     QWidget(parent),
@@ -57,8 +58,8 @@ void RaspForm::updateWorkTable()
 
     while (ui->workTable->rowCount()>0) ui->workTable->removeRow(0);
 
-    query = "select sch_id, sch_kks, sch_type, sch_worktype, loc_location from schedule left join locations on schedule.sch_kks = locations.loc_kks "
-            "where schedule.sch_executor = 'ИТЦРК' and sch_unit = '" + ui->unitBox->currentData().toString() + "' ";
+    query = "select sch_id, sch_kks, sch_type, sch_worktype, loc_location, sch_hours, sch_state from schedule left join locations on schedule.sch_kks = locations.loc_kks "
+            "where schedule.sch_executor = 'ИТЦРК' and sch_unit = '" + ui->unitBox->currentData().toString() + "' and sch_state < 2";
     if (ui->monthBox->currentIndex() != 0) {
         if (ui->monthBox->currentIndex() == 13){
             month = "ППР-" + QString::number(QDate::currentDate().year());
@@ -77,15 +78,38 @@ void RaspForm::updateWorkTable()
     for (int i=0; db->pq->next(); i++)
     {
         ui->workTable->insertRow(i);
-        for (int j=0; j<5; j++)
+        for (int j=0; j<6; j++)
         {
             ui->workTable->setItem(i, j, new QTableWidgetItem(db->pq->value(j).toString()));
+            if (db->pq->value(6) == 1)
+                ui->workTable->item(i,j)->setBackground(QBrush(Qt::yellow));
         }
     }
+    updateTotal();
 }
 
 void RaspForm::closeEvent(QCloseEvent *event)
 {
     QWidget::closeEvent(event);
     emit closed(this);
+}
+
+void RaspForm::updateTotal()
+{
+    float total = 0;
+    QString labelText;
+    for (int i=0; i<ui->workTable->rowCount(); i++ )
+        total += ui->workTable->item(i,5)->text().toFloat();
+    labelText = QString("Итоговые трудозатраты: %1 часов.").arg(QString::number(total, 'f', 2));
+    ui->labelTotal->setText(labelText);
+}
+
+void RaspForm::updateRaspTotal()
+{
+    float total = 0;
+    QString labelText;
+    for (int i=0; i<ui->currWorkTable->rowCount(); i++)
+        total += ui->currWorkTable->item(i, 5)->text().toFloat();
+    labelText = QString("Итоговые трудозатраты: %1 часов.").arg(QString::number(total, 'f', 2));
+    ui->labelRaspTotal->setText(labelText);
 }

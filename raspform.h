@@ -24,6 +24,8 @@ public:
 private:
     Ui::RaspForm *ui;
     Database *db;
+    void updateTotal();
+    void updateRaspTotal();
 private slots:
     void updateWorkTable();
 
