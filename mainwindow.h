@@ -28,6 +28,7 @@ private slots:
     void employeesTriggered();
     void scheduleTriggered();
     void unitsTriggered();
+    void issuersTriggered();
     void locationsTriggered();
     void addRaspClicked();
     void raspFormClosed(RaspForm *sender);

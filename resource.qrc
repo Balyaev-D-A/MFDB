@@ -4,5 +4,7 @@
         <file>icons/delete.png</file>
         <file>icons/import.png</file>
         <file>icons/refresh.png</file>
+        <file>icons/metrolog.png</file>
+        <file>icons/technic.png</file>
     </qresource>
 </RCC>

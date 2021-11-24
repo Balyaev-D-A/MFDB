@@ -138,6 +138,22 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("Обозначение");
         headers.append("Размещение");
         break;
+    case ISSUERS:
+        setWindowTitle("Справочник: Выдающие");
+        dbTable = "issuers";
+        fields.append("iss_id");
+        fields.append("iss_name");
+        fields.append("iss_loc");
+        fields.append("iss_default");
+        fieldTypes.append("int");
+        fieldTypes.append("string");
+        fieldTypes.append("string");
+        fieldTypes.append("bool");
+        headers.append("id");
+        headers.append("ФИО");
+        headers.append("Должность");
+        headers.append("По умолчанию");
+        break;
     }
 
     ui->table->setColumnCount(fields.count());
@@ -185,6 +201,7 @@ void DictionaryForm::addRecord()
     if (db->pq->exec("insert into " + dbTable + " default values" )) {
         lId = db->pq->lastInsertId();
        if (lId.isValid()) {
+            ui->table->setSortingEnabled(false);
             ui->table->insertRow(ui->table->rowCount());
             ui->table->setCurrentCell(ui->table->rowCount()-1, 1);
             for (int i=0; i<fields.size(); i++)
@@ -200,7 +217,7 @@ void DictionaryForm::addRecord()
                 } else
                     ui->table->setItem(ui->table->rowCount()-1, i, new QTableWidgetItem(""));
             }
-
+            ui->table->setSortingEnabled(true);
         }
     } else {
         qDebug() << "Ошибка выполнения запроса";

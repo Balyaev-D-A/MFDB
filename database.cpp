@@ -1,4 +1,5 @@
 #include <QStringList>
+#include <QMessageBox>
 #include "database.h"
 
 Database::Database()
@@ -69,4 +70,9 @@ bool Database::deployTables()
                   "re_equip integer references schedule(sch_id), re_worktype char(10))")) return false;
 
     return true;
+}
+
+void Database::showError(QWidget *sender)
+{
+    QMessageBox::critical(sender, "Ошибка выполнения запроса!", "Ошибка выполнения запроса: " + pq->lastError().text());
 }
