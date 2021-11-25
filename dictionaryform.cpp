@@ -168,6 +168,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
 
 void DictionaryForm::updateData()
 {
+    ui->table->setSortingEnabled(false);
     while (ui->table->rowCount()>0) ui->table->removeRow(0);
     db->pq->exec("select " + db->explodeFields(fields, 0) + " from " + dbTable);
     for (int i = 0; db->pq->next(); i++)
@@ -188,6 +189,7 @@ void DictionaryForm::updateData()
         }
     }
     ui->table->resizeColumnsToContents();
+    ui->table->setSortingEnabled(true);
     if (headers[0] == "id")
         ui->table->sortItems(1);
     else

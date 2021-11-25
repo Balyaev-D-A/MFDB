@@ -33,6 +33,7 @@ private:
     Database *db;
     QMap<QString, EmpInfo> empmap;
     bool hasMA = true;
+    int lastUnitIndex;
     void updateTotal();
     void updateRaspTotal();
 private slots:
@@ -41,7 +42,8 @@ private slots:
     void addMemberClicked();
     void removeMemberClicked();
     void addWorkClicked();
-//    void removeWorkPressed();
+    void removeWorkClicked();
+    void unitChanged(const QString &text);
 
 protected:
     void closeEvent(QCloseEvent *event);

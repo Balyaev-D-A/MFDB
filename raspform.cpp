@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 
+
 RaspForm::RaspForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RaspForm)
@@ -14,6 +15,9 @@ RaspForm::RaspForm(QWidget *parent) :
     connect(ui->addMemberButton, &QToolButton::clicked, this, &RaspForm::addMemberClicked);
     connect(ui->removeMemberButton, &QToolButton::clicked, this, &RaspForm::removeMemberClicked);
     connect(ui->addWorkButton, &QToolButton::clicked, this, &RaspForm::addWorkClicked);
+    connect(ui->removeWorkButton, &QToolButton::clicked, this, &RaspForm::removeWorkClicked);
+    connect(ui->unitBox, &QComboBox::currentTextChanged, this, &RaspForm::unitChanged);
+    connect(ui->monthBox, &QComboBox::currentTextChanged, this, &RaspForm::updateWorkTable);
 }
 
 RaspForm::~RaspForm()
@@ -28,6 +32,8 @@ void RaspForm::setDatabase(Database *db)
 
 void RaspForm::newRasp()
 {
+    ui->unitBox->blockSignals(true);
+    ui->monthBox->blockSignals(true);
     ui->dateEdit->setDate(QDate::currentDate());
 
     db->pq->exec("select iss_id, iss_name, iss_default from issuers");
@@ -42,21 +48,23 @@ void RaspForm::newRasp()
     db->pq->exec("select unit_id, unit_name from units order by unit_name");
     while (db->pq->next())
         ui->unitBox->addItem(db->pq->value(1).toString(), db->pq->value(0));
+    lastUnitIndex = 0;
     ui->unitBox->setCurrentIndex(0);
     ui->monthBox->setCurrentIndex(QDate::currentDate().month());
-
+    ui->unitBox->blockSignals(false);
+    ui->monthBox->blockSignals(false);
     ui->currWorkTable->hideColumn(0);
     ui->workTable->hideColumn(0);
     updateWorkTable();
     updateMembers();
-    connect(ui->unitBox, &QComboBox::currentTextChanged, this, &RaspForm::updateWorkTable);
-    connect(ui->monthBox, &QComboBox::currentTextChanged, this, &RaspForm::updateWorkTable);
 }
 
 void RaspForm::updateWorkTable()
 {
     QString query;
     QString month = "";
+    QStringList choosedWorks;
+    int row;
 
     while (ui->workTable->rowCount()>0) ui->workTable->removeRow(0);
 
@@ -84,25 +92,36 @@ void RaspForm::updateWorkTable()
         QMessageBox::critical(this, "Ошибка выполнения запроса!", "Ошибка выполнения запроса: " + db->pq->lastError().text());
         return;
     }
-    for (int i=0; db->pq->next(); i++)
+
+    choosedWorks.clear();
+    for (int i=0; i<ui->currWorkTable->rowCount(); i++)
     {
-        ui->workTable->insertRow(i);
+        choosedWorks.append(ui->currWorkTable->item(i, 0)->text());
+    }
+
+    ui->workTable->setSortingEnabled(false);
+    while (db->pq->next())
+    {
+        if (choosedWorks.contains(db->pq->value(0).toString())) continue;
+        row = ui->workTable->rowCount();
+        ui->workTable->insertRow(row);
         for (int j=0; j<6; j++)
         {
-            ui->workTable->setItem(i, j, new QTableWidgetItem(db->pq->value(j).toString()));
+            ui->workTable->setItem(row, j, new QTableWidgetItem(db->pq->value(j).toString()));
             switch (db->pq->value(6).toInt())
             {
             case 1:
-                ui->workTable->item(i,j)->setBackground(QBrush(Qt::yellow));
+                ui->workTable->item(row, j)->setBackground(QBrush(Qt::yellow));
                 break;
             case 2:
-                ui->workTable->item(i,j)->setBackground(QBrush(Qt::green));
+                ui->workTable->item(row, j)->setBackground(QBrush(Qt::green));
                 break;
             default:
                 break;
             }
         }
     }
+    ui->workTable->setSortingEnabled(true);
     updateTotal();
 }
 
@@ -230,11 +249,49 @@ void RaspForm::addWorkClicked()
     int curRow;
     curRow = ui->workTable->currentRow();
     if (curRow < 0) return;
+    ui->currWorkTable->setSortingEnabled(false);
     ui->currWorkTable->insertRow(ui->currWorkTable->rowCount());
     for (int i=0; i<ui->workTable->columnCount(); i++)
     {
         it = new QTableWidgetItem();
         it->setText(ui->workTable->item(curRow, i)->text());
-        ui->currWorkTable->setItem(ui->currWorkTable->rowCount(), i, it);
+        ui->currWorkTable->setItem(ui->currWorkTable->rowCount()-1, i, it);
     }
+    ui->workTable->removeRow(curRow);
+    ui->currWorkTable->setSortingEnabled(true);
+    updateRaspTotal();
+}
+
+void RaspForm::removeWorkClicked()
+{
+    if (ui->currWorkTable->currentRow() < 0) return;
+    ui->currWorkTable->removeRow(ui->currWorkTable->currentRow());
+    updateWorkTable();
+}
+
+void RaspForm::unitChanged(const QString &text)
+{
+    QMessageBox *mb;
+    QMessageBox::StandardButton btn;
+
+    if (ui->currWorkTable->rowCount() > 0) {
+        mb = new QMessageBox();
+        mb->setButtonText(QMessageBox::Yes, "Да");
+        mb->setButtonText(QMessageBox::No, "Нет");
+        btn = mb->question(this, "Смена блока", "В распоряжение нельзя добавлять работы с разных блоков. "
+                                                   "При смене блока список работ будет очищен. Вы действительно хотите сменить блок?");
+        delete mb;
+        if (btn == QMessageBox::Yes) {
+            while (ui->currWorkTable->rowCount()>0)
+                ui->currWorkTable->removeRow(0);
+            lastUnitIndex = ui->unitBox->findText(text);
+        }
+        else {
+        ui->unitBox->blockSignals(true);
+        ui->unitBox->setCurrentIndex(lastUnitIndex);
+        ui->unitBox->blockSignals(false);
+        }
+    }
+    lastUnitIndex = ui->unitBox->currentIndex();
+    updateWorkTable();
 }
