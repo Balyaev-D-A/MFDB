@@ -13,6 +13,7 @@ RaspForm::RaspForm(QWidget *parent) :
     connect(ui->completedCheckBox, &QCheckBox::stateChanged, this, &RaspForm::updateWorkTable);
     connect(ui->addMemberButton, &QToolButton::clicked, this, &RaspForm::addMemberClicked);
     connect(ui->removeMemberButton, &QToolButton::clicked, this, &RaspForm::removeMemberClicked);
+    connect(ui->addWorkButton, &QToolButton::clicked, this, &RaspForm::addWorkClicked);
 }
 
 RaspForm::~RaspForm()
@@ -226,12 +227,14 @@ void RaspForm::removeMemberClicked()
 void RaspForm::addWorkClicked()
 {
     QTableWidgetItem *it;
-
-    if (ui->workTable->currentRow()<0) return;
+    int curRow;
+    curRow = ui->workTable->currentRow();
+    if (curRow < 0) return;
     ui->currWorkTable->insertRow(ui->currWorkTable->rowCount());
     for (int i=0; i<ui->workTable->columnCount(); i++)
     {
         it = new QTableWidgetItem();
-
+        it->setText(ui->workTable->item(curRow, i)->text());
+        ui->currWorkTable->setItem(ui->currWorkTable->rowCount(), i, it);
     }
 }

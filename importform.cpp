@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QCloseEvent>
 #include "importform.h"
 #include "ui_importform.h"
 #include "csvreader.h"
