@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMap>
 #include "database.h"
+#include "fieldeditor.h"
 
 struct EmpInfo
 {
@@ -34,6 +35,8 @@ private:
     QMap<QString, EmpInfo> empmap;
     bool hasMA = true;
     int lastUnitIndex;
+    FieldEditor *wEditor;
+    FieldEditor *cwEditor;
     void updateTotal();
     void updateRaspTotal();
 private slots:
@@ -44,6 +47,12 @@ private slots:
     void addWorkClicked();
     void removeWorkClicked();
     void unitChanged(const QString &text);
+    void wCellDblClicked(int row, int column);
+    void cwCellDblClicked(int row, int column);
+    void wInputAccepted();
+    void wInputRejected();
+    void cwInputAccepted();
+    void cwInputRejected();
 
 protected:
     void closeEvent(QCloseEvent *event);

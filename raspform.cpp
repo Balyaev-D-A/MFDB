@@ -9,6 +9,12 @@ RaspForm::RaspForm(QWidget *parent) :
     ui(new Ui::RaspForm)
 {
     ui->setupUi(this);
+    wEditor = new FieldEditor(ui->workTable->viewport());
+    wEditor->hide();
+    cwEditor = new FieldEditor(ui->currWorkTable->viewport());
+    cwEditor->hide();
+    wEditor->setType(ESTRING);
+    cwEditor->setType(ESTRING);
     connect(ui->newCheckBox, &QCheckBox::stateChanged, this, &RaspForm::updateWorkTable);
     connect(ui->inworkCheckBox, &QCheckBox::stateChanged, this, &RaspForm::updateWorkTable);
     connect(ui->completedCheckBox, &QCheckBox::stateChanged, this, &RaspForm::updateWorkTable);
@@ -18,10 +24,18 @@ RaspForm::RaspForm(QWidget *parent) :
     connect(ui->removeWorkButton, &QToolButton::clicked, this, &RaspForm::removeWorkClicked);
     connect(ui->unitBox, &QComboBox::currentTextChanged, this, &RaspForm::unitChanged);
     connect(ui->monthBox, &QComboBox::currentTextChanged, this, &RaspForm::updateWorkTable);
+    connect(ui->workTable, &QTableWidget::cellDoubleClicked, this, &RaspForm::wCellDblClicked);
+    connect(ui->currWorkTable, &QTableWidget::cellDoubleClicked, this, &RaspForm::cwCellDblClicked);
+    connect(wEditor, &FieldEditor::acceptInput, this, &RaspForm::wInputAccepted);
+    connect(wEditor, &FieldEditor::rejectInput, this, &RaspForm::wInputRejected);
+    connect(cwEditor, &FieldEditor::acceptInput, this, &RaspForm::cwInputAccepted);
+    connect(cwEditor, &FieldEditor::rejectInput, this, &RaspForm::cwInputRejected);
 }
 
 RaspForm::~RaspForm()
 {
+    delete wEditor;
+    delete cwEditor;
     delete ui;
 }
 
@@ -171,9 +185,9 @@ void RaspForm::updateMembers()
         empmap[db->pq->value(1).toString()] = info;
         it = new QListWidgetItem(db->pq->value(1).toString());
         if (info.metrolog)
-            it->setIcon(QIcon(":/icons/icons/metrolog.png"));
+            it->setIcon(QIcon(":/icons/metrolog.png"));
         else
-            it->setIcon(QIcon(":/icons/icons/technic.png"));
+            it->setIcon(QIcon(":/icons/technic.png"));
         ui->teamList->addItem(it);
     }
 }
@@ -267,6 +281,7 @@ void RaspForm::removeWorkClicked()
     if (ui->currWorkTable->currentRow() < 0) return;
     ui->currWorkTable->removeRow(ui->currWorkTable->currentRow());
     updateWorkTable();
+    updateRaspTotal();
 }
 
 void RaspForm::unitChanged(const QString &text)
@@ -276,8 +291,6 @@ void RaspForm::unitChanged(const QString &text)
 
     if (ui->currWorkTable->rowCount() > 0) {
         mb = new QMessageBox();
-        mb->setButtonText(QMessageBox::Yes, "Да");
-        mb->setButtonText(QMessageBox::No, "Нет");
         btn = mb->question(this, "Смена блока", "В распоряжение нельзя добавлять работы с разных блоков. "
                                                    "При смене блока список работ будет очищен. Вы действительно хотите сменить блок?");
         delete mb;
@@ -294,4 +307,88 @@ void RaspForm::unitChanged(const QString &text)
     }
     lastUnitIndex = ui->unitBox->currentIndex();
     updateWorkTable();
+}
+
+void RaspForm::wCellDblClicked(int row, int column)
+{
+    if (column != 4) return;
+    wEditor->setCell(row, column);
+    wEditor->setGeometry(ui->workTable->visualItemRect(ui->workTable->item(row, column)));
+    wEditor->setText(ui->workTable->item(row, column)->text());
+    wEditor->show();
+    wEditor->setFocus();
+}
+
+void RaspForm::cwCellDblClicked(int row, int column)
+{
+    if (column != 4) return;
+    cwEditor->setCell(row, column);
+    cwEditor->setGeometry(ui->currWorkTable->visualItemRect(ui->currWorkTable->item(row, column)));
+    cwEditor->setText(ui->currWorkTable->item(row, column)->text());
+    cwEditor->show();
+    cwEditor->setFocus();
+}
+
+void RaspForm::wInputAccepted()
+{
+    QString kks = ui->workTable->item(wEditor->getRow(), 1)->text();
+    QString query = "select loc_kks from locations where loc_kks = '" + kks + "'";
+
+    if (!db->pq->exec(query)) {
+        db->showError(this);
+        return;
+    }
+    if (db->pq->numRowsAffected() > 0) {
+        query = "update locations set loc_location = '" + wEditor->text() + "' where loc_kks = '" + kks + "'";
+        if (!db->pq->exec(query)) {
+            db->showError(this);
+            return;
+        }
+    }
+    else {
+        query = "insert into locations (loc_kks, loc_location) values ('" + kks + "', '" + wEditor->text() + "')";
+        if (!db->pq->exec(query)) {
+            db->showError(this);
+            return;
+        }
+    }
+    ui->workTable->item(wEditor->getRow(), wEditor->getColumn())->setText(wEditor->text());
+    wEditor->hide();
+}
+
+void RaspForm::cwInputAccepted()
+{
+    QString kks = ui->currWorkTable->item(cwEditor->getRow(), 1)->text();
+    QString query = "select loc_kks from locations where loc_kks = '" + kks + "'";
+
+    if (!db->pq->exec(query)) {
+        db->showError(this);
+        return;
+    }
+    if (db->pq->numRowsAffected() > 0) {
+        query = "update locations set loc_location = '" + cwEditor->text() + "' where loc_kks = '" + kks + "'";
+        if (!db->pq->exec(query)) {
+            db->showError(this);
+            return;
+        }
+    }
+    else {
+        query = "insert into locations (loc_kks, loc_location) values ('" + kks + "', '" + cwEditor->text() + "')";
+        if (!db->pq->exec(query)) {
+            db->showError(this);
+            return;
+        }
+    }
+    ui->currWorkTable->item(cwEditor->getRow(), cwEditor->getColumn())->setText(cwEditor->text());
+    cwEditor->hide();
+}
+
+void RaspForm::wInputRejected()
+{
+    wEditor->hide();
+}
+
+void RaspForm::cwInputRejected()
+{
+    cwEditor->hide();
 }

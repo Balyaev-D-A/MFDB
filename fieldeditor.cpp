@@ -36,7 +36,6 @@ void FieldEditor::setType(EType type)
 
 void FieldEditor::focusOutEvent(QFocusEvent *e)
 {
-    qDebug() << "Focus out";
     emit rejectInput();
     e->accept();
 }
@@ -45,7 +44,6 @@ void FieldEditor::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {
     case Qt::Key_Escape:
-        qDebug() << "Escape pressed";
         emit rejectInput();
         break;
     case Qt::Key_Enter:
@@ -53,7 +51,7 @@ void FieldEditor::keyPressEvent(QKeyEvent *e)
         emit acceptInput();
         break;
     }
-    e->accept();
+//    e->accept();
     QLineEdit::keyPressEvent(e);
 }
 

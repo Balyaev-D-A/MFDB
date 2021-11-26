@@ -14,6 +14,7 @@ SOURCES += \
     csvreader.cpp \
     database.cpp \
     dictionaryform.cpp \
+    dragdroptable.cpp \
     fieldeditor.cpp \
     headercombobox.cpp \
     importform.cpp \
@@ -28,6 +29,7 @@ HEADERS += \
     csvreader.h \
     database.h \
     dictionaryform.h \
+    dragdroptable.h \
     fieldeditor.h \
     headercombobox.h \
     importform.h \

@@ -162,6 +162,21 @@
            <layout class="QVBoxLayout" name="verticalLayout_15">
             <item>
              <widget class="QTableWidget" name="currWorkTable">
+              <property name="acceptDrops">
+               <bool>false</bool>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::NoDragDrop</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::IgnoreAction</enum>
+              </property>
               <property name="selectionMode">
                <enum>QAbstractItemView::SingleSelection</enum>
               </property>
@@ -267,6 +282,15 @@
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <widget class="QTreeWidget" name="teamTree">
+          <property name="acceptDrops">
+           <bool>false</bool>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::NoDragDrop</enum>
+          </property>
+          <property name="defaultDropAction">
+           <enum>Qt::IgnoreAction</enum>
+          </property>
           <column>
            <property name="text">
             <string>Состав бригады</string>
@@ -320,6 +344,18 @@
         </item>
         <item>
          <widget class="QListWidget" name="teamList">
+          <property name="acceptDrops">
+           <bool>false</bool>
+          </property>
+          <property name="dragEnabled">
+           <bool>true</bool>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::NoDragDrop</enum>
+          </property>
+          <property name="defaultDropAction">
+           <enum>Qt::IgnoreAction</enum>
+          </property>
           <property name="iconSize">
            <size>
             <width>16</width>
@@ -556,6 +592,18 @@
              <width>500</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="acceptDrops">
+            <bool>false</bool>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::NoDragDrop</enum>
+           </property>
+           <property name="defaultDropAction">
+            <enum>Qt::MoveAction</enum>
            </property>
            <property name="selectionMode">
             <enum>QAbstractItemView::SingleSelection</enum>

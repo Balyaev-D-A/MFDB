@@ -38,7 +38,7 @@
        </property>
        <property name="icon">
         <iconset resource="resource.qrc">
-         <normaloff>:/icons/icons/refresh.png</normaloff>:/icons/icons/refresh.png</iconset>
+         <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -64,7 +64,7 @@
        </property>
        <property name="icon">
         <iconset resource="resource.qrc">
-         <normaloff>:/icons/icons/add.png</normaloff>:/icons/icons/add.png</iconset>
+         <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -90,7 +90,7 @@
        </property>
        <property name="icon">
         <iconset resource="resource.qrc">
-         <normaloff>:/icons/icons/delete.png</normaloff>:/icons/icons/delete.png</iconset>
+         <normaloff>:/icons/delete.png</normaloff>:/icons/delete.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -116,7 +116,7 @@
        </property>
        <property name="icon">
         <iconset resource="resource.qrc">
-         <normaloff>:/icons/icons/import.png</normaloff>:/icons/icons/import.png</iconset>
+         <normaloff>:/icons/import.png</normaloff>:/icons/import.png</iconset>
        </property>
        <property name="iconSize">
         <size>
