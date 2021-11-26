@@ -8,7 +8,7 @@ class DragDropTable : public QTableWidget
 {
     Q_OBJECT
 public:
-    DragDropTable();
+    DragDropTable(QWidget *parent = 0);
     ~DragDropTable();
 private:
     QPoint dragStart;
