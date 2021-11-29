@@ -1,7 +1,7 @@
 #include "dragdroptable.h"
-#include <QApplication>
-#include <QDrag>
-#include <QMimeData>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+
 
 DragDropTable::DragDropTable(QWidget *parent)
     :QTableWidget(parent)
@@ -9,27 +9,20 @@ DragDropTable::DragDropTable(QWidget *parent)
 
 }
 
-DragDropTable::~DragDropTable()
+void DragDropTable::dragEnterEvent(QDragEnterEvent *event)
 {
-
+    if (acceptFrom == nullptr) return;
+    if (event->source() == acceptFrom)
+        event->acceptProposedAction();
 }
 
-void DragDropTable::mousePressEvent(QMouseEvent *event)
+void DragDropTable::dropEvent(QDropEvent *event)
 {
-    dragStart = event->pos();
+    if (event->source() == acceptFrom)
+        emit itemDroped();
 }
 
-void DragDropTable::mouseMoveEvent(QMouseEvent *event)
+void DragDropTable::setAcceptFrom(QObject *obj)
 {
-    QString value;
-    QString data;
-
-    int dist = (event->pos() - dragStart).manhattanLength();
-
-    if(dist >= QApplication::startDragDistance() && (event->buttons() & Qt::LeftButton)) {
-        QDrag *drag = new QDrag(this);
-        QMimeData *mime = new QMimeData();
-
-
-    }
+    acceptFrom = obj;
 }

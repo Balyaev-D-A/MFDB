@@ -161,18 +161,21 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_15">
             <item>
-             <widget class="QTableWidget" name="currWorkTable">
+             <widget class="DragDropTable" name="currWorkTable">
               <property name="acceptDrops">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="editTriggers">
                <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="dragEnabled">
+               <bool>true</bool>
               </property>
               <property name="dragDropOverwriteMode">
                <bool>false</bool>
               </property>
               <property name="dragDropMode">
-               <enum>QAbstractItemView::NoDragDrop</enum>
+               <enum>QAbstractItemView::DragDrop</enum>
               </property>
               <property name="defaultDropAction">
                <enum>Qt::IgnoreAction</enum>
@@ -281,12 +284,12 @@
       <widget class="QWidget" name="layoutWidget">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QTreeWidget" name="teamTree">
+         <widget class="DragDropTree" name="teamTree">
           <property name="acceptDrops">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="dragDropMode">
-           <enum>QAbstractItemView::NoDragDrop</enum>
+           <enum>QAbstractItemView::DragDrop</enum>
           </property>
           <property name="defaultDropAction">
            <enum>Qt::IgnoreAction</enum>
@@ -343,15 +346,15 @@
          </layout>
         </item>
         <item>
-         <widget class="QListWidget" name="teamList">
+         <widget class="DragDropList" name="teamList">
           <property name="acceptDrops">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="dragEnabled">
            <bool>true</bool>
           </property>
           <property name="dragDropMode">
-           <enum>QAbstractItemView::NoDragDrop</enum>
+           <enum>QAbstractItemView::DragDrop</enum>
           </property>
           <property name="defaultDropAction">
            <enum>Qt::IgnoreAction</enum>
@@ -580,7 +583,7 @@
           </layout>
          </item>
          <item>
-          <widget class="QTableWidget" name="workTable">
+          <widget class="DragDropTable" name="workTable">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -599,11 +602,17 @@
            <property name="editTriggers">
             <set>QAbstractItemView::NoEditTriggers</set>
            </property>
+           <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="dragDropOverwriteMode">
+            <bool>false</bool>
+           </property>
            <property name="dragDropMode">
-            <enum>QAbstractItemView::NoDragDrop</enum>
+            <enum>QAbstractItemView::DragDrop</enum>
            </property>
            <property name="defaultDropAction">
-            <enum>Qt::MoveAction</enum>
+            <enum>Qt::IgnoreAction</enum>
            </property>
            <property name="selectionMode">
             <enum>QAbstractItemView::SingleSelection</enum>
@@ -698,6 +707,23 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DragDropTable</class>
+   <extends>QTableWidget</extends>
+   <header>dragdroptable.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DragDropList</class>
+   <extends>QListWidget</extends>
+   <header>dragdroplist.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DragDropTree</class>
+   <extends>QTreeWidget</extends>
+   <header>dragdroptree.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

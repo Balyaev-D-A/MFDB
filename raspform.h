@@ -53,6 +53,7 @@ private slots:
     void wInputRejected();
     void cwInputAccepted();
     void cwInputRejected();
+    void okButtonClicked();
 
 protected:
     void closeEvent(QCloseEvent *event);

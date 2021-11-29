@@ -14,7 +14,9 @@ SOURCES += \
     csvreader.cpp \
     database.cpp \
     dictionaryform.cpp \
+    dragdroplist.cpp \
     dragdroptable.cpp \
+    dragdroptree.cpp \
     fieldeditor.cpp \
     headercombobox.cpp \
     importform.cpp \
@@ -22,28 +24,33 @@ SOURCES += \
     mainwindow.cpp \
     progressform.cpp \
     raspform.cpp \
-    settings.cpp
+    settings.cpp \
+    worktypewidget.cpp
 
 HEADERS += \
     comboheader.h \
     csvreader.h \
     database.h \
     dictionaryform.h \
+    dragdroplist.h \
     dragdroptable.h \
+    dragdroptree.h \
     fieldeditor.h \
     headercombobox.h \
     importform.h \
     mainwindow.h \
     progressform.h \
     raspform.h \
-    settings.h
+    settings.h \
+    worktypewidget.h
 
 FORMS += \
     dictionaryform.ui \
     importform.ui \
     mainwindow.ui \
     progressform.ui \
-    raspform.ui
+    raspform.ui \
+    worktypewidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

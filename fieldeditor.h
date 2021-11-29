@@ -18,7 +18,7 @@ class FieldEditor : public QLineEdit
 {
     Q_OBJECT
 public:
-    FieldEditor(QWidget *parent = 0);
+    explicit FieldEditor(QWidget *parent = nullptr);
     ~FieldEditor();
     void setType(EType type);
     void setCell(int row, int column);

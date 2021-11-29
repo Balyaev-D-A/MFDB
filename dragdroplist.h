@@ -1,15 +1,15 @@
-#ifndef DRAGDROPTABLE_H
-#define DRAGDROPTABLE_H
+#ifndef DRAGDROPLIST_H
+#define DRAGDROPLIST_H
 
-#include <QTableWidget>
-#include <QMouseEvent>
+#include <QListWidget>
 
-class DragDropTable : public QTableWidget
+class DragDropList : public QListWidget
 {
     Q_OBJECT
 public:
-    explicit DragDropTable(QWidget *parent = nullptr);
+    explicit DragDropList(QWidget *parent = nullptr);
     void setAcceptFrom(QObject *obj);
+
 private:
     QObject *acceptFrom = nullptr;
 
@@ -21,4 +21,4 @@ signals:
     void itemDroped();
 };
 
-#endif // DRAGDROPTABLE_H
+#endif // DRAGDROPLIST_H

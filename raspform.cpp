@@ -15,6 +15,10 @@ RaspForm::RaspForm(QWidget *parent) :
     cwEditor->hide();
     wEditor->setType(ESTRING);
     cwEditor->setType(ESTRING);
+    ui->currWorkTable->setAcceptFrom(ui->workTable);
+    ui->workTable->setAcceptFrom(ui->currWorkTable);
+    ui->teamList->setAcceptFrom(ui->teamTree);
+    ui->teamTree->setAcceptFrom(ui->teamList);
     connect(ui->newCheckBox, &QCheckBox::stateChanged, this, &RaspForm::updateWorkTable);
     connect(ui->inworkCheckBox, &QCheckBox::stateChanged, this, &RaspForm::updateWorkTable);
     connect(ui->completedCheckBox, &QCheckBox::stateChanged, this, &RaspForm::updateWorkTable);
@@ -30,6 +34,10 @@ RaspForm::RaspForm(QWidget *parent) :
     connect(wEditor, &FieldEditor::rejectInput, this, &RaspForm::wInputRejected);
     connect(cwEditor, &FieldEditor::acceptInput, this, &RaspForm::cwInputAccepted);
     connect(cwEditor, &FieldEditor::rejectInput, this, &RaspForm::cwInputRejected);
+    connect(ui->currWorkTable, &DragDropTable::itemDroped, this, &RaspForm::addWorkClicked);
+    connect(ui->workTable, &DragDropTable::itemDroped, this, &RaspForm::removeWorkClicked);
+    connect(ui->teamList, &DragDropList::itemDroped, this, &RaspForm::removeMemberClicked);
+    connect(ui->teamTree, &DragDropTree::itemDroped, this, &RaspForm::addMemberClicked);
 }
 
 RaspForm::~RaspForm()
@@ -391,4 +399,19 @@ void RaspForm::wInputRejected()
 void RaspForm::cwInputRejected()
 {
     cwEditor->hide();
+}
+
+void RaspForm::okButtonClicked()
+{
+    if (ui->currWorkTable->rowCount() == 0) {
+        QMessageBox::critical(this, "Невозможно сохранить распоряжение!", "Список работ по распоряжению пуст. Добавьте работы по распоряжению.");
+        return;
+    }
+
+    if (ui->teamTree->topLevelItemCount() == 0) {
+        QMessageBox::critical(this, "Невозможно сохранить распоряжение!", "Нет ни одного человека в бригаде. Добавьте сотрудников в бригаду.");
+        return;
+    }
+
+
 }
