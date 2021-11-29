@@ -1,5 +1,6 @@
 #include "raspform.h"
 #include "ui_raspform.h"
+#include "worktypewidget.h"
 #include <QMessageBox>
 #include <QTextStream>
 
@@ -329,12 +330,17 @@ void RaspForm::wCellDblClicked(int row, int column)
 
 void RaspForm::cwCellDblClicked(int row, int column)
 {
-    if (column != 4) return;
-    cwEditor->setCell(row, column);
-    cwEditor->setGeometry(ui->currWorkTable->visualItemRect(ui->currWorkTable->item(row, column)));
-    cwEditor->setText(ui->currWorkTable->item(row, column)->text());
-    cwEditor->show();
-    cwEditor->setFocus();
+    if (column == 4) {
+        cwEditor->setCell(row, column);
+        cwEditor->setGeometry(ui->currWorkTable->visualItemRect(ui->currWorkTable->item(row, column)));
+        cwEditor->setText(ui->currWorkTable->item(row, column)->text());
+        cwEditor->show();
+        cwEditor->setFocus();
+    }
+    if (column == 3) {
+        WorkTypeWidget *w = new WorkTypeWidget(ui->currWorkTable->viewport());
+        w->setGeometry()
+    }
 }
 
 void RaspForm::wInputAccepted()

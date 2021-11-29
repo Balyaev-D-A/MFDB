@@ -1,11 +1,18 @@
 #include "worktypewidget.h"
 #include "ui_worktypewidget.h"
+#include <QFocusEvent>
 
 WorkTypeWidget::WorkTypeWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WorkTypeWidget)
 {
     ui->setupUi(this);
+    connect(ui->TOBox, &QCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
+    connect(ui->TRBox, &QCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
+    connect(ui->KRBox, &QCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
+    connect(ui->MABox, &QCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
+    connect(ui->okButton, &QToolButton::clicked, this, &WorkTypeWidget::okButtonClicked);
+    setFocus();
 }
 
 WorkTypeWidget::~WorkTypeWidget()
@@ -47,5 +54,24 @@ QString WorkTypeWidget::workTypes()
         if (result.size() > 0) result += ", ";
         result += "MA";
     }
-    return ;
+    return result;
+}
+
+
+void WorkTypeWidget::checkBoxStateChanged()
+{
+    emit typeChanged();
+}
+
+void WorkTypeWidget::focusOutEvent(QFocusEvent *event)
+{
+    event->accept();
+    hide();
+    emit widgetHidden(this);
+}
+
+void WorkTypeWidget::okButtonClicked()
+{
+    hide();
+    emit widgetHidden(this);
 }

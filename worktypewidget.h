@@ -19,6 +19,17 @@ public:
 
 private:
     Ui::WorkTypeWidget *ui;
+
+private slots:
+    void checkBoxStateChanged();
+    void okButtonClicked();
+
+protected:
+    void focusOutEvent(QFocusEvent *event);
+
+signals:
+    void typeChanged();
+    void widgetHidden(QWidget *sender);
 };
 
 #endif // WORKTYPEWIDGET_H
