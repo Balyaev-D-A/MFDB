@@ -424,6 +424,12 @@ void RaspForm::okButtonClicked()
         QMessageBox::critical(this, "Невозможно сохранить распоряжение!", "Нет ни одного человека в бригаде. Добавьте сотрудников в бригаду.");
         return;
     }
+
+    QString query;
+
+    if (currentRasp < 0) {
+        query = "insert into rasp (rasp_num, rasp_date, rasp_btime, rasp_etime, rasp_issuing, ";
+    }
 }
 
 void RaspForm::workTypesChanged()

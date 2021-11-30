@@ -75,6 +75,7 @@ QString WorkTypeWidget::workTypes()
         if (result.size() > 0) result += ", ";
         result += "МА";
     }
+    if (result == "") result = "ТО";
     return result;
 }
 

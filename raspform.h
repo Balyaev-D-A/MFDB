@@ -36,6 +36,7 @@ private:
     QMap<QString, EmpInfo> empmap;
     bool hasMA = false;
     int lastUnitIndex;
+    int currentRasp = -1;
     FieldEditor *wEditor;
     FieldEditor *cwEditor;
     WorkTypeWidget *wtWidget;
