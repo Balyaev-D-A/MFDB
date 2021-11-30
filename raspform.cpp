@@ -1,6 +1,5 @@
 #include "raspform.h"
 #include "ui_raspform.h"
-#include "worktypewidget.h"
 #include <QMessageBox>
 #include <QTextStream>
 
@@ -16,6 +15,8 @@ RaspForm::RaspForm(QWidget *parent) :
     cwEditor->hide();
     wEditor->setType(ESTRING);
     cwEditor->setType(ESTRING);
+    wtWidget = new WorkTypeWidget(ui->currWorkTable->viewport());
+    wtWidget->hide();
     ui->currWorkTable->setAcceptFrom(ui->workTable);
     ui->workTable->setAcceptFrom(ui->currWorkTable);
     ui->teamList->setAcceptFrom(ui->teamTree);
@@ -39,12 +40,14 @@ RaspForm::RaspForm(QWidget *parent) :
     connect(ui->workTable, &DragDropTable::itemDroped, this, &RaspForm::removeWorkClicked);
     connect(ui->teamList, &DragDropList::itemDroped, this, &RaspForm::removeMemberClicked);
     connect(ui->teamTree, &DragDropTree::itemDroped, this, &RaspForm::addMemberClicked);
+    connect(wtWidget, &WorkTypeWidget::typeChanged, this, &RaspForm::workTypesChanged);
 }
 
 RaspForm::~RaspForm()
 {
-    delete wEditor;
-    delete cwEditor;
+    wEditor->deleteLater();
+    cwEditor->deleteLater();
+    wtWidget->deleteLater();
     delete ui;
 }
 
@@ -192,6 +195,7 @@ void RaspForm::updateMembers()
         info.id = db->pq->value(0).toInt();
         info.metrolog = db->pq->value(2).toBool();
         empmap[db->pq->value(1).toString()] = info;
+        if (memberAdded(db->pq->value(1).toString())) continue;
         it = new QListWidgetItem(db->pq->value(1).toString());
         if (info.metrolog)
             it->setIcon(QIcon(":/icons/metrolog.png"));
@@ -338,8 +342,10 @@ void RaspForm::cwCellDblClicked(int row, int column)
         cwEditor->setFocus();
     }
     if (column == 3) {
-        WorkTypeWidget *w = new WorkTypeWidget(ui->currWorkTable->viewport());
-        w->setGeometry()
+        QRect r = ui->currWorkTable->visualItemRect(ui->currWorkTable->item(row, column));
+        wtWidget->setGeometry(r.x()+r.width(), r.y(), wtWidget->width(), wtWidget->height());
+        wtWidget->setWorkTypes(ui->currWorkTable->item(row, column)->text());
+        wtWidget->show();
     }
 }
 
@@ -418,6 +424,48 @@ void RaspForm::okButtonClicked()
         QMessageBox::critical(this, "Невозможно сохранить распоряжение!", "Нет ни одного человека в бригаде. Добавьте сотрудников в бригаду.");
         return;
     }
+}
 
+void RaspForm::workTypesChanged()
+{
+    ui->currWorkTable->item(ui->currWorkTable->currentRow(), 3)->setText(wtWidget->workTypes());
+    hasMA = false;
+    for (int i=0; i<ui->currWorkTable->rowCount(); i++)
+    {
+        if (ui->currWorkTable->item(i, 3)->text().contains("МА"))
+            hasMA = true;
+    }
+    checkAddedMembers();
+    updateMembers();
+}
 
+void RaspForm::checkAddedMembers()
+{
+    QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
+    QTreeWidgetItem *child;
+    if (it) {
+        for (int i=0; i<it->childCount(); i++)
+        {
+            child = it->child(i);
+            if (empmap[child->text(0)].metrolog)
+                if (!hasMA) {
+                    delete it->takeChild(i);
+                }
+        }
+    }
+}
+
+bool RaspForm::memberAdded(QString member)
+{
+    QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
+
+    if (!it) return false;
+
+    if (it->text(0) == member) return true;
+
+    for (int i=0; i<it->childCount(); i++)
+    {
+        if (it->child(i)->text(0) == member) return true;
+    }
+    return false;
 }

@@ -25,7 +25,9 @@ SOURCES += \
     progressform.cpp \
     raspform.cpp \
     settings.cpp \
-    worktypewidget.cpp
+    worktypewidget.cpp \
+    wtbutton.cpp \
+    wtcheckbox.cpp
 
 HEADERS += \
     comboheader.h \
@@ -42,7 +44,9 @@ HEADERS += \
     progressform.h \
     raspform.h \
     settings.h \
-    worktypewidget.h
+    worktypewidget.h \
+    wtbutton.h \
+    wtcheckbox.h
 
 FORMS += \
     dictionaryform.ui \

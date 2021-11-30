@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>72</width>
-    <height>162</height>
+    <width>87</width>
+    <height>130</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -16,35 +16,50 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>87</width>
+    <height>130</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>87</width>
+    <height>130</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QCheckBox" name="TOBox">
+      <widget class="WTCheckBox" name="TOBox">
        <property name="text">
         <string>ТО</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="TRBox">
+      <widget class="WTCheckBox" name="TRBox">
        <property name="text">
         <string>ТР</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="KRBox">
+      <widget class="WTCheckBox" name="KRBox">
        <property name="text">
         <string>КР</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="MABox">
+      <widget class="WTCheckBox" name="MABox">
        <property name="text">
         <string>МА</string>
        </property>
@@ -53,21 +68,92 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
-     </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QToolButton" name="okButton">
+      <widget class="WTButton" name="closeButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="Button">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>192</red>
+             <green>28</green>
+             <blue>40</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="Button">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>192</red>
+             <green>28</green>
+             <blue>40</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="Button">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>192</red>
+             <green>28</green>
+             <blue>40</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
        <property name="text">
-        <string>...</string>
+        <string>x</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WTCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>wtcheckbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WTButton</class>
+   <extends>QToolButton</extends>
+   <header>wtbutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

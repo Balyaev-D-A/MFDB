@@ -1,18 +1,24 @@
 #include "worktypewidget.h"
 #include "ui_worktypewidget.h"
 #include <QFocusEvent>
+#include <QShowEvent>
 
 WorkTypeWidget::WorkTypeWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WorkTypeWidget)
 {
     ui->setupUi(this);
-    connect(ui->TOBox, &QCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
-    connect(ui->TRBox, &QCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
-    connect(ui->KRBox, &QCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
-    connect(ui->MABox, &QCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
-    connect(ui->okButton, &QToolButton::clicked, this, &WorkTypeWidget::okButtonClicked);
-    setFocus();
+    connect(ui->TOBox, &WTCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
+    connect(ui->TRBox, &WTCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
+    connect(ui->KRBox, &WTCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
+    connect(ui->MABox, &WTCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
+    connect(ui->closeButton, &WTButton::clicked, this, &WorkTypeWidget::closeButtonClicked);
+    connect(ui->TOBox, &WTCheckBox::focusLost, this, &WorkTypeWidget::childLostFocus);
+    connect(ui->TRBox, &WTCheckBox::focusLost, this, &WorkTypeWidget::childLostFocus);
+    connect(ui->KRBox, &WTCheckBox::focusLost, this, &WorkTypeWidget::childLostFocus);
+    connect(ui->MABox, &WTCheckBox::focusLost, this, &WorkTypeWidget::childLostFocus);
+    connect(ui->closeButton, &WTButton::focusLost, this, &WorkTypeWidget::childLostFocus);
+    ui->TOBox->setFocus();
 }
 
 WorkTypeWidget::~WorkTypeWidget()
@@ -22,7 +28,17 @@ WorkTypeWidget::~WorkTypeWidget()
 
 void WorkTypeWidget::setWorkTypes(QString wt)
 {
+    ui->TOBox->blockSignals(true);
+    ui->TRBox->blockSignals(true);
+    ui->KRBox->blockSignals(true);
+    ui->MABox->blockSignals(true);
+    ui->TOBox->setChecked(false);
+    ui->TRBox->setChecked(false);
+    ui->KRBox->setChecked(false);
+    ui->MABox->setChecked(false);
+
     QStringList types = wt.split(",");
+
     for (int i=0; i<types.size(); i++)
     {
         if (types[i].simplified() == "ТО")
@@ -34,6 +50,11 @@ void WorkTypeWidget::setWorkTypes(QString wt)
         else if (types[i].simplified() == "МА")
             ui->MABox->setChecked(true);
     }
+
+    ui->TOBox->blockSignals(false);
+    ui->TRBox->blockSignals(false);
+    ui->KRBox->blockSignals(false);
+    ui->MABox->blockSignals(false);
 }
 
 QString WorkTypeWidget::workTypes()
@@ -52,7 +73,7 @@ QString WorkTypeWidget::workTypes()
     }
     if (ui->MABox->isChecked()) {
         if (result.size() > 0) result += ", ";
-        result += "MA";
+        result += "МА";
     }
     return result;
 }
@@ -64,14 +85,41 @@ void WorkTypeWidget::checkBoxStateChanged()
 }
 
 void WorkTypeWidget::focusOutEvent(QFocusEvent *event)
+{   
+    if (!ui->TOBox->hasFocus() &
+            !ui->TRBox->hasFocus() &
+            !ui->KRBox->hasFocus() &
+            !ui->MABox->hasFocus() &
+            !ui->closeButton->hasFocus())
+    {
+        hide();
+        emit widgetHidden(this);
+    }
+    QWidget::focusOutEvent(event);
+}
+
+void WorkTypeWidget::closeButtonClicked()
 {
-    event->accept();
     hide();
     emit widgetHidden(this);
 }
 
-void WorkTypeWidget::okButtonClicked()
+void WorkTypeWidget::childLostFocus()
 {
-    hide();
-    emit widgetHidden(this);
+    if (!ui->TOBox->hasFocus() &
+            !ui->TRBox->hasFocus() &
+            !ui->KRBox->hasFocus() &
+            !ui->MABox->hasFocus() &
+            !ui->closeButton->hasFocus() &
+            !this->hasFocus())
+    {
+        hide();
+        emit widgetHidden(this);
+    }
+}
+
+void WorkTypeWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    ui->TOBox->setFocus();
 }

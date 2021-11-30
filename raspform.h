@@ -5,6 +5,7 @@
 #include <QMap>
 #include "database.h"
 #include "fieldeditor.h"
+#include "worktypewidget.h"
 
 struct EmpInfo
 {
@@ -33,12 +34,14 @@ private:
     Ui::RaspForm *ui;
     Database *db;
     QMap<QString, EmpInfo> empmap;
-    bool hasMA = true;
+    bool hasMA = false;
     int lastUnitIndex;
     FieldEditor *wEditor;
     FieldEditor *cwEditor;
+    WorkTypeWidget *wtWidget;
     void updateTotal();
     void updateRaspTotal();
+    bool memberAdded(QString member);
 private slots:
     void updateWorkTable();
     void updateMembers();
@@ -54,6 +57,8 @@ private slots:
     void cwInputAccepted();
     void cwInputRejected();
     void okButtonClicked();
+    void workTypesChanged();
+    void checkAddedMembers();
 
 protected:
     void closeEvent(QCloseEvent *event);

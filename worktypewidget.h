@@ -22,14 +22,16 @@ private:
 
 private slots:
     void checkBoxStateChanged();
-    void okButtonClicked();
+    void closeButtonClicked();
+    void childLostFocus();
 
 protected:
     void focusOutEvent(QFocusEvent *event);
+    void showEvent(QShowEvent *event);
 
 signals:
     void typeChanged();
-    void widgetHidden(QWidget *sender);
+    void widgetHidden(WorkTypeWidget *sender);
 };
 
 #endif // WORKTYPEWIDGET_H
