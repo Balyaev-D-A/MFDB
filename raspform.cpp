@@ -466,9 +466,7 @@ bool RaspForm::memberAdded(QString member)
     QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
 
     if (!it) return false;
-
     if (it->text(0) == member) return true;
-
     for (int i=0; i<it->childCount(); i++)
     {
         if (it->child(i)->text(0) == member) return true;

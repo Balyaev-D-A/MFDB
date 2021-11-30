@@ -95,7 +95,7 @@ void ImportForm::importButtonClicked()
         }
         query +=")";
         if (!db->pq->exec(query)) {
-            QMessageBox::critical(this, "Ошибка выполнения запроса!", "Ошибка выполнения запроса: " + db->pq->lastError().text());
+            db->showError(this);
             db->pdb->rollback();
             return;
         }

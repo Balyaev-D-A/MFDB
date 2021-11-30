@@ -162,7 +162,6 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
     if (headers[0] == "id")
         ui->table->hideColumn(0);
     ui->table->verticalHeader()->hide();
-    ui->table->setSortingEnabled(true);
     updateData();
 }
 
@@ -222,7 +221,7 @@ void DictionaryForm::addRecord()
             ui->table->setSortingEnabled(true);
         }
     } else {
-        qDebug() << "Ошибка выполнения запроса";
+        db->showError(this);
 }
 }
 
@@ -235,7 +234,7 @@ void DictionaryForm::deleteRecord()
     if (db->pq->exec("delete from " + dbTable + " where " + fields.at(0) + "=" + crId))
         ui->table->removeRow(cr);
     else
-        qDebug() << "Ошибка выполнения запроса";//TODO: Обработка ошибки
+        db->showError(this);
 }
 
 void DictionaryForm::cellDoubleClicked(int row, int column)
@@ -250,7 +249,8 @@ void DictionaryForm::cellDoubleClicked(int row, int column)
                 ui->table->item(row, column)->setCheckState(Qt::Checked);
         }
         else {
-            return; //TODO: Обработка ошибки
+            db->showError(this);
+            return;
         }
     }
     else if ((fieldTypes.at(column) == "int") || (fieldTypes.at(column) == "int1")) {
@@ -292,7 +292,7 @@ void DictionaryForm::inputAccepted()
         ui->table->item(editor->getRow(), editor->getColumn())->setText(editor->text());
         ui->table->resizeColumnToContents(editor->getColumn());
     } else
-        qDebug() << "Ошибка выполнения запроса: " + db->lastError().databaseText();//TODO: Обработка ошибки
+        db->showError(this);
 
     editor->hide();
     ui->table->setFocus();
@@ -312,8 +312,6 @@ void DictionaryForm::importBtnClicked()
 
 void DictionaryForm::importFormClosed()
 {
-    disconnect(importForm, &ImportForm::closed, this, &DictionaryForm::importFormClosed);
-    delete importForm;
-    importForm = nullptr;
+    importForm->deleteLater();
     updateData();
 }
