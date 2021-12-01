@@ -60,8 +60,9 @@ bool Database::deployTables()
                   "iss_default bool default false)")) return false;
 
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
-    if (!pq->exec("create table if not exists rasp (rasp_id serial primary key, rasp_num char(6), rasp_date char(10), rasp_btime char(5),"
-                  " rasp_etime char(5), rasp_issuer integer references issuers(iss_id), rasp_executor integer references employees(emp_id))")) return false;
+    if (!pq->exec("create table if not exists rasp (rasp_id serial primary key, rasp_num char(6), rasp_date char(10), rasp_btime char(5), "
+                  "rasp_etime char(5), rasp_issuer integer references issuers(iss_id), rasp_executor integer references employees(emp_id), "
+                  "rasp_completed bool default 'false')")) return false;
 
     if (!pq->exec("create table if not exists rmembers (rm_id serial primary key, rm_rasp integer references rasp(rasp_id), "
                   "rm_emp integer references employees(emp_id))")) return false;

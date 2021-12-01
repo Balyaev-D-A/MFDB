@@ -428,7 +428,72 @@ void RaspForm::okButtonClicked()
     QString query;
 
     if (currentRasp < 0) {
-        query = "insert into rasp (rasp_num, rasp_date, rasp_btime, rasp_etime, rasp_issuing, ";
+        query = "insert into rasp (rasp_num, rasp_date, rasp_btime, rasp_etime, rasp_issuer, rasp_executor) "
+                "values (:num, :date, :btime, :etime, :issuer, "
+                "(select emp_id from employees where emp_name = :executor limit 1))";
+        db->pq->prepare(query);
+        db->pq->bindValue(":num", ui->numEdit->text());
+        db->pq->bindValue(":date", ui->dateEdit->text());
+        db->pq->bindValue(":btime", ui->bTimeEdit->text());
+        db->pq->bindValue(":etime", ui->eTimeEdit->text());
+        db->pq->bindValue(":issuer", ui->issuerBox->currentData());
+        db->pq->bindValue(":executor", ui->teamTree->topLevelItem(0)->text(0));
+
+        db->pdb->transaction();
+        if (!db->pq->exec()) {
+            db->pdb->rollback();
+            db->showError(this);
+            return;
+        }
+        int id = db->pq->lastInsertId().toInt();
+        query = "insert into rmembers (rm_rasp, rm_emp) values (:rasp, "
+                "(select emp_id from employees where emp_name = :emp limit 1))";
+        db->pq->prepare(query);
+        QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
+        for (int i=0; i<it->childCount(); i++)
+        {
+            db->pq->bindValue(":rasp", id);
+            db->pq->bindValue(":emp", it->child(i)->text(0));
+            if (!db->pq->exec()) {
+                db->pdb->rollback();
+                db->showError(this);
+                return;
+            }
+        }
+
+        query = "insert into requipment (re_rasp, re_equip, re_worktype) values (:rasp, :equip, :worktype)";
+        db->pq->prepare(query);
+        for (int i=0; i<ui->currWorkTable->rowCount(); i++)
+        {
+            db->pq->bindValue(":rasp", id);
+            db->pq->bindValue(":equip", ui->currWorkTable->item(i, 0)->text());
+            db->pq->bindValue(":worktype", ui->currWorkTable->item(i, 3)->text());
+            if (!db->pq->exec()) {
+                db->pdb->rollback();
+                db->showError(this);
+                return;
+            }
+        }
+        db->pdb->commit();
+    }
+    else {
+        query = "update rasp set rasp_num = :num, rasp_date = :date, rasp_btime = :btime, rasp_etime = :etime, "
+                "rasp_issuer = :issuer, rasp_executor = (select emp_id from employees where emp_name = :executor limit 1)";
+        db->pq->prepare(query);
+        db->pq->bindValue(":num", ui->numEdit->text());
+        db->pq->bindValue(":date", ui->dateEdit->text());
+        db->pq->bindValue(":btime", ui->bTimeEdit->text());
+        db->pq->bindValue(":etime", ui->eTimeEdit->text());
+        db->pq->bindValue(":issuer", ui->issuerBox->currentData());
+        db->pq->bindValue(":executor", ui->teamTree->topLevelItem(0)->text(0));
+        db->pdb->transaction();
+        if (!db->pq->exec()) {
+            db->pdb->rollback();
+            db->showError(this);
+            return;
+        }
+        query = "delete from rmembers where rmrasp = " + QString("%d").arg(currentRasp);
+
     }
 }
 
