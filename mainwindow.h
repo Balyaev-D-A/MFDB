@@ -32,6 +32,7 @@ private slots:
     void locationsTriggered();
     void addRaspClicked();
     void raspFormClosed(RaspForm *sender);
+    void updateRaspTable();
 
 protected:
     void showEvent(QShowEvent *event);

@@ -41,6 +41,8 @@ RaspForm::RaspForm(QWidget *parent) :
     connect(ui->teamList, &DragDropList::itemDroped, this, &RaspForm::removeMemberClicked);
     connect(ui->teamTree, &DragDropTree::itemDroped, this, &RaspForm::addMemberClicked);
     connect(wtWidget, &WorkTypeWidget::typeChanged, this, &RaspForm::workTypesChanged);
+    connect(ui->saveButton, &QPushButton::clicked, this, &RaspForm::saveButtonClicked);
+    connect(ui->cancelButton, &QPushButton::clicked, this, &RaspForm::cancelButtonClicked);
 }
 
 RaspForm::~RaspForm()
@@ -413,7 +415,7 @@ void RaspForm::cwInputRejected()
     cwEditor->hide();
 }
 
-void RaspForm::okButtonClicked()
+void RaspForm::saveButtonClicked()
 {
     if (ui->currWorkTable->rowCount() == 0) {
         QMessageBox::critical(this, "Невозможно сохранить распоряжение!", "Список работ по распоряжению пуст. Добавьте работы по распоряжению.");
@@ -428,47 +430,51 @@ void RaspForm::okButtonClicked()
     QString query;
 
     if (currentRasp < 0) {
-        query = "insert into rasp (rasp_num, rasp_date, rasp_btime, rasp_etime, rasp_issuer, rasp_executor) "
-                "values (:num, :date, :btime, :etime, :issuer, "
-                "(select emp_id from employees where emp_name = :executor limit 1))";
-        db->pq->prepare(query);
-        db->pq->bindValue(":num", ui->numEdit->text());
-        db->pq->bindValue(":date", ui->dateEdit->text());
-        db->pq->bindValue(":btime", ui->bTimeEdit->text());
-        db->pq->bindValue(":etime", ui->eTimeEdit->text());
-        db->pq->bindValue(":issuer", ui->issuerBox->currentData());
-        db->pq->bindValue(":executor", ui->teamTree->topLevelItem(0)->text(0));
+        query = "insert into rasp (rasp_num, rasp_date, rasp_btime, rasp_etime, rasp_issuer, rasp_completed, rasp_executor) "
+                "values ('%1', '%2', '%3', '%4', %5, %6, "
+                "(select emp_id from employees where emp_name = '%7' limit 1))";
+
+        query = query.arg(ui->numEdit->text());
+        query = query.arg(ui->dateEdit->text());
+        query = query.arg(ui->bTimeEdit->text());
+        query = query.arg(ui->eTimeEdit->text());
+        query = query.arg(ui->issuerBox->currentData().toInt());
+        if (ui->allCompletedCheckBox->isChecked())
+            query = query.arg("true");
+        else
+            query = query.arg("false");
+        query = query.arg(ui->teamTree->topLevelItem(0)->text(0));
 
         db->pdb->transaction();
-        if (!db->pq->exec()) {
+        if (!db->pq->exec(query)) {
+            QMessageBox::information(this, "QUERY", query);
             db->pdb->rollback();
             db->showError(this);
             return;
         }
+
         int id = db->pq->lastInsertId().toInt();
-        query = "insert into rmembers (rm_rasp, rm_emp) values (:rasp, "
-                "(select emp_id from employees where emp_name = :emp limit 1))";
-        db->pq->prepare(query);
+        query = "insert into rmembers (rm_rasp, rm_emp) values (%1, "
+                "(select emp_id from employees where emp_name = '%2' limit 1))";
         QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
+
         for (int i=0; i<it->childCount(); i++)
         {
-            db->pq->bindValue(":rasp", id);
-            db->pq->bindValue(":emp", it->child(i)->text(0));
-            if (!db->pq->exec()) {
+            if (!db->pq->exec(query.arg(id).arg(it->child(i)->text(0)))) {
                 db->pdb->rollback();
                 db->showError(this);
                 return;
             }
         }
 
-        query = "insert into requipment (re_rasp, re_equip, re_worktype) values (:rasp, :equip, :worktype)";
-        db->pq->prepare(query);
+        query = "insert into requipment (re_rasp, re_equip, re_worktype) values (%1, %2, '%3')";
+        QString q;
         for (int i=0; i<ui->currWorkTable->rowCount(); i++)
         {
-            db->pq->bindValue(":rasp", id);
-            db->pq->bindValue(":equip", ui->currWorkTable->item(i, 0)->text());
-            db->pq->bindValue(":worktype", ui->currWorkTable->item(i, 3)->text());
-            if (!db->pq->exec()) {
+            q = query.arg(id);
+            q = q.arg(ui->currWorkTable->item(i, 0)->text());
+            q = q.arg(ui->currWorkTable->item(i, 3)->text());
+            if (!db->pq->exec(q)) {
                 db->pdb->rollback();
                 db->showError(this);
                 return;
@@ -477,24 +483,68 @@ void RaspForm::okButtonClicked()
         db->pdb->commit();
     }
     else {
-        query = "update rasp set rasp_num = :num, rasp_date = :date, rasp_btime = :btime, rasp_etime = :etime, "
-                "rasp_issuer = :issuer, rasp_executor = (select emp_id from employees where emp_name = :executor limit 1)";
-        db->pq->prepare(query);
-        db->pq->bindValue(":num", ui->numEdit->text());
-        db->pq->bindValue(":date", ui->dateEdit->text());
-        db->pq->bindValue(":btime", ui->bTimeEdit->text());
-        db->pq->bindValue(":etime", ui->eTimeEdit->text());
-        db->pq->bindValue(":issuer", ui->issuerBox->currentData());
-        db->pq->bindValue(":executor", ui->teamTree->topLevelItem(0)->text(0));
+        query = "update rasp set rasp_num = '%1', rasp_date = '%2', rasp_btime = '%3', rasp_etime = '%4', "
+                "rasp_issuer = %5, rasp_completed = %6, "
+                "rasp_executor = (select emp_id from employees where emp_name = '%7' limit 1)";
+
+        query = query.arg(ui->numEdit->text());
+        query = query.arg(ui->dateEdit->text());
+        query = query.arg(ui->bTimeEdit->text());
+        query = query.arg(ui->eTimeEdit->text());
+        query = query.arg(ui->issuerBox->currentData().toInt());
+        if (ui->allCompletedCheckBox->isChecked())
+            query = query.arg("true");
+        else
+            query = query.arg("false");
+        query = query.arg(ui->teamTree->topLevelItem(0)->text(0));
         db->pdb->transaction();
         if (!db->pq->exec()) {
             db->pdb->rollback();
             db->showError(this);
             return;
         }
-        query = "delete from rmembers where rmrasp = " + QString("%d").arg(currentRasp);
+        query = "delete from rmembers where rm_rasp = " + QString("%1").arg(currentRasp);
+        if (!db->pq->exec(query)) {
+            db->pdb->rollback();
+            db->showError(this);
+            return;
+        }
+        query = "delete from requipment where re_rasp = " + QString("%1").arg(currentRasp);
+        if (!db->pq->exec(query)) {
+            db->pdb->rollback();
+            db->showError(this);
+            return;
+        }
 
+        query = "insert into rmembers (rm_rasp, rm_emp) values (%1, "
+                "(select emp_id from employees where emp_name = '%2' limit 1))";
+        QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
+
+        for (int i=0; i<it->childCount(); i++)
+        {
+            if (!db->pq->exec(query.arg(currentRasp).arg(it->child(i)->text(0)))) {
+                db->pdb->rollback();
+                db->showError(this);
+                return;
+            }
+        }
+
+        query = "insert into requipment (re_rasp, re_equip, re_worktype) values (%1, %2, '%3')";
+        QString q;
+        for (int i=0; i<ui->currWorkTable->rowCount(); i++)
+        {
+            q = query.arg(currentRasp);
+            q = q.arg(ui->currWorkTable->item(i, 0)->text());
+            q = q.arg(ui->currWorkTable->item(i, 3)->text());
+            if (!db->pq->exec(q)) {
+                db->pdb->rollback();
+                db->showError(this);
+                return;
+            }
+        }
+        db->pdb->commit();
     }
+    close();
 }
 
 void RaspForm::workTypesChanged()
@@ -537,4 +587,16 @@ bool RaspForm::memberAdded(QString member)
         if (it->child(i)->text(0) == member) return true;
     }
     return false;
+}
+
+void RaspForm::cancelButtonClicked()
+{
+    if ((ui->currWorkTable->rowCount() > 0) |
+        (ui->teamTree->topLevelItemCount() > 0))
+    {
+        QMessageBox::StandardButton btn = QMessageBox::question(this, "Внимание!!!", "Все изменения будут уничтожены. Вы действительно хотите отменить изменения?");
+        if (btn == QMessageBox::No)
+            return;
+    }
+    close();
 }

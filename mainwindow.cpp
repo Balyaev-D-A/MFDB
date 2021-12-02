@@ -10,6 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->raspTable->hideColumn(0);
+
     db = new Database;
     dictionaryForm = new DictionaryForm();
     dictionaryForm->setDatabase(db);
@@ -31,15 +34,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::showEvent(QShowEvent *event)
 {
+    QMainWindow::showEvent(event);
+
     if (!connectDB("127.0.0.1", "itcrk", "itcrk", "123321")) {
-        QMessageBox::critical(this, "Ошибка", "Невозможно подключиться к базе");
+        db->showError(this);
     }
     ui->raspDateEdit->setDate(QDate::currentDate());
     ui->taskDateEdit->setDate(QDate::currentDate());
-    db->pq->exec("select emp_name, emp_id from employees where emp_metrolog='false'");
+    db->pq->exec("select emp_name, emp_id from employees where emp_metrolog = false and emp_hidden = false order by emp_name");
+    ui->employeeBox->addItem("Все", 0);
     while (db->pq->next())
         ui->employeeBox->addItem(db->pq->value(0).toString(), db->pq->value(1));
-    QMainWindow::showEvent(event);
+    updateRaspTable();
 }
 
 bool MainWindow::connectDB(QString host, QString dbname, QString user, QString password)
@@ -95,4 +101,33 @@ void MainWindow::raspFormClosed(RaspForm *sender)
 {
     disconnect(sender, &RaspForm::closed, this, &MainWindow::raspFormClosed);
     delete sender;
+}
+
+void MainWindow::updateRaspTable()
+{
+    QString query = "select rasp_id, emp_name, rasp_num, rasp_executor, unit_name, sum(sch_hours) from rasp r "
+                    "left join requipment re on r.rasp_id = re.re_rasp "
+                    "left join schedule sh on sh.sch_id = re.re_equip "
+                    "left join units u on sh.sch_unit = u.unit_id "
+                    "left join employees e on e.emp_id = r.rasp_executor "
+                    "where rasp_date = '%1' group by emp_name, rasp_id, unit_name order by rasp_id";
+    query = query.arg(ui->raspDateEdit->text());
+    if (!db->pq->exec(query)) {
+        db->showError(this);
+        return;
+    }
+
+    while (ui->raspTable->rowCount() > 0) ui->raspTable->removeRow(0);
+    ui->raspTable->setSortingEnabled(false);
+    for (int i=0; db->pq->next(); i++)
+    {
+        ui->raspTable->insertRow(i);
+        ui->raspTable->setItem(i, 0, new QTableWidgetItem(db->pq->value(0).toString()));
+        ui->raspTable->setItem(i, 1, new QTableWidgetItem(db->pq->value(1).toString()));
+        ui->raspTable->setItem(i, 2, new QTableWidgetItem(db->pq->value(2).toString()));
+        ui->raspTable->setItem(i, 3, new QTableWidgetItem(db->pq->value(3).toString()));
+        ui->raspTable->setItem(i, 5, new QTableWidgetItem(db->pq->value(4).toString()));
+    }
+    ui->raspTable->setSortingEnabled(true);
+
 }

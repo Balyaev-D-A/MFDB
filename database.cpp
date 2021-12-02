@@ -64,10 +64,10 @@ bool Database::deployTables()
                   "rasp_etime char(5), rasp_issuer integer references issuers(iss_id), rasp_executor integer references employees(emp_id), "
                   "rasp_completed bool default 'false')")) return false;
 
-    if (!pq->exec("create table if not exists rmembers (rm_id serial primary key, rm_rasp integer references rasp(rasp_id), "
+    if (!pq->exec("create table if not exists rmembers (rm_id serial primary key, rm_rasp integer references rasp(rasp_id) on delete cascade, "
                   "rm_emp integer references employees(emp_id))")) return false;
 
-    if (!pq->exec("create table if not exists requipment (re_id serial primary key, re_rasp integer references rasp(rasp_id), "
+    if (!pq->exec("create table if not exists requipment (re_id serial primary key, re_rasp integer references rasp(rasp_id) on delete cascade, "
                   "re_equip integer references schedule(sch_id), re_worktype char(16))")) return false;
 
     return true;

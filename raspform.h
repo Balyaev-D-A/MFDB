@@ -57,9 +57,10 @@ private slots:
     void wInputRejected();
     void cwInputAccepted();
     void cwInputRejected();
-    void okButtonClicked();
     void workTypesChanged();
     void checkAddedMembers();
+    void saveButtonClicked();
+    void cancelButtonClicked();
 
 protected:
     void closeEvent(QCloseEvent *event);
