@@ -157,7 +157,7 @@ QString MainWindow::makeRaspEquipments(QStringList equip)
     QString result = "";
 
     for (int i=0; i<equip.size(); i++) eqMap[equip[i]] = 0;  //Заполняем ключи
-    for (int i=0; i<equip.size(); i++) eqMap[equip[i]]++;
+    for (int i=0; i<equip.size(); i++) eqMap[equip[i]]++;    //Подсчет
     QMap<QString, int>::const_iterator i = eqMap.constBegin();
     while (i != eqMap.constEnd())
     {
