@@ -430,14 +430,12 @@ void RaspForm::saveButtonClicked()
     QString query;
 
     if (currentRasp < 0) {
-        query = "insert into rasp (rasp_num, rasp_date, rasp_btime, rasp_etime, rasp_issuer, rasp_completed, rasp_executor) "
-                "values ('%1', '%2', '%3', '%4', %5, %6, "
-                "(select emp_id from employees where emp_name = '%7' limit 1))";
+        query = "insert into rasp (rasp_num, rasp_date, rasp_issuer, rasp_completed, rasp_executor) "
+                "values ('%1', '%2', '%3', '%4', "
+                "(select emp_id from employees where emp_name = '%5' limit 1))";
 
         query = query.arg(ui->numEdit->text());
         query = query.arg(ui->dateEdit->text());
-        query = query.arg(ui->bTimeEdit->text());
-        query = query.arg(ui->eTimeEdit->text());
         query = query.arg(ui->issuerBox->currentData().toInt());
         if (ui->allCompletedCheckBox->isChecked())
             query = query.arg("true");
@@ -483,14 +481,12 @@ void RaspForm::saveButtonClicked()
         db->pdb->commit();
     }
     else {
-        query = "update rasp set rasp_num = '%1', rasp_date = '%2', rasp_btime = '%3', rasp_etime = '%4', "
-                "rasp_issuer = %5, rasp_completed = %6, "
-                "rasp_executor = (select emp_id from employees where emp_name = '%7' limit 1)";
+        query = "update rasp set rasp_num = '%1', rasp_date = '%2', "
+                "rasp_issuer = %3, rasp_completed = %4, "
+                "rasp_executor = (select emp_id from employees where emp_name = '%5' limit 1)";
 
         query = query.arg(ui->numEdit->text());
         query = query.arg(ui->dateEdit->text());
-        query = query.arg(ui->bTimeEdit->text());
-        query = query.arg(ui->eTimeEdit->text());
         query = query.arg(ui->issuerBox->currentData().toInt());
         if (ui->allCompletedCheckBox->isChecked())
             query = query.arg("true");

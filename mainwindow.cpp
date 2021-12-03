@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->aIssuers, &QAction::triggered, this, &MainWindow::issuersTriggered);
     connect(ui->aLocations, &QAction::triggered, this, &MainWindow::locationsTriggered);
     connect(ui->addRaspButton, &QToolButton::clicked, this, &MainWindow::addRaspClicked);
-
+    connect(ui->raspDateEdit, &QDateEdit::dateChanged, this, &MainWindow::raspDateChanged);
 }
 
 MainWindow::~MainWindow()
@@ -99,13 +99,13 @@ void MainWindow::addRaspClicked()
 
 void MainWindow::raspFormClosed(RaspForm *sender)
 {
-    disconnect(sender, &RaspForm::closed, this, &MainWindow::raspFormClosed);
-    delete sender;
+    updateRaspTable();
+    sender->deleteLater();
 }
 
 void MainWindow::updateRaspTable()
 {
-    QString query = "select rasp_id, emp_name, rasp_num, rasp_executor, unit_name, sum(sch_hours) from rasp r "
+    QString query = "select rasp_id, rasp_num, emp_name, unit_name, sum(sch_hours) from rasp r "
                     "left join requipment re on r.rasp_id = re.re_rasp "
                     "left join schedule sh on sh.sch_id = re.re_equip "
                     "left join units u on sh.sch_unit = u.unit_id "
@@ -126,8 +126,73 @@ void MainWindow::updateRaspTable()
         ui->raspTable->setItem(i, 1, new QTableWidgetItem(db->pq->value(1).toString()));
         ui->raspTable->setItem(i, 2, new QTableWidgetItem(db->pq->value(2).toString()));
         ui->raspTable->setItem(i, 3, new QTableWidgetItem(db->pq->value(3).toString()));
-        ui->raspTable->setItem(i, 5, new QTableWidgetItem(db->pq->value(4).toString()));
+        ui->raspTable->setItem(i, 6, new QTableWidgetItem(db->pq->value(4).toString()));
+    }
+    query = "select sch_type, re_worktype  from requipment re left join schedule sch on re.re_equip = sch.sch_id where re_rasp = ";
+    QStringList equip;
+    QStringList wt;
+    for (int i=0; i<ui->raspTable->rowCount(); i++)
+    {
+        if(!db->pq->exec(query + ui->raspTable->item(i, 0)->text())) {
+            db->showError(this);
+            return;
+        }
+        equip.clear();
+        wt.clear();
+        for (int j=0; db->pq->next(); j++)
+        {
+            equip.append(db->pq->value(0).toString());
+            wt.append(db->pq->value(1).toString());
+        }
+        ui->raspTable->setItem(i, 4, new QTableWidgetItem(makeRaspEquipments(equip)));
+        ui->raspTable->setItem(i, 5, new QTableWidgetItem(makeRaspWoktypes(wt)));
     }
     ui->raspTable->setSortingEnabled(true);
+    ui->raspTable->resizeColumnsToContents();
+}
 
+QString MainWindow::makeRaspEquipments(QStringList equip)
+{
+    QMap<QString, int> eqMap;
+    QString result = "";
+
+    for (int i=0; i<equip.size(); i++) eqMap[equip[i]] = 0;  //Заполняем ключи
+    for (int i=0; i<equip.size(); i++) eqMap[equip[i]]++;
+    QMap<QString, int>::const_iterator i = eqMap.constBegin();
+    while (i != eqMap.constEnd())
+    {
+        result += i.key() + " (" + QString("%1").arg(i.value()) + " шт.)";
+        i++;
+        if (i != eqMap.constEnd()) result += ", ";
+    }
+    return result;
+}
+
+QString MainWindow::makeRaspWoktypes(QStringList wt)
+{
+    QStringList wtList;
+    QMap<QString, int> wtMap;
+    QString result = "";
+
+    for (int i=0; i<wt.size(); i++)
+    {
+        QStringList l = wt[i].split(",");
+        wtList.append(l);
+    }
+
+    for (int i=0; i<wtList.size(); i++) wtMap[wtList[i]] = 0;
+    for (int i=0; i<wtList.size(); i++) wtMap[wtList[i]]++;
+    QMap<QString, int>::const_iterator i = wtMap.constBegin();
+    while (i != wtMap.constEnd())
+    {
+        result += i.key().simplified() + "(" + QString("%1").arg(i.value()) + ")";
+        i++;
+        if (i != wtMap.constEnd()) result += ", ";
+    }
+    return result;
+}
+
+void MainWindow::raspDateChanged()
+{
+    updateRaspTable();
 }

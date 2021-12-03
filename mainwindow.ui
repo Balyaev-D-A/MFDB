@@ -280,6 +280,9 @@
             <property name="sortingEnabled">
              <bool>true</bool>
             </property>
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
             <column>
              <property name="text">
               <string>Id</string>
@@ -307,12 +310,12 @@
             </column>
             <column>
              <property name="text">
-              <string>Часы</string>
+              <string>Работы</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Отработано</string>
+              <string>Часы</string>
              </property>
             </column>
            </widget>

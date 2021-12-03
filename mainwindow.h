@@ -24,6 +24,8 @@ private:
     Database *db;
     bool adminMode;
     DictionaryForm *dictionaryForm;
+    QString makeRaspEquipments(QStringList equip);
+    QString makeRaspWoktypes(QStringList wt);
 private slots:
     void employeesTriggered();
     void scheduleTriggered();
@@ -33,6 +35,7 @@ private slots:
     void addRaspClicked();
     void raspFormClosed(RaspForm *sender);
     void updateRaspTable();
+    void raspDateChanged();
 
 protected:
     void showEvent(QShowEvent *event);
