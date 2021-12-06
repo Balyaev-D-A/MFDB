@@ -117,7 +117,7 @@ void RaspForm::updateWorkTable()
         query += "and sch_date = '" + month + "'";
 
     if (!db->pq->exec(query)) {
-        QMessageBox::critical(this, "Ошибка выполнения запроса!", "Ошибка выполнения запроса: " + db->pq->lastError().text());
+        db->showError(this);
         return;
     }
 
@@ -543,15 +543,20 @@ void RaspForm::saveButtonClicked()
     close();
 }
 
-void RaspForm::workTypesChanged()
+void RaspForm::checkMA()
 {
-    ui->currWorkTable->item(ui->currWorkTable->currentRow(), 3)->setText(wtWidget->workTypes());
     hasMA = false;
     for (int i=0; i<ui->currWorkTable->rowCount(); i++)
     {
         if (ui->currWorkTable->item(i, 3)->text().contains("МА"))
             hasMA = true;
     }
+}
+
+void RaspForm::workTypesChanged()
+{
+    ui->currWorkTable->item(ui->currWorkTable->currentRow(), 3)->setText(wtWidget->workTypes());
+    checkMA();
     checkAddedMembers();
     updateMembers();
 }
@@ -595,4 +600,98 @@ void RaspForm::cancelButtonClicked()
             return;
     }
     close();
+}
+
+bool RaspForm::editRasp(QString raspId)
+{
+    int executorId;
+
+    ui->unitBox->blockSignals(true);
+    ui->monthBox->blockSignals(true);
+
+    db->pq->exec("select iss_id, iss_name, iss_default from issuers");
+    while (db->pq->next())
+        ui->issuerBox->addItem(db->pq->value(1).toString(), db->pq->value(0));
+
+    db->pq->exec("select unit_id, unit_name from units order by unit_name");
+    while (db->pq->next())
+        ui->unitBox->addItem(db->pq->value(1).toString(), db->pq->value(0));
+    lastUnitIndex = 0;
+    ui->unitBox->blockSignals(false);
+    ui->monthBox->blockSignals(false);
+    ui->currWorkTable->hideColumn(0);
+    ui->workTable->hideColumn(0);
+
+    QString query = "select rasp_num, rasp_date, rasp_issuer, rasp_executor, rasp_completed from rasp "
+                    "where rasp_id = " + raspId;
+    if (!db->pq->exec(query)) {
+        db->showError(this);
+        return false;
+    }
+
+
+    while (db->pq->next())
+    {
+        ui->numEdit->setText(db->pq->value(0).toString());
+        QStringList d = db->pq->value(1).toString().split(".");
+        ui->dateEdit->setDate(QDate(d[2].toInt(), d[1].toInt(), d[0].toInt()));
+        ui->monthBox->setCurrentIndex(d[1].toInt());
+//        ui->issuerBox->setCurrentIndex(ui->issuerBox->findData(db->pq->value(2)));
+//        ui->completedCheckBox->setChecked(db->pq->value(4).toBool());
+        executorId = 38; //db->pq->value(3).toInt();
+    }
+
+    query = "select sch_id, sch_kks, sch_type, re_worktype, loc_location, sch_hours, sch_unit from requipment re "
+            "left join schedule sch on sch.sch_id = re_equip "
+            "left join locations loc on loc.loc_kks = sch.sch_kks "
+            "where re_rasp = " + raspId;
+
+    if (!db->pq->exec(query)) {
+       db->showError(this);
+       return false;
+    }
+
+    ui->currWorkTable->setSortingEnabled(false);
+    for (int i=0; db->pq->next(); i++)
+    {
+        if (!i) ui->unitBox->setCurrentIndex(ui->unitBox->findData(db->pq->value(6)));
+        ui->currWorkTable->insertRow(i);
+        for (int j=0; j<6; j++)
+        {
+            ui->currWorkTable->setItem(i, j, new QTableWidgetItem(db->pq->value(j).toString()));
+            QMessageBox::information(this, "info", db->pq->value(j).toString());
+        }
+    }
+    ui->currWorkTable->setSortingEnabled(true);
+    checkMA();
+    updateWorkTable();
+    updateMembers();
+    for (int i=0; i<ui->teamList->count(); i++)
+    {
+        if (empmap[ui->teamList->item(i)->text()].id == executorId) {
+            ui->teamList->setCurrentRow(i);
+            addMemberClicked();
+            break;
+        }
+    }
+
+    query = "select rm_emp from rmembers where rm_rasp = " + raspId;
+    if (!db->pq->exec(query)) {
+        db->showError(this);
+        return false;
+    }
+
+    while (db->pq->next())
+    {
+        for (int i=0; i<ui->teamList->count(); i++)
+        {
+            if (empmap[ui->teamList->item(i)->text()].id == db->pq->value(0).toInt()) {
+                ui->teamList->setCurrentRow(i);
+                addMemberClicked();
+                break;
+            }
+        }
+    }
+
+    return true;
 }

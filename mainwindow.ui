@@ -323,6 +323,23 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
+             <widget class="QToolButton" name="updateRaspButton">
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resource.qrc">
+                <normaloff>:/icons/refresh.png</normaloff>:/icons/refresh.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QToolButton" name="addRaspButton">
               <property name="text">
                <string>...</string>
@@ -346,7 +363,7 @@
               </property>
               <property name="icon">
                <iconset resource="resource.qrc">
-                <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
+                <normaloff>:/icons/edit.png</normaloff>:/icons/edit.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -380,7 +397,24 @@
               </property>
               <property name="icon">
                <iconset resource="resource.qrc">
-                <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
+                <normaloff>:/icons/selectall.png</normaloff>:/icons/selectall.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="printButton">
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resource.qrc">
+                <normaloff>:/icons/print.png</normaloff>:/icons/print.png</iconset>
               </property>
               <property name="iconSize">
                <size>

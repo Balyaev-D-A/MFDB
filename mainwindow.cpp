@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->aLocations, &QAction::triggered, this, &MainWindow::locationsTriggered);
     connect(ui->addRaspButton, &QToolButton::clicked, this, &MainWindow::addRaspClicked);
     connect(ui->raspDateEdit, &QDateEdit::dateChanged, this, &MainWindow::raspDateChanged);
+    connect(ui->editRaspButton, &QToolButton::clicked, this, &MainWindow::editRaspClicked);
 }
 
 MainWindow::~MainWindow()
@@ -37,7 +38,8 @@ void MainWindow::showEvent(QShowEvent *event)
     QMainWindow::showEvent(event);
 
     if (!connectDB("127.0.0.1", "itcrk", "itcrk", "123321")) {
-        db->showError(this);
+        QMessageBox::critical(this, "Ошибка!!!", "Невозможно установить соединение с сервером БД!");
+        return;
     }
     ui->raspDateEdit->setDate(QDate::currentDate());
     ui->taskDateEdit->setDate(QDate::currentDate());
@@ -195,4 +197,13 @@ QString MainWindow::makeRaspWoktypes(QStringList wt)
 void MainWindow::raspDateChanged()
 {
     updateRaspTable();
+}
+
+void MainWindow::editRaspClicked()
+{
+    RaspForm *rf = new RaspForm();
+    rf->setDatabase(db);
+    connect(rf, &RaspForm::closed, this, &MainWindow::raspFormClosed);
+    rf->editRasp(ui->raspTable->item(ui->raspTable->currentRow(), 0)->text());
+    rf->show();
 }

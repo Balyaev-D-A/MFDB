@@ -7,6 +7,9 @@
         <file>icons/metrolog.png</file>
         <file>icons/technic.png</file>
         <file>tr/qtbase_ru.qm</file>
+        <file>icons/edit.png</file>
+        <file>icons/print.png</file>
+        <file>icons/selectall.png</file>
     </qresource>
     <qresource prefix="/tr"/>
 </RCC>

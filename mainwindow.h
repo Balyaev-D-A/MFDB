@@ -36,6 +36,7 @@ private slots:
     void raspFormClosed(RaspForm *sender);
     void updateRaspTable();
     void raspDateChanged();
+    void editRaspClicked();
 
 protected:
     void showEvent(QShowEvent *event);

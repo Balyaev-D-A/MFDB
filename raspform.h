@@ -25,7 +25,7 @@ public:
     explicit RaspForm(QWidget *parent = nullptr);
     ~RaspForm();
     void setDatabase(Database *db);
-//    void editRasp(int raspId);
+    bool editRasp(QString raspId);
     void newRasp();
 
 
@@ -43,6 +43,7 @@ private:
     void updateTotal();
     void updateRaspTotal();
     bool memberAdded(QString member);
+    void checkMA();
 private slots:
     void updateWorkTable();
     void updateMembers();
