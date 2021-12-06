@@ -605,6 +605,7 @@ void RaspForm::cancelButtonClicked()
 bool RaspForm::editRasp(QString raspId)
 {
     int executorId;
+    QString query;
 
     ui->unitBox->blockSignals(true);
     ui->monthBox->blockSignals(true);
@@ -622,30 +623,31 @@ bool RaspForm::editRasp(QString raspId)
     ui->currWorkTable->hideColumn(0);
     ui->workTable->hideColumn(0);
 
-    QString query = "select rasp_num, rasp_date, rasp_issuer, rasp_executor, rasp_completed from rasp "
-                    "where rasp_id = " + raspId;
-    if (!db->pq->exec(query)) {
-        db->showError(this);
-        return false;
-    }
+//    QString query = "select rasp_num, rasp_date, rasp_issuer, rasp_executor, rasp_completed from rasp "
+//                    "where rasp_id = " + raspId;
+//    if (!db->pq->exec(query)) {
+//        db->showError(this);
+//        return false;
+//    }
 
 
-    while (db->pq->next())
-    {
-        ui->numEdit->setText(db->pq->value(0).toString());
-        QStringList d = db->pq->value(1).toString().split(".");
-        ui->dateEdit->setDate(QDate(d[2].toInt(), d[1].toInt(), d[0].toInt()));
-        ui->monthBox->setCurrentIndex(d[1].toInt());
-//        ui->issuerBox->setCurrentIndex(ui->issuerBox->findData(db->pq->value(2)));
-//        ui->completedCheckBox->setChecked(db->pq->value(4).toBool());
-        executorId = 38; //db->pq->value(3).toInt();
-    }
+//    while (db->pq->next())
+//    {
+//        ui->numEdit->setText(db->pq->value(0).toString());
+//        QStringList d = db->pq->value(1).toString().split(".");
+//        ui->dateEdit->setDate(QDate(d[2].toInt(), d[1].toInt(), d[0].toInt()));
+//        ui->monthBox->setCurrentIndex(d[1].toInt());
+////        ui->issuerBox->setCurrentIndex(ui->issuerBox->findData(db->pq->value(2)));
+////        ui->completedCheckBox->setChecked(db->pq->value(4).toBool());
+//        executorId = 38; //db->pq->value(3).toInt();
+//    }
 
+    executorId = 38;
     query = "select sch_id, sch_kks, sch_type, re_worktype, loc_location, sch_hours, sch_unit from requipment re "
             "left join schedule sch on sch.sch_id = re_equip "
             "left join locations loc on loc.loc_kks = sch.sch_kks "
             "where re_rasp = " + raspId;
-
+    QMessageBox::information(this, "Info", query);
     if (!db->pq->exec(query)) {
        db->showError(this);
        return false;
