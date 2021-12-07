@@ -85,6 +85,8 @@ void RaspForm::newRasp()
     ui->workTable->hideColumn(0);
     updateWorkTable();
     updateMembers();
+    teamChanged = false;
+    worksChanged = false;
 }
 
 void RaspForm::updateWorkTable()
@@ -232,6 +234,7 @@ void RaspForm::addMemberClicked()
         it->setExpanded(true);
         delete ui->teamList->takeItem(ui->teamList->currentRow());
     }
+    teamChanged = true;
 }
 
 void RaspForm::removeMemberClicked()
@@ -270,6 +273,7 @@ void RaspForm::removeMemberClicked()
         ui->teamList->addItem(lwItem);
         delete parent;
     }
+    teamChanged = true;
 }
 
 void RaspForm::addWorkClicked()
@@ -289,6 +293,7 @@ void RaspForm::addWorkClicked()
     ui->workTable->removeRow(curRow);
     ui->currWorkTable->setSortingEnabled(true);
     updateRaspTotal();
+    worksChanged = true;
 }
 
 void RaspForm::removeWorkClicked()
@@ -297,6 +302,7 @@ void RaspForm::removeWorkClicked()
     ui->currWorkTable->removeRow(ui->currWorkTable->currentRow());
     updateWorkTable();
     updateRaspTotal();
+    worksChanged = true;
 }
 
 void RaspForm::unitChanged(const QString &text)
@@ -429,12 +435,15 @@ void RaspForm::saveButtonClicked()
 
     QString query;
 
+    QStringList s = ui->numEdit->text().split("/");
+    QString num = s[0].simplified() + "/" + s[1].simplified();
+
     if (currentRasp < 0) {
         query = "insert into rasp (rasp_num, rasp_date, rasp_issuer, rasp_completed, rasp_executor) "
                 "values ('%1', '%2', '%3', '%4', "
                 "(select emp_id from employees where emp_name = '%5' limit 1))";
 
-        query = query.arg(ui->numEdit->text());
+        query = query.arg(num);
         query = query.arg(ui->dateEdit->text());
         query = query.arg(ui->issuerBox->currentData().toInt());
         if (ui->allCompletedCheckBox->isChecked())
@@ -481,11 +490,12 @@ void RaspForm::saveButtonClicked()
         db->pdb->commit();
     }
     else {
+        db->pdb->transaction();
         query = "update rasp set rasp_num = '%1', rasp_date = '%2', "
                 "rasp_issuer = %3, rasp_completed = %4, "
                 "rasp_executor = (select emp_id from employees where emp_name = '%5' limit 1)";
 
-        query = query.arg(ui->numEdit->text());
+        query = query.arg(num);
         query = query.arg(ui->dateEdit->text());
         query = query.arg(ui->issuerBox->currentData().toInt());
         if (ui->allCompletedCheckBox->isChecked())
@@ -493,49 +503,52 @@ void RaspForm::saveButtonClicked()
         else
             query = query.arg("false");
         query = query.arg(ui->teamTree->topLevelItem(0)->text(0));
-        db->pdb->transaction();
         if (!db->pq->exec()) {
             db->pdb->rollback();
             db->showError(this);
             return;
         }
-        query = "delete from rmembers where rm_rasp = " + QString("%1").arg(currentRasp);
-        if (!db->pq->exec(query)) {
-            db->pdb->rollback();
-            db->showError(this);
-            return;
-        }
-        query = "delete from requipment where re_rasp = " + QString("%1").arg(currentRasp);
-        if (!db->pq->exec(query)) {
-            db->pdb->rollback();
-            db->showError(this);
-            return;
-        }
-
-        query = "insert into rmembers (rm_rasp, rm_emp) values (%1, "
-                "(select emp_id from employees where emp_name = '%2' limit 1))";
-        QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
-
-        for (int i=0; i<it->childCount(); i++)
-        {
-            if (!db->pq->exec(query.arg(currentRasp).arg(it->child(i)->text(0)))) {
+        if (teamChanged) {
+            query = "delete from rmembers where rm_rasp = " + QString("%1").arg(currentRasp);
+            if (!db->pq->exec(query)) {
                 db->pdb->rollback();
                 db->showError(this);
                 return;
             }
+            query = "insert into rmembers (rm_rasp, rm_emp) values (%1, "
+                    "(select emp_id from employees where emp_name = '%2' limit 1))";
+            QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
+
+            for (int i=0; i<it->childCount(); i++)
+            {
+                if (!db->pq->exec(query.arg(currentRasp).arg(it->child(i)->text(0)))) {
+                    db->pdb->rollback();
+                    db->showError(this);
+                    return;
+                }
+            }
         }
 
-        query = "insert into requipment (re_rasp, re_equip, re_worktype) values (%1, %2, '%3')";
-        QString q;
-        for (int i=0; i<ui->currWorkTable->rowCount(); i++)
-        {
-            q = query.arg(currentRasp);
-            q = q.arg(ui->currWorkTable->item(i, 0)->text());
-            q = q.arg(ui->currWorkTable->item(i, 3)->text());
-            if (!db->pq->exec(q)) {
+        if (worksChanged) {
+            query = "delete from requipment where re_rasp = " + QString("%1").arg(currentRasp);
+            if (!db->pq->exec(query)) {
                 db->pdb->rollback();
                 db->showError(this);
                 return;
+            }
+
+            query = "insert into requipment (re_rasp, re_equip, re_worktype) values (%1, %2, '%3')";
+            QString q;
+            for (int i=0; i<ui->currWorkTable->rowCount(); i++)
+            {
+                q = query.arg(currentRasp);
+                q = q.arg(ui->currWorkTable->item(i, 0)->text());
+                q = q.arg(ui->currWorkTable->item(i, 3)->text());
+                if (!db->pq->exec(q)) {
+                    db->pdb->rollback();
+                    db->showError(this);
+                    return;
+                }
             }
         }
         db->pdb->commit();
@@ -559,6 +572,7 @@ void RaspForm::workTypesChanged()
     checkMA();
     checkAddedMembers();
     updateMembers();
+    worksChanged = true;
 }
 
 void RaspForm::checkAddedMembers()
@@ -606,6 +620,32 @@ bool RaspForm::editRasp(QString raspId)
 {
     int executorId;
     QString query;
+    int unitId;
+
+    currentRasp = raspId.toInt();
+
+    query = "select sch_id, sch_kks, sch_type, re_worktype, loc_location, sch_hours, sch_unit from requipment re "
+            "left join schedule sch on sch.sch_id = re_equip "
+            "left join locations loc on loc.loc_kks = sch.sch_kks "
+            "where re_rasp = " + raspId;
+    if (!db->pq->exec(query)) {
+       db->showError(this);
+       return false;
+    }
+
+    ui->currWorkTable->setSortingEnabled(false);
+    for (int i=0; db->pq->next(); i++)
+    {
+        ui->currWorkTable->insertRow(i);
+        for (int j=0; j<6; j++)
+        {
+            ui->currWorkTable->setItem(i, j, new QTableWidgetItem(db->pq->value(j).toString()));
+        }
+    }
+    ui->currWorkTable->setSortingEnabled(true);
+    db->pq->first();
+    unitId = db->pq->value(6).toInt();
+    db->pq->finish();
 
     ui->unitBox->blockSignals(true);
     ui->monthBox->blockSignals(true);
@@ -617,57 +657,39 @@ bool RaspForm::editRasp(QString raspId)
     db->pq->exec("select unit_id, unit_name from units order by unit_name");
     while (db->pq->next())
         ui->unitBox->addItem(db->pq->value(1).toString(), db->pq->value(0));
-    lastUnitIndex = 0;
+    ui->unitBox->setCurrentIndex(ui->unitBox->findData(unitId));
+    lastUnitIndex = ui->unitBox->currentIndex();
     ui->unitBox->blockSignals(false);
     ui->monthBox->blockSignals(false);
     ui->currWorkTable->hideColumn(0);
     ui->workTable->hideColumn(0);
 
-//    QString query = "select rasp_num, rasp_date, rasp_issuer, rasp_executor, rasp_completed from rasp "
-//                    "where rasp_id = " + raspId;
-//    if (!db->pq->exec(query)) {
-//        db->showError(this);
-//        return false;
-//    }
-
-
-//    while (db->pq->next())
-//    {
-//        ui->numEdit->setText(db->pq->value(0).toString());
-//        QStringList d = db->pq->value(1).toString().split(".");
-//        ui->dateEdit->setDate(QDate(d[2].toInt(), d[1].toInt(), d[0].toInt()));
-//        ui->monthBox->setCurrentIndex(d[1].toInt());
-////        ui->issuerBox->setCurrentIndex(ui->issuerBox->findData(db->pq->value(2)));
-////        ui->completedCheckBox->setChecked(db->pq->value(4).toBool());
-//        executorId = 38; //db->pq->value(3).toInt();
-//    }
-
-    executorId = 38;
-    query = "select sch_id, sch_kks, sch_type, re_worktype, loc_location, sch_hours, sch_unit from requipment re "
-            "left join schedule sch on sch.sch_id = re_equip "
-            "left join locations loc on loc.loc_kks = sch.sch_kks "
-            "where re_rasp = " + raspId;
-    QMessageBox::information(this, "Info", query);
-    if (!db->pq->exec(query)) {
-       db->showError(this);
-       return false;
-    }
-
-    ui->currWorkTable->setSortingEnabled(false);
-    for (int i=0; db->pq->next(); i++)
-    {
-        if (!i) ui->unitBox->setCurrentIndex(ui->unitBox->findData(db->pq->value(6)));
-        ui->currWorkTable->insertRow(i);
-        for (int j=0; j<6; j++)
-        {
-            ui->currWorkTable->setItem(i, j, new QTableWidgetItem(db->pq->value(j).toString()));
-            QMessageBox::information(this, "info", db->pq->value(j).toString());
-        }
-    }
-    ui->currWorkTable->setSortingEnabled(true);
     checkMA();
     updateWorkTable();
     updateMembers();
+
+    query = "select rasp_num, rasp_date, rasp_issuer, rasp_executor, rasp_completed from rasp "
+                    "where rasp_id = " + raspId;
+    if (!db->pq->exec(query)) {
+        db->showError(this);
+        return false;
+    }
+
+    if (db->pq->next())
+    {
+        QString num = db->pq->value(0).toString();
+        QString date = db->pq->value(1).toString();
+        QVariant issuer = db->pq->value(2);
+        bool completed = db->pq->value(4).toBool();
+        executorId = db->pq->value(3).toInt();
+        ui->numEdit->setText(num);
+        QStringList d = date.split(".");
+        ui->dateEdit->setDate(QDate(d[2].toInt(), d[1].toInt(), d[0].toInt()));
+        ui->monthBox->setCurrentIndex(d[1].toInt());
+        ui->issuerBox->setCurrentIndex(ui->issuerBox->findData(issuer));
+        ui->completedCheckBox->setChecked(completed);
+    }
+
     for (int i=0; i<ui->teamList->count(); i++)
     {
         if (empmap[ui->teamList->item(i)->text()].id == executorId) {
@@ -694,6 +716,7 @@ bool RaspForm::editRasp(QString raspId)
             }
         }
     }
-
+    teamChanged = false;
+    worksChanged = false;
     return true;
 }

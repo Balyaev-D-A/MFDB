@@ -37,6 +37,9 @@ private slots:
     void updateRaspTable();
     void raspDateChanged();
     void editRaspClicked();
+    void raspCellDoubleClicked(int row, int column);
+    void editorInputAccepted(FieldEditor *editor);
+    void editorInputRejected(FieldEditor *editor);
 
 protected:
     void showEvent(QShowEvent *event);

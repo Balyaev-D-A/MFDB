@@ -27,6 +27,7 @@ void FieldEditor::setType(EType type)
     case EREAL:
         m_doublevalidator->setRange(0, 9999999, 2);
         this->setValidator(m_doublevalidator);
+        break;
     case EDIGIT:
         m_intvalidator->setRange(0, 9);
         this->setValidator(m_intvalidator);
@@ -36,7 +37,7 @@ void FieldEditor::setType(EType type)
 
 void FieldEditor::focusOutEvent(QFocusEvent *e)
 {
-    emit rejectInput();
+    emit rejectInput(this);
     e->accept();
 }
 
@@ -44,14 +45,13 @@ void FieldEditor::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {
     case Qt::Key_Escape:
-        emit rejectInput();
+        emit rejectInput(this);
         break;
     case Qt::Key_Enter:
     case Qt::Key_Return:
-        emit acceptInput();
+        emit acceptInput(this);
         break;
     }
-//    e->accept();
     QLineEdit::keyPressEvent(e);
 }
 

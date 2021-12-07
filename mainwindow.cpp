@@ -4,6 +4,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "fieldeditor.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->addRaspButton, &QToolButton::clicked, this, &MainWindow::addRaspClicked);
     connect(ui->raspDateEdit, &QDateEdit::dateChanged, this, &MainWindow::raspDateChanged);
     connect(ui->editRaspButton, &QToolButton::clicked, this, &MainWindow::editRaspClicked);
+    connect(ui->raspTable, &QTableWidget::cellDoubleClicked, this, &MainWindow::raspCellDoubleClicked);
 }
 
 MainWindow::~MainWindow()
@@ -206,4 +208,50 @@ void MainWindow::editRaspClicked()
     connect(rf, &RaspForm::closed, this, &MainWindow::raspFormClosed);
     rf->editRasp(ui->raspTable->item(ui->raspTable->currentRow(), 0)->text());
     rf->show();
+}
+
+void MainWindow::raspCellDoubleClicked(int row, int column)
+{
+    if (column == 1) {
+        FieldEditor *editor = new FieldEditor(ui->raspTable->viewport());
+        editor->setType(ESTRING);
+        editor->setInputMask("000/00");
+        editor->setText(ui->raspTable->item(row, 1)->text());
+        editor->setCell(row, 1);
+        editor->setGeometry(ui->raspTable->visualItemRect(ui->raspTable->item(row, 1)));
+        connect(editor, &FieldEditor::acceptInput, this, &MainWindow::editorInputAccepted);
+        connect(editor, &FieldEditor::rejectInput, this, &MainWindow::editorInputRejected);
+        editor->show();
+        editor->selectAll();
+        editor->setFocus();
+    }
+    else {
+        RaspForm *rf = new RaspForm();
+        rf->setDatabase(db);
+        connect(rf, &RaspForm::closed, this, &MainWindow::raspFormClosed);
+        rf->editRasp(ui->raspTable->item(row, 0)->text());
+        rf->show();
+    }
+}
+
+void MainWindow::editorInputAccepted(FieldEditor *editor)
+{
+    QString query = "update rasp set rasp_num = '%1' where rasp_id = '%2'";
+    QStringList s = editor->text().split("/");
+    QString num = s[0].simplified() + "/" + s[1].simplified();
+    query = query.arg(num).arg(ui->raspTable->item(editor->getRow(), 0)->text());
+    if (db->pq->exec(query)) {
+        updateRaspTable();
+    }
+    else {
+        db->showError(this);
+    }
+    editor->hide();
+    editor->deleteLater();
+}
+
+void MainWindow::editorInputRejected(FieldEditor *editor)
+{
+    editor->hide();
+    editor->deleteLater();
 }

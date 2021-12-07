@@ -35,8 +35,8 @@ protected:
     virtual void keyPressEvent(QKeyEvent *e);
 
 signals:
-    void acceptInput();
-    void rejectInput();
+    void acceptInput(FieldEditor *sender);
+    void rejectInput(FieldEditor *sender);
 };
 
 #endif // FIELDEDITOR_H

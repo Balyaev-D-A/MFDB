@@ -40,6 +40,8 @@ private:
     FieldEditor *wEditor;
     FieldEditor *cwEditor;
     WorkTypeWidget *wtWidget;
+    bool worksChanged;
+    bool teamChanged;
     void updateTotal();
     void updateRaspTotal();
     bool memberAdded(QString member);
