@@ -27,6 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->raspDateEdit, &QDateEdit::dateChanged, this, &MainWindow::raspDateChanged);
     connect(ui->editRaspButton, &QToolButton::clicked, this, &MainWindow::editRaspClicked);
     connect(ui->raspTable, &QTableWidget::cellDoubleClicked, this, &MainWindow::raspCellDoubleClicked);
+    connect(ui->deleteRaspButton, &QToolButton::clicked, this, &MainWindow::deleteRaspClicked);
+    connect(ui->selectAllButton, &QToolButton::clicked, this, &MainWindow::selectAllRaspClicked);
+    connect(ui->printButton, &QToolButton::clicked, this, &MainWindow::printRaspClicked);
+    connect(ui->updateRaspButton, &QToolButton::clicked, this, &MainWindow::updateRaspTable);
 }
 
 MainWindow::~MainWindow()
@@ -254,4 +258,47 @@ void MainWindow::editorInputRejected(FieldEditor *editor)
 {
     editor->hide();
     editor->deleteLater();
+}
+
+void MainWindow::deleteRaspClicked()
+{
+    QList<QTableWidgetSelectionRange> selRanges;
+    QStringList raspsToDel;
+    QString query;
+
+    selRanges = ui->raspTable->selectedRanges();
+    foreach(QTableWidgetSelectionRange r, selRanges)
+    {
+        for (int i=r.topRow(); i<=r.bottomRow(); i++)
+        {
+            raspsToDel.append(ui->raspTable->item(i, 0)->text());
+        }
+    }
+
+    query = "delete from rasp where ";
+    for (int i=0; i<raspsToDel.count(); i++)
+    {
+        query += "rasp_id = '" + raspsToDel[i] + "'";
+        if (i < raspsToDel.count()-1) query += " or ";
+    }
+
+    if (!db->pq->exec(query)) {
+        db->showError(this);
+        return;
+    }
+
+    for (int i=ui->raspTable->rowCount()-1; i>=0; i--)
+    {
+        if (raspsToDel.contains(ui->raspTable->item(i, 0)->text())) ui->raspTable->removeRow(i);
+    }
+}
+
+void MainWindow::selectAllRaspClicked()
+{
+    ui->raspTable->selectAll();
+}
+
+void MainWindow::printRaspClicked()
+{
+    return;
 }

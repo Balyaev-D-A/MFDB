@@ -37,6 +37,9 @@ private slots:
     void updateRaspTable();
     void raspDateChanged();
     void editRaspClicked();
+    void deleteRaspClicked();
+    void selectAllRaspClicked();
+    void printRaspClicked();
     void raspCellDoubleClicked(int row, int column);
     void editorInputAccepted(FieldEditor *editor);
     void editorInputRejected(FieldEditor *editor);

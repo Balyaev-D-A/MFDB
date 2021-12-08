@@ -63,7 +63,7 @@
                <string>000/00</string>
               </property>
               <property name="text">
-               <string>/</string>
+               <string>000/00</string>
               </property>
               <property name="cursorPosition">
                <number>6</number>
