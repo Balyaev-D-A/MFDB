@@ -5,6 +5,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "fieldeditor.h"
+#include "raspprintpreviewform.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -300,5 +301,9 @@ void MainWindow::selectAllRaspClicked()
 
 void MainWindow::printRaspClicked()
 {
+    QStringList raspList;
+    RaspPrintPreviewForm *rpp;
+    rpp = new RaspPrintPreviewForm();
+    rpp->showPreview(raspList);
     return;
 }
