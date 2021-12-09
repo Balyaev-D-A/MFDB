@@ -18,8 +18,19 @@ public:
     bool isConnected();
     void showError(QWidget *sender);
     QString explodeFields(QStringList fields, unsigned char from);
+    bool execQuery(const QString &query);
+    QVariant fetchValue(int index);
+    QVariant fetchValue(const QString &name);
+    int affectedRows() const;
+    bool nextRecord();
+    bool seekRecord(int index, bool relative = false);
+    bool startTransaction();
+    bool commitTransaction();
+    bool rollbackTransaction();
+    QVariant lastInsertId() const;
     QSqlQuery *pq;
     QSqlDatabase *pdb;
+
 private:
     QSqlDatabase db;
 

@@ -64,9 +64,9 @@ void RaspForm::newRasp()
     ui->monthBox->blockSignals(true);
     ui->dateEdit->setDate(QDate::currentDate());
 
-    db->pq->exec("select iss_id, iss_name, iss_default from issuers");
-    while (db->pq->next())
-        ui->issuerBox->addItem(db->pq->value(1).toString(), db->pq->value(0));
+    db->execQuery("select iss_id, iss_name, iss_default from issuers");
+    while (db->nextRecord())
+        ui->issuerBox->addItem(db->fetchValue(1).toString(), db->fetchValue(0));
     db->pq->seek(-1);
     while (db->pq->next())
         if (db->pq->value(2).toBool()) {

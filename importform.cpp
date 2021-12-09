@@ -78,7 +78,7 @@ void ImportForm::importButtonClicked()
             fieldsmap[field] = i;
         }
     }
-    db->pdb->transaction();
+    db->startTransaction();
     usedfields = fieldsmap.keys();
     for (int i=0; i<ui->table->rowCount(); i++)
     {
@@ -94,13 +94,13 @@ void ImportForm::importButtonClicked()
             if (j!=usedfields.count()-1) query += ", ";
         }
         query +=")";
-        if (!db->pq->exec(query)) {
+        if (!db->execQuery(query)) {
             db->showError(this);
-            db->pdb->rollback();
+            db->rollbackTransaction();
             return;
         }
     }
-    db->pdb->commit();
+    db->commitTransaction();
     close();
 }
 
@@ -108,10 +108,10 @@ void ImportForm::setTable(QString table)
 {
     dbTable = table;
     if (table == "schedule") {
-        if (db->pq->exec("select unit_name, unit_id from units order by unit_name")) {
-            while (db->pq->next())
+        if (db->execQuery("select unit_name, unit_id from units order by unit_name")) {
+            while (db->nextRecord())
             {
-                ui->unitBox->addItem(db->pq->value(0).toString(), db->pq->value(1));
+                ui->unitBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
             }
         }
     }

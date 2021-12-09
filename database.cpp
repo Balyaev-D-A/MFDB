@@ -1,5 +1,6 @@
 #include <QStringList>
 #include <QMessageBox>
+#include <QVariant>
 #include "database.h"
 
 Database::Database()
@@ -76,4 +77,54 @@ bool Database::deployTables()
 void Database::showError(QWidget *sender)
 {
     QMessageBox::critical(sender, "Ошибка выполнения запроса!", pq->lastError().text());
+}
+
+bool Database::execQuery(const QString &query)
+{
+    return pq->exec(query);
+}
+
+QVariant Database::fetchValue(int index)
+{
+    return pq->value(index);
+}
+
+QVariant Database::fetchValue(const QString &name)
+{
+    return pq->value(name);
+}
+
+int Database::affectedRows() const
+{
+    return pq->numRowsAffected();
+}
+
+bool Database::nextRecord()
+{
+    return pq->next();
+}
+
+bool Database::startTransaction()
+{
+    return pdb->transaction();
+}
+
+bool Database::commitTransaction()
+{
+    return pdb->commit();
+}
+
+bool Database::rollbackTransaction()
+{
+    return pdb->rollback();
+}
+
+QVariant Database::lastInsertId() const
+{
+    return pq->lastInsertId();
+}
+
+bool Database::seekRecord(int index, bool relative)
+{
+    return pq->seek(index, relative);
 }

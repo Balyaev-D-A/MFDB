@@ -169,8 +169,11 @@ void DictionaryForm::updateData()
 {
     ui->table->setSortingEnabled(false);
     while (ui->table->rowCount()>0) ui->table->removeRow(0);
-    db->pq->exec("select " + db->explodeFields(fields, 0) + " from " + dbTable);
-    for (int i = 0; db->pq->next(); i++)
+    if (!db->execQuery("select " + db->explodeFields(fields, 0) + " from " + dbTable)) {
+        db->showError(this);
+        return;
+    }
+    for (int i = 0; db->nextRecord(); i++)
     {
         ui->table->insertRow(i);
         for (int j=0; j<fields.count(); j++){
@@ -178,13 +181,13 @@ void DictionaryForm::updateData()
                 QTableWidgetItem *it = new QTableWidgetItem();
                 it->data(Qt::CheckStateRole);
                 it->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-                if (db->pq->value(j).toBool())
+                if (db->fetchValue(j).toBool())
                     it->setCheckState(Qt::Checked);
                 else
                     it->setCheckState(Qt::Unchecked);
                 ui->table->setItem(i, j, it);
             } else
-                ui->table->setItem(i, j, new QTableWidgetItem(db->pq->value(j).toString()));
+                ui->table->setItem(i, j, new QTableWidgetItem(db->fetchValue(j).toString()));
         }
     }
     ui->table->resizeColumnsToContents();
@@ -199,8 +202,8 @@ void DictionaryForm::updateData()
 void DictionaryForm::addRecord()
 {
     QVariant lId;
-    if (db->pq->exec("insert into " + dbTable + " default values" )) {
-        lId = db->pq->lastInsertId();
+    if (db->execQuery("insert into " + dbTable + " default values" )) {
+        lId = db->lastInsertId();
        if (lId.isValid()) {
             ui->table->setSortingEnabled(false);
             ui->table->insertRow(ui->table->rowCount());
@@ -231,7 +234,7 @@ void DictionaryForm::deleteRecord()
     if (cr<0) return;
     QString crId = ui->table->item(cr,0)->text();
 
-    if (db->pq->exec("delete from " + dbTable + " where " + fields.at(0) + "=" + crId))
+    if (db->execQuery("delete from " + dbTable + " where " + fields.at(0) + "=" + crId))
         ui->table->removeRow(cr);
     else
         db->showError(this);
@@ -242,7 +245,7 @@ void DictionaryForm::cellDoubleClicked(int row, int column)
     QString crId = ui->table->item(row, 0)->text();
     if (fieldTypes.at(column) == "bool") {
         bool cs = (ui->table->item(row, column)->checkState() == Qt::Checked);
-        if(db->pq->exec("update " + dbTable + " set " + fields.at(column) + "=" + QVariant(!cs).toString() + " where " + fields.at(0) + "=" + crId)) {
+        if(db->execQuery("update " + dbTable + " set " + fields.at(column) + "=" + QVariant(!cs).toString() + " where " + fields.at(0) + "=" + crId)) {
             if (cs)
                 ui->table->item(row, column)->setCheckState(Qt::Unchecked);
             else
@@ -286,8 +289,8 @@ void DictionaryForm::inputRejected()
 void DictionaryForm::inputAccepted()
 {
     QString crId = ui->table->item(editor->getRow(), 0)->text();
-   qDebug() << "update " + dbTable + " set " + fields.at(editor->getColumn()) + "='" +editor->text() + "' where " + fields.at(0) + "=" + crId;
-    if (db->pq->exec("update " + dbTable + " set " + fields.at(editor->getColumn()) + "='" +
+
+    if (db->execQuery("update " + dbTable + " set " + fields.at(editor->getColumn()) + "='" +
                      editor->text() + "'where " + fields.at(0) + "=" + crId)){
         ui->table->item(editor->getRow(), editor->getColumn())->setText(editor->text());
         ui->table->resizeColumnToContents(editor->getColumn());
