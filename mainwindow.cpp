@@ -268,7 +268,7 @@ void MainWindow::deleteRaspClicked()
     QString query;
 
     selRanges = ui->raspTable->selectedRanges();
-    foreach(QTableWidgetSelectionRange r, selRanges)
+    foreach (QTableWidgetSelectionRange r, selRanges)
     {
         for (int i=r.topRow(); i<=r.bottomRow(); i++)
         {
@@ -303,7 +303,19 @@ void MainWindow::printRaspClicked()
 {
     QStringList raspList;
     RaspPrintPreviewForm *rpp;
+    QList<QTableWidgetSelectionRange> selRanges;
+
+    selRanges = ui->raspTable->selectedRanges();
+    if (selRanges.isEmpty()) return;
+    foreach (QTableWidgetSelectionRange s, selRanges)
+    {
+        for (int i=s.topRow(); i<=s.bottomRow(); i++)
+        {
+            raspList.append(ui->raspTable->item(i, 0)->text());
+        }
+    }
     rpp = new RaspPrintPreviewForm();
+    rpp->setDatabase(db);
     rpp->showPreview(raspList);
     return;
 }
