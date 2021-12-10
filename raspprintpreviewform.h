@@ -19,6 +19,7 @@ public:
     ~RaspPrintPreviewForm();
     void setDatabase(Database *db);
     void showPreview(QStringList raspList);
+    QString groupWorks(QList<QStringList> workList);
 
 private:
     Ui::RaspPrintPreviewForm *ui;

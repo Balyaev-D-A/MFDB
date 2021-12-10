@@ -44,6 +44,7 @@ void RaspPrintPreviewForm::showPreview(QStringList raspList)
     QString group;
     QList<QStringList> workList;
     QStringList work;
+    QString workString;
     QFile file;
     QTextStream *ts;
 
@@ -126,12 +127,54 @@ void RaspPrintPreviewForm::showPreview(QStringList raspList)
             workList.append(work);
         }
 
+        workString = groupWorks(workList);
+        table.replace("%WORKS%", workString);
+
         body += table;
     }
 
     html.replace("%BODY%", body);
     ui->htmlView->setHtml(html);
     show();
+}
+
+QString RaspPrintPreviewForm::groupWorks(QList<QStringList> workList)
+{
+    typedef QMap<QString, QStringList> TYPE_MAP;
+    typedef QMap<QString, TYPE_MAP> LOC_MAP;
+    typedef QMap<QString, LOC_MAP> WORK_MAP;
+    WORK_MAP workMap;
+    QString result;
+
+    for (int i=0; i<workList.size(); i++)
+    {
+        workMap[workList[i][3]][workList[i][0]][workList[i][1]].append(workList[i][2]);
+    }
+
+    WORK_MAP::const_iterator i = workMap.constBegin();
+    while (i != workMap.constEnd())
+    {
+        LOC_MAP::const_iterator j = i.value().constBegin();
+        while (j != i.value().constEnd())
+        {
+            result += j.key() + ": ";
+            TYPE_MAP::const_iterator k = j.value().constBegin();
+            while (k != j.value().constEnd())
+            {
+                result += "<b>"+k.key()+"</b> ";
+                foreach (QString kks, k.value())
+                {
+                    result += kks + ", ";
+                }
+                result.chop(2);
+                if (++k != j.value().constEnd()) result += ", ";
+            }
+            if (++j != i.value().constEnd()) result += "; ";
+        }
+        result += " - " + i.key();
+        if (++i != workMap.constEnd()) result += "; ";
+    }
+    return result;
 }
 
 void RaspPrintPreviewForm::saveToPDFClicked()
