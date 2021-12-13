@@ -208,6 +208,7 @@ void MainWindow::raspDateChanged()
 
 void MainWindow::editRaspClicked()
 {
+    if (ui->raspTable->currentRow() < 0) return;
     RaspForm *rf = new RaspForm();
     rf->setDatabase(db);
     connect(rf, &RaspForm::closed, this, &MainWindow::raspFormClosed);
