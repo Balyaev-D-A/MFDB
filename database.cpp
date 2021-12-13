@@ -128,3 +128,13 @@ bool Database::seekRecord(int index, bool relative)
 {
     return pq->seek(index, relative);
 }
+
+void Database::close()
+{
+    pdb->close();
+}
+
+bool Database::firstRecord()
+{
+    return pq->first();
+}

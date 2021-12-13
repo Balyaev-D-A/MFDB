@@ -13,6 +13,7 @@ public:
     Database();
     ~Database();
     bool open(QString dbhost, QString dbname, QString dbuser, QString dbpwd);
+    void close();
     QSqlError lastError();
     bool deployTables();
     bool isConnected();
@@ -22,17 +23,19 @@ public:
     QVariant fetchValue(int index);
     QVariant fetchValue(const QString &name);
     int affectedRows() const;
+    bool firstRecord();
     bool nextRecord();
     bool seekRecord(int index, bool relative = false);
     bool startTransaction();
     bool commitTransaction();
     bool rollbackTransaction();
     QVariant lastInsertId() const;
-    QSqlQuery *pq;
-    QSqlDatabase *pdb;
+
 
 private:
     QSqlDatabase db;
+    QSqlQuery *pq;
+    QSqlDatabase *pdb;
 
 };
 

@@ -67,15 +67,15 @@ void RaspForm::newRasp()
     db->execQuery("select iss_id, iss_name, iss_default from issuers");
     while (db->nextRecord())
         ui->issuerBox->addItem(db->fetchValue(1).toString(), db->fetchValue(0));
-    db->pq->seek(-1);
-    while (db->pq->next())
-        if (db->pq->value(2).toBool()) {
-            ui->issuerBox->setCurrentText(db->pq->value(1).toString());
+    db->seekRecord(-1);
+    while (db->nextRecord())
+        if (db->fetchValue(2).toBool()) {
+            ui->issuerBox->setCurrentText(db->fetchValue(1).toString());
             break;
         }
-    db->pq->exec("select unit_id, unit_name from units order by unit_name");
-    while (db->pq->next())
-        ui->unitBox->addItem(db->pq->value(1).toString(), db->pq->value(0));
+    db->execQuery("select unit_id, unit_name from units order by unit_name");
+    while (db->nextRecord())
+        ui->unitBox->addItem(db->fetchValue(1).toString(), db->fetchValue(0));
     lastUnitIndex = 0;
     ui->unitBox->setCurrentIndex(0);
     ui->monthBox->setCurrentIndex(QDate::currentDate().month());
@@ -118,7 +118,7 @@ void RaspForm::updateWorkTable()
     if (month != "")
         query += "and sch_date = '" + month + "'";
 
-    if (!db->pq->exec(query)) {
+    if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
@@ -130,15 +130,15 @@ void RaspForm::updateWorkTable()
     }
 
     ui->workTable->setSortingEnabled(false);
-    while (db->pq->next())
+    while (db->nextRecord())
     {
-        if (choosedWorks.contains(db->pq->value(0).toString())) continue;
+        if (choosedWorks.contains(db->fetchValue(0).toString())) continue;
         row = ui->workTable->rowCount();
         ui->workTable->insertRow(row);
         for (int j=0; j<6; j++)
         {
-            ui->workTable->setItem(row, j, new QTableWidgetItem(db->pq->value(j).toString()));
-            switch (db->pq->value(6).toInt())
+            ui->workTable->setItem(row, j, new QTableWidgetItem(db->fetchValue(j).toString()));
+            switch (db->fetchValue(6).toInt())
             {
             case 1:
                 ui->workTable->item(row, j)->setBackground(QBrush(Qt::yellow));
@@ -188,19 +188,19 @@ void RaspForm::updateMembers()
     QString query = "select emp_id, emp_name, emp_metrolog from employees where emp_hidden = false";
     if (!hasMA)
         query += " and emp_metrolog = false";
-    if (!db->pq->exec(query)){
+    if (!db->execQuery(query)){
         db->showError(this);
         return;
     }
     empmap.clear();
     ui->teamList->clear();
-    while (db->pq->next())
+    while (db->nextRecord())
     {
-        info.id = db->pq->value(0).toInt();
-        info.metrolog = db->pq->value(2).toBool();
-        empmap[db->pq->value(1).toString()] = info;
-        if (memberAdded(db->pq->value(1).toString())) continue;
-        it = new QListWidgetItem(db->pq->value(1).toString());
+        info.id = db->fetchValue(0).toInt();
+        info.metrolog = db->fetchValue(2).toBool();
+        empmap[db->fetchValue(1).toString()] = info;
+        if (memberAdded(db->fetchValue(1).toString())) continue;
+        it = new QListWidgetItem(db->fetchValue(1).toString());
         if (info.metrolog)
             it->setIcon(QIcon(":/icons/metrolog.png"));
         else
@@ -362,20 +362,20 @@ void RaspForm::wInputAccepted()
     QString kks = ui->workTable->item(wEditor->getRow(), 1)->text();
     QString query = "select loc_kks from locations where loc_kks = '" + kks + "'";
 
-    if (!db->pq->exec(query)) {
+    if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
-    if (db->pq->numRowsAffected() > 0) {
+    if (db->affectedRows() > 0) {
         query = "update locations set loc_location = '" + wEditor->text() + "' where loc_kks = '" + kks + "'";
-        if (!db->pq->exec(query)) {
+        if (!db->execQuery(query)) {
             db->showError(this);
             return;
         }
     }
     else {
         query = "insert into locations (loc_kks, loc_location) values ('" + kks + "', '" + wEditor->text() + "')";
-        if (!db->pq->exec(query)) {
+        if (!db->execQuery(query)) {
             db->showError(this);
             return;
         }
@@ -389,20 +389,20 @@ void RaspForm::cwInputAccepted()
     QString kks = ui->currWorkTable->item(cwEditor->getRow(), 1)->text();
     QString query = "select loc_kks from locations where loc_kks = '" + kks + "'";
 
-    if (!db->pq->exec(query)) {
+    if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
-    if (db->pq->numRowsAffected() > 0) {
+    if (db->affectedRows() > 0) {
         query = "update locations set loc_location = '" + cwEditor->text() + "' where loc_kks = '" + kks + "'";
-        if (!db->pq->exec(query)) {
+        if (!db->execQuery(query)) {
             db->showError(this);
             return;
         }
     }
     else {
         query = "insert into locations (loc_kks, loc_location) values ('" + kks + "', '" + cwEditor->text() + "')";
-        if (!db->pq->exec(query)) {
+        if (!db->execQuery(query)) {
             db->showError(this);
             return;
         }
@@ -452,23 +452,23 @@ void RaspForm::saveButtonClicked()
             query = query.arg("false");
         query = query.arg(ui->teamTree->topLevelItem(0)->text(0));
 
-        db->pdb->transaction();
-        if (!db->pq->exec(query)) {
+        db->startTransaction();
+        if (!db->execQuery(query)) {
             QMessageBox::information(this, "QUERY", query);
-            db->pdb->rollback();
+            db->rollbackTransaction();
             db->showError(this);
             return;
         }
 
-        int id = db->pq->lastInsertId().toInt();
+        int id = db->lastInsertId().toInt();
         query = "insert into rmembers (rm_rasp, rm_emp) values (%1, "
                 "(select emp_id from employees where emp_name = '%2' limit 1))";
         QTreeWidgetItem *it = ui->teamTree->topLevelItem(0);
 
         for (int i=0; i<it->childCount(); i++)
         {
-            if (!db->pq->exec(query.arg(id).arg(it->child(i)->text(0)))) {
-                db->pdb->rollback();
+            if (!db->execQuery(query.arg(id).arg(it->child(i)->text(0)))) {
+                db->rollbackTransaction();
                 db->showError(this);
                 return;
             }
@@ -481,16 +481,16 @@ void RaspForm::saveButtonClicked()
             q = query.arg(id);
             q = q.arg(ui->currWorkTable->item(i, 0)->text());
             q = q.arg(ui->currWorkTable->item(i, 3)->text());
-            if (!db->pq->exec(q)) {
-                db->pdb->rollback();
+            if (!db->execQuery(q)) {
+                db->rollbackTransaction();
                 db->showError(this);
                 return;
             }
         }
-        db->pdb->commit();
+        db->commitTransaction();
     }
     else {
-        db->pdb->transaction();
+        db->startTransaction();
         query = "update rasp set rasp_num = '%1', rasp_date = '%2', "
                 "rasp_issuer = %3, rasp_completed = %4, "
                 "rasp_executor = (select emp_id from employees where emp_name = '%5' limit 1)";
@@ -503,15 +503,15 @@ void RaspForm::saveButtonClicked()
         else
             query = query.arg("false");
         query = query.arg(ui->teamTree->topLevelItem(0)->text(0));
-        if (!db->pq->exec()) {
-            db->pdb->rollback();
+        if (!db->execQuery(query)) {
+            db->rollbackTransaction();
             db->showError(this);
             return;
         }
         if (teamChanged) {
             query = "delete from rmembers where rm_rasp = " + QString("%1").arg(currentRasp);
-            if (!db->pq->exec(query)) {
-                db->pdb->rollback();
+            if (!db->execQuery(query)) {
+                db->rollbackTransaction();
                 db->showError(this);
                 return;
             }
@@ -521,8 +521,8 @@ void RaspForm::saveButtonClicked()
 
             for (int i=0; i<it->childCount(); i++)
             {
-                if (!db->pq->exec(query.arg(currentRasp).arg(it->child(i)->text(0)))) {
-                    db->pdb->rollback();
+                if (!db->execQuery(query.arg(currentRasp).arg(it->child(i)->text(0)))) {
+                    db->rollbackTransaction();
                     db->showError(this);
                     return;
                 }
@@ -531,8 +531,8 @@ void RaspForm::saveButtonClicked()
 
         if (worksChanged) {
             query = "delete from requipment where re_rasp = " + QString("%1").arg(currentRasp);
-            if (!db->pq->exec(query)) {
-                db->pdb->rollback();
+            if (!db->execQuery(query)) {
+                db->rollbackTransaction();
                 db->showError(this);
                 return;
             }
@@ -544,14 +544,14 @@ void RaspForm::saveButtonClicked()
                 q = query.arg(currentRasp);
                 q = q.arg(ui->currWorkTable->item(i, 0)->text());
                 q = q.arg(ui->currWorkTable->item(i, 3)->text());
-                if (!db->pq->exec(q)) {
-                    db->pdb->rollback();
+                if (!db->execQuery(q)) {
+                    db->rollbackTransaction();
                     db->showError(this);
                     return;
                 }
             }
         }
-        db->pdb->commit();
+        db->commitTransaction();
     }
     close();
 }
@@ -628,35 +628,34 @@ bool RaspForm::editRasp(QString raspId)
             "left join schedule sch on sch.sch_id = re_equip "
             "left join locations loc on loc.loc_kks = sch.sch_kks "
             "where re_rasp = " + raspId;
-    if (!db->pq->exec(query)) {
+    if (!db->execQuery(query)) {
        db->showError(this);
        return false;
     }
 
     ui->currWorkTable->setSortingEnabled(false);
-    for (int i=0; db->pq->next(); i++)
+    for (int i=0; db->nextRecord(); i++)
     {
         ui->currWorkTable->insertRow(i);
         for (int j=0; j<6; j++)
         {
-            ui->currWorkTable->setItem(i, j, new QTableWidgetItem(db->pq->value(j).toString()));
+            ui->currWorkTable->setItem(i, j, new QTableWidgetItem(db->fetchValue(j).toString()));
         }
     }
     ui->currWorkTable->setSortingEnabled(true);
-    db->pq->first();
-    unitId = db->pq->value(6).toInt();
-    db->pq->finish();
+    db->firstRecord();
+    unitId = db->fetchValue(6).toInt();
 
     ui->unitBox->blockSignals(true);
     ui->monthBox->blockSignals(true);
 
-    db->pq->exec("select iss_id, iss_name, iss_default from issuers");
-    while (db->pq->next())
-        ui->issuerBox->addItem(db->pq->value(1).toString(), db->pq->value(0));
+    db->execQuery("select iss_id, iss_name, iss_default from issuers");
+    while (db->nextRecord())
+        ui->issuerBox->addItem(db->fetchValue(1).toString(), db->fetchValue(0));
 
-    db->pq->exec("select unit_id, unit_name from units order by unit_name");
-    while (db->pq->next())
-        ui->unitBox->addItem(db->pq->value(1).toString(), db->pq->value(0));
+    db->execQuery("select unit_id, unit_name from units order by unit_name");
+    while (db->nextRecord())
+        ui->unitBox->addItem(db->fetchValue(1).toString(), db->fetchValue(0));
     ui->unitBox->setCurrentIndex(ui->unitBox->findData(unitId));
     lastUnitIndex = ui->unitBox->currentIndex();
     ui->unitBox->blockSignals(false);
@@ -670,18 +669,18 @@ bool RaspForm::editRasp(QString raspId)
 
     query = "select rasp_num, rasp_date, rasp_issuer, rasp_executor, rasp_completed from rasp "
                     "where rasp_id = " + raspId;
-    if (!db->pq->exec(query)) {
+    if (!db->execQuery(query)) {
         db->showError(this);
         return false;
     }
 
-    if (db->pq->next())
+    if (db->nextRecord())
     {
-        QString num = db->pq->value(0).toString();
-        QString date = db->pq->value(1).toString();
-        QVariant issuer = db->pq->value(2);
-        bool completed = db->pq->value(4).toBool();
-        executorId = db->pq->value(3).toInt();
+        QString num = db->fetchValue(0).toString();
+        QString date = db->fetchValue(1).toString();
+        QVariant issuer = db->fetchValue(2);
+        bool completed = db->fetchValue(4).toBool();
+        executorId = db->fetchValue(3).toInt();
         ui->numEdit->setText(num);
         QStringList d = date.split(".");
         ui->dateEdit->setDate(QDate(d[2].toInt(), d[1].toInt(), d[0].toInt()));
@@ -700,16 +699,16 @@ bool RaspForm::editRasp(QString raspId)
     }
 
     query = "select rm_emp from rmembers where rm_rasp = " + raspId;
-    if (!db->pq->exec(query)) {
+    if (!db->execQuery(query)) {
         db->showError(this);
         return false;
     }
 
-    while (db->pq->next())
+    while (db->nextRecord())
     {
         for (int i=0; i<ui->teamList->count(); i++)
         {
-            if (empmap[ui->teamList->item(i)->text()].id == db->pq->value(0).toInt()) {
+            if (empmap[ui->teamList->item(i)->text()].id == db->fetchValue(0).toInt()) {
                 ui->teamList->setCurrentRow(i);
                 addMemberClicked();
                 break;

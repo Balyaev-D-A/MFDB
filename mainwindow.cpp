@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    db->pdb->close();
+    db->close();
     delete ui;
 }
 
@@ -50,10 +50,10 @@ void MainWindow::showEvent(QShowEvent *event)
     }
     ui->raspDateEdit->setDate(QDate::currentDate());
     ui->taskDateEdit->setDate(QDate::currentDate());
-    db->pq->exec("select emp_name, emp_id from employees where emp_metrolog = false and emp_hidden = false order by emp_name");
+    db->execQuery("select emp_name, emp_id from employees where emp_metrolog = false and emp_hidden = false order by emp_name");
     ui->employeeBox->addItem("Все", 0);
-    while (db->pq->next())
-        ui->employeeBox->addItem(db->pq->value(0).toString(), db->pq->value(1));
+    while (db->nextRecord())
+        ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
     updateRaspTable();
 }
 
@@ -121,37 +121,37 @@ void MainWindow::updateRaspTable()
                     "left join employees e on e.emp_id = r.rasp_executor "
                     "where rasp_date = '%1' group by emp_name, rasp_id, unit_name order by rasp_id";
     query = query.arg(ui->raspDateEdit->text());
-    if (!db->pq->exec(query)) {
+    if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
 
     while (ui->raspTable->rowCount() > 0) ui->raspTable->removeRow(0);
     ui->raspTable->setSortingEnabled(false);
-    for (int i=0; db->pq->next(); i++)
+    for (int i=0; db->nextRecord(); i++)
     {
         ui->raspTable->insertRow(i);
-        ui->raspTable->setItem(i, 0, new QTableWidgetItem(db->pq->value(0).toString()));
-        ui->raspTable->setItem(i, 1, new QTableWidgetItem(db->pq->value(1).toString()));
-        ui->raspTable->setItem(i, 2, new QTableWidgetItem(db->pq->value(2).toString()));
-        ui->raspTable->setItem(i, 3, new QTableWidgetItem(db->pq->value(3).toString()));
-        ui->raspTable->setItem(i, 6, new QTableWidgetItem(db->pq->value(4).toString()));
+        ui->raspTable->setItem(i, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
+        ui->raspTable->setItem(i, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
+        ui->raspTable->setItem(i, 2, new QTableWidgetItem(db->fetchValue(2).toString()));
+        ui->raspTable->setItem(i, 3, new QTableWidgetItem(db->fetchValue(3).toString()));
+        ui->raspTable->setItem(i, 6, new QTableWidgetItem(db->fetchValue(4).toString()));
     }
     query = "select sch_type, re_worktype  from requipment re left join schedule sch on re.re_equip = sch.sch_id where re_rasp = ";
     QStringList equip;
     QStringList wt;
     for (int i=0; i<ui->raspTable->rowCount(); i++)
     {
-        if(!db->pq->exec(query + ui->raspTable->item(i, 0)->text())) {
+        if(!db->execQuery(query + ui->raspTable->item(i, 0)->text())) {
             db->showError(this);
             return;
         }
         equip.clear();
         wt.clear();
-        for (int j=0; db->pq->next(); j++)
+        for (int j=0; db->nextRecord(); j++)
         {
-            equip.append(db->pq->value(0).toString());
-            wt.append(db->pq->value(1).toString());
+            equip.append(db->fetchValue(0).toString());
+            wt.append(db->fetchValue(1).toString());
         }
         ui->raspTable->setItem(i, 4, new QTableWidgetItem(makeRaspEquipments(equip)));
         ui->raspTable->setItem(i, 5, new QTableWidgetItem(makeRaspWoktypes(wt)));
@@ -245,7 +245,7 @@ void MainWindow::editorInputAccepted(FieldEditor *editor)
     QStringList s = editor->text().split("/");
     QString num = s[0].simplified() + "/" + s[1].simplified();
     query = query.arg(num).arg(ui->raspTable->item(editor->getRow(), 0)->text());
-    if (db->pq->exec(query)) {
+    if (db->execQuery(query)) {
         updateRaspTable();
     }
     else {
@@ -283,7 +283,7 @@ void MainWindow::deleteRaspClicked()
         if (i < raspsToDel.count()-1) query += " or ";
     }
 
-    if (!db->pq->exec(query)) {
+    if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
