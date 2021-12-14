@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tasksTab">
        <property name="enabled">
@@ -150,93 +150,6 @@
          </layout>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Работы</string>
-       </attribute>
-       <widget class="QCheckBox" name="checkBox">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>20</y>
-          <width>81</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>CheckBox</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBox_2">
-        <property name="geometry">
-         <rect>
-          <x>670</x>
-          <y>20</y>
-          <width>81</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>CheckBox</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBox_3">
-        <property name="geometry">
-         <rect>
-          <x>770</x>
-          <y>20</y>
-          <width>81</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>CheckBox</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="comboBox">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>20</y>
-          <width>221</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="comboBox_2">
-        <property name="geometry">
-         <rect>
-          <x>31</x>
-          <y>20</y>
-          <width>101</width>
-          <height>25</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>540</y>
-          <width>561</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-       <widget class="QTableWidget" name="tableWidget">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>160</y>
-          <width>821</width>
-          <height>192</height>
-         </rect>
-        </property>
-       </widget>
       </widget>
       <widget class="QWidget" name="rasp_tab">
        <attribute name="title">
@@ -445,6 +358,118 @@
          </layout>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Работы</string>
+       </attribute>
+       <widget class="QCheckBox" name="checkBox">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>20</y>
+          <width>81</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>CheckBox</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="checkBox_2">
+        <property name="geometry">
+         <rect>
+          <x>670</x>
+          <y>20</y>
+          <width>81</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>CheckBox</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="checkBox_3">
+        <property name="geometry">
+         <rect>
+          <x>770</x>
+          <y>20</y>
+          <width>81</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>CheckBox</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="comboBox">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>20</y>
+          <width>221</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="comboBox_2">
+        <property name="geometry">
+         <rect>
+          <x>31</x>
+          <y>20</y>
+          <width>101</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>540</y>
+          <width>561</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+       <widget class="QTableWidget" name="tableWidget">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>160</y>
+          <width>821</width>
+          <height>192</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="defectsTab">
+       <attribute name="title">
+        <string>Дефекты</string>
+       </attribute>
+       <widget class="QComboBox" name="comboBox_3">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>161</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QTableWidget" name="tableWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>25</x>
+          <y>91</y>
+          <width>601</width>
+          <height>331</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
