@@ -16,7 +16,7 @@ RaspPrintPreviewForm::RaspPrintPreviewForm(QWidget *parent) :
 
     pdfPrinter.setPageSize(QPrinter::A4);
     pdfPrinter.setOutputFormat(QPrinter::PdfFormat);
-    pdfPrinter.setOutputFileName("/home/user/print.pdf");
+    pdfPrinter.setOutputFileName(QApplication::applicationDirPath() + "/print.pdf");
 }
 
 RaspPrintPreviewForm::~RaspPrintPreviewForm()

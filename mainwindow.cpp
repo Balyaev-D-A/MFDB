@@ -44,7 +44,7 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
 
-    if (!connectDB("127.0.0.1", "itcrk", "itcrk", "123321")) {
+    if (!connectDB("77.221.144.110", "itcrk", "itcrk", "123321")) {
         QMessageBox::critical(this, "Ошибка!!!", "Невозможно установить соединение с сервером БД!");
         return;
     }

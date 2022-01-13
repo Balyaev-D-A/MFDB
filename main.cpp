@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QTranslator>
+#include <QTextCodec>
 
 int main(int argc, char *argv[])
 {
@@ -10,6 +11,8 @@ int main(int argc, char *argv[])
     QTranslator tr;
     tr.load(":/tr/qtbase_ru.qm");
     a.installTranslator(&tr);
+    QTextCodec *utfcodec = QTextCodec::codecForName("UTF-8");
+    QTextCodec::setCodecForLocale(utfcodec);
     w.show();
     return a.exec();
 }
