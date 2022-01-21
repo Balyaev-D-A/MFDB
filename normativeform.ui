@@ -110,7 +110,13 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QTableWidget" name="normativeTable">
+       <widget class="DragDropTable" name="normativeTable">
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
         <column>
          <property name="text">
           <string>Id</string>
@@ -173,13 +179,19 @@
        </layout>
       </item>
       <item>
-       <widget class="QTableWidget" name="materialsTable">
+       <widget class="DragDropTable" name="materialsTable">
         <property name="maximumSize">
          <size>
           <width>250</width>
           <height>16777215</height>
          </size>
         </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
         <column>
          <property name="text">
           <string>Id</string>
@@ -247,6 +259,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DragDropTable</class>
+   <extends>QTableWidget</extends>
+   <header>dragdroptable.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

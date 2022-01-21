@@ -37,6 +37,9 @@ void NormativeForm::showEvent(QShowEvent *event)
     {
         ui->deviceBox->addItem(db->fetchValue(0).toString());
     }
+
+    connect(ui->deviceBox, &QComboBox::currentTextChanged, this, &NormativeForm::updateNormatives);
+    connect(ui->workBox, &QComboBox::currentTextChanged, this, &NormativeForm::updateNormatives);
 }
 
 void NormativeForm::updateNormatives()
@@ -54,7 +57,7 @@ void NormativeForm::updateNormatives()
     }
     if (db->nextRecord()) ui->workEdit->setText(db->fetchValue(0).toString());
 
-    query = "SELECT nm_material, mat_name, nm_count FROM normativmat LEFT JOIN ON normativemat.nm_material = materials.mat_id "
+    query = "SELECT nm_material, mat_name, nm_count FROM normativmat AS nm LEFT JOIN materials AS mat ON nm.nm_material = mat.mat_id "
             "WHERE nm_dev = '%1' AND nm_worktype = '%2'";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
 
@@ -79,14 +82,17 @@ void NormativeForm::updateNormatives()
         return;
     }
 
+    ui->materialsTable->setSortingEnabled(false);
     while (db->nextRecord())
     {
         if (!matIds.contains(db->fetchValue(0).toString())) {
             ui->materialsTable->insertRow(ui->materialsTable->rowCount());
-            ui->materialsTable->setItem(ui->materialsTable->rowCount(), 0, new QTableWidgetItem(db->fetchValue(0).toString()));
-            ui->materialsTable->setItem(ui->materialsTable->rowCount(), 0, new QTableWidgetItem(db->fetchValue(0).toString()));
+            ui->materialsTable->setItem(ui->materialsTable->rowCount()-1, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
+            ui->materialsTable->setItem(ui->materialsTable->rowCount()-1, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
         }
     }
+    ui->materialsTable->setSortingEnabled(true);
+    ui->materialsTable->resizeColumnsToContents();
 
     query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
