@@ -46,7 +46,7 @@ void NormativeForm::updateNormatives()
     ui->workEdit->clear();
     ui->actionsTextEdit->document()->clear();
 
-    QString query = "SELECT nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_work = '%2'";
+    QString query = "SELECT nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -98,4 +98,64 @@ void NormativeForm::updateNormatives()
 
     if (db->nextRecord()) ui->actionsTextEdit->document()->setPlainText(db->fetchValue(0).toString());
 
+}
+
+void NormativeForm::saveNormatives()
+{
+    QString query;
+    QString q;
+
+    db->startTransaction();
+
+    query = "DELETE FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    if (db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    query = "DELETE FROM normativmat WHERE nm_dev = '%1' AND nm_worktype = '%2'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    if (db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    query = "DELETE FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    if (db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    query = "INSERT INTO normativwork (nw_dev, nw_worktype, nw_work) VALUES ('%1' , '%2', '%3')";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->workEdit->text());
+    if (db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    query = "INSERT INTO normativactions (na_dev, na_worktype, na_actions) VALUES ('%1' , '%2', '%3')";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->actionsTextEdit->document()->toPlainText());
+    if (db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    query = "INSERT INTO normativmat (nm_dev, nm_worktype, nm_material, nm_count) VALUES ('%1', '%2', '%3', '%4')";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    for (int i=0; i<ui->normativeTable->rowCount(); i++)
+    {
+        q = query.arg(ui->normativeTable->item(i, 0)->text()).arg(ui->normativeTable->item(i,2)->text());
+        if (db->execQuery(q)) {
+            db->showError(this);
+            db->rollbackTransaction();
+            return;
+        }
+    }
 }

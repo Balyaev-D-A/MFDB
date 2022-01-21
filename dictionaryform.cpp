@@ -91,7 +91,8 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fields.append("sch_worktype");
         fields.append("sch_hours");
         fields.append("sch_executor");
-        fields.append("sch_state");
+        fields.append("sch_done");
+        fields.append("sch_note");
         fieldTypes.append("int");
         fieldTypes.append("int");
         fieldTypes.append("string");
@@ -104,6 +105,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fieldTypes.append("real");
         fieldTypes.append("string");
         fieldTypes.append("bool");
+        fieldTypes.append("string");
         headers.append("id");
         headers.append("Блок");
         headers.append("Обозначение");
@@ -116,6 +118,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("Трудозатраты");
         headers.append("Исполнитель");
         headers.append("Выполнено");
+        headers.append("Заметки");
         break;
 
     case UNITS:

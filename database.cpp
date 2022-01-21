@@ -66,7 +66,7 @@ bool Database::deployTables()
     if (!pq->exec("create table if not exists normativmat (nm_id serial primary key, nm_dev varchar(50), nm_worktype char(2), "
                   "nm_material integer references materials(mat_id), nm_count decimal(5,2))")) return false;
 
-    if (!pq->exec("create table if not exists normativwork (nw_id serial primary key, nw_dev varchar(50), nv_worktype char(2), "
+    if (!pq->exec("create table if not exists normativwork (nw_id serial primary key, nw_dev varchar(50), nw_worktype char(2), "
                   "nw_work decimal(5,2))")) return false;
 
     if (!pq->exec("create table if not exists normativactions (na_id serial primary key, na_dev varchar(50), na_worktype char(2), "

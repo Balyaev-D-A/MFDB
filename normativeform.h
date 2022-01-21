@@ -23,6 +23,9 @@ private:
     Database *db;
     void updateNormatives();
 
+private slots:
+    void saveNormatives();
+
 protected:
     void showEvent(QShowEvent *event);
 };
