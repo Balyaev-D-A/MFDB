@@ -5,6 +5,7 @@
 #include "database.h"
 #include "dictionaryform.h"
 #include "raspform.h"
+#include "normativeform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +25,7 @@ private:
     Database *db;
     bool adminMode;
     DictionaryForm *dictionaryForm;
+    NormativeForm *normativeForm;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
 private slots:
@@ -32,6 +34,8 @@ private slots:
     void unitsTriggered();
     void issuersTriggered();
     void locationsTriggered();
+    void materialsTriggered();
+    void normativeTriggered();
     void addRaspClicked();
     void raspFormClosed(RaspForm *sender);
     void updateRaspTable();

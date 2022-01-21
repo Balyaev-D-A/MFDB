@@ -13,6 +13,7 @@ SOURCES += \
     comboheader.cpp \
     csvreader.cpp \
     database.cpp \
+    defectform.cpp \
     dictionaryform.cpp \
     dragdroplist.cpp \
     dragdroptable.cpp \
@@ -22,6 +23,7 @@ SOURCES += \
     importform.cpp \
     main.cpp \
     mainwindow.cpp \
+    normativeform.cpp \
     progressform.cpp \
     raspform.cpp \
     raspprintpreviewform.cpp \
@@ -34,6 +36,7 @@ HEADERS += \
     comboheader.h \
     csvreader.h \
     database.h \
+    defectform.h \
     dictionaryform.h \
     dragdroplist.h \
     dragdroptable.h \
@@ -42,6 +45,7 @@ HEADERS += \
     headercombobox.h \
     importform.h \
     mainwindow.h \
+    normativeform.h \
     progressform.h \
     raspform.h \
     raspprintpreviewform.h \
@@ -51,9 +55,11 @@ HEADERS += \
     wtcheckbox.h
 
 FORMS += \
+    defectform.ui \
     dictionaryform.ui \
     importform.ui \
     mainwindow.ui \
+    normativeform.ui \
     progressform.ui \
     raspform.ui \
     raspprintpreviewform.ui \

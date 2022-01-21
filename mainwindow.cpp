@@ -18,12 +18,16 @@ MainWindow::MainWindow(QWidget *parent)
     db = new Database;
     dictionaryForm = new DictionaryForm();
     dictionaryForm->setDatabase(db);
+    normativeForm = new NormativeForm();
+    normativeForm->setDatabase(db);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
     connect(ui->aUnits, &QAction::triggered, this, &MainWindow::unitsTriggered);
     connect(ui->aIssuers, &QAction::triggered, this, &MainWindow::issuersTriggered);
     connect(ui->aLocations, &QAction::triggered, this, &MainWindow::locationsTriggered);
+    connect(ui->aMaterials, &QAction::triggered, this, &MainWindow::materialsTriggered);
+    connect(ui->aNormative, &QAction::triggered, this, &MainWindow::normativeTriggered);
     connect(ui->addRaspButton, &QToolButton::clicked, this, &MainWindow::addRaspClicked);
     connect(ui->raspDateEdit, &QDateEdit::dateChanged, this, &MainWindow::raspDateChanged);
     connect(ui->editRaspButton, &QToolButton::clicked, this, &MainWindow::editRaspClicked);
@@ -44,7 +48,7 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
 
-    if (!connectDB("77.221.144.110", "itcrk", "itcrk", "123321")) {
+    if (!connectDB("alpha.prostore.ru", "radico22", "radico", "coolpass")) {
         QMessageBox::critical(this, "Ошибка!!!", "Невозможно установить соединение с сервером БД!");
         return;
     }
@@ -95,6 +99,17 @@ void MainWindow::locationsTriggered()
 {
     dictionaryForm->setDictionary(LOCATIONS);
     dictionaryForm->show();
+}
+
+void MainWindow::materialsTriggered()
+{
+    dictionaryForm->setDictionary(MATERIALS);
+    dictionaryForm->show();
+}
+
+void MainWindow::normativeTriggered()
+{
+    normativeForm->show();
 }
 
 void MainWindow::addRaspClicked()

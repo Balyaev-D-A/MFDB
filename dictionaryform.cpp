@@ -103,7 +103,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fieldTypes.append("string");
         fieldTypes.append("real");
         fieldTypes.append("string");
-        fieldTypes.append("int");
+        fieldTypes.append("bool");
         headers.append("id");
         headers.append("Блок");
         headers.append("Обозначение");
@@ -115,7 +115,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("Тип работ");
         headers.append("Трудозатраты");
         headers.append("Исполнитель");
-        headers.append("Состояние");
+        headers.append("Выполнено");
         break;
 
     case UNITS:
@@ -154,6 +154,21 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("Должность");
         headers.append("По умолчанию");
         break;
+    case MATERIALS:
+        setWindowTitle("Справочник: Материалы");
+        dbTable = "materials";
+        fields.append("mat_id");
+        fields.append("mat_name");
+        fields.append("mat_doc");
+        fields.append("mat_measure");
+        fieldTypes.append("int");
+        fieldTypes.append("string");
+        fieldTypes.append("string");
+        fieldTypes.append("string");
+        headers.append("id");
+        headers.append("Материал");
+        headers.append("Документ");
+        headers.append("Ед. Изм.");
     }
 
     ui->table->setColumnCount(fields.count());
