@@ -21,10 +21,16 @@ public:
 private:
     Ui::NormativeForm *ui;
     Database *db;
+    void updateNormTable();
+    void updateMatTable();
     void updateNormatives();
 
 private slots:
-    void saveNormatives();
+    bool saveNormatives();
+    void addMatClicked();
+    void removeMatClicked();
+    void okClicked();
+
 
 protected:
     void showEvent(QShowEvent *event);

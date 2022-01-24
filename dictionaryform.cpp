@@ -83,6 +83,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fields.append("sch_id");
         fields.append("sch_unit");
         fields.append("sch_kks");
+        fields.append("sch_invno");
         fields.append("sch_name");
         fields.append("sch_type");
         fields.append("sch_tdoc");
@@ -102,6 +103,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fieldTypes.append("string");
         fieldTypes.append("string");
         fieldTypes.append("string");
+        fieldTypes.append("string");
         fieldTypes.append("real");
         fieldTypes.append("string");
         fieldTypes.append("bool");
@@ -109,6 +111,7 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("id");
         headers.append("Блок");
         headers.append("Обозначение");
+        headers.append("Инв. номер");
         headers.append("Наименование");
         headers.append("Тип");
         headers.append("Техдокумент");

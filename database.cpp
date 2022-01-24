@@ -51,7 +51,7 @@ bool Database::deployTables()
     if (!pq->exec("create table if not exists units (unit_id serial primary key, unit_name varchar(20))")) return false;
 
     if (!pq->exec("create table if not exists schedule (sch_id serial primary key, sch_unit integer references units(unit_id), "
-                  "sch_kks varchar(50), sch_name varchar(255), sch_type varchar(50), sch_tdoc varchar(255), sch_date varchar(10), "
+                  "sch_kks varchar(50), sch_invno varchar(20), sch_name varchar(255), sch_type varchar(50), sch_tdoc varchar(255), sch_date varchar(10), "
                   "sch_reportdate varchar(10), sch_worktype char(2), sch_hours decimal(5,2), sch_executor char(10), sch_done bool default 'false', "
                   "sch_note varchar(1000))")) return false;
 
@@ -67,7 +67,7 @@ bool Database::deployTables()
                   "nm_material integer references materials(mat_id), nm_count decimal(5,2))")) return false;
 
     if (!pq->exec("create table if not exists normativwork (nw_id serial primary key, nw_dev varchar(50), nw_worktype char(2), "
-                  "nw_work decimal(5,2))")) return false;
+                  "nw_oesn varchar(255), nw_work decimal(5,2))")) return false;
 
     if (!pq->exec("create table if not exists normativactions (na_id serial primary key, na_dev varchar(50), na_worktype char(2), "
                   "na_actions text)")) return false;
