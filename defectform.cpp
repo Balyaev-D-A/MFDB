@@ -12,3 +12,8 @@ DefectForm::~DefectForm()
 {
     delete ui;
 }
+
+void DefectForm::setDatabase(Database *db)
+{
+    this->db = db;
+}

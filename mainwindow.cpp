@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     dictionaryForm->setDatabase(db);
     normativeForm = new NormativeForm();
     normativeForm->setDatabase(db);
+    defectForm = new DefectForm();
+    defectForm->setDatabase(db);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -36,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->selectAllButton, &QToolButton::clicked, this, &MainWindow::selectAllRaspClicked);
     connect(ui->printButton, &QToolButton::clicked, this, &MainWindow::printRaspClicked);
     connect(ui->updateRaspButton, &QToolButton::clicked, this, &MainWindow::updateRaspTable);
+    connect(ui->addDefectButton, &QToolButton::clicked, this, &MainWindow::addDefectClicked);
 }
 
 MainWindow::~MainWindow()
@@ -334,4 +337,9 @@ void MainWindow::printRaspClicked()
     rpp->setDatabase(db);
     rpp->showPreview(raspList);
     return;
+}
+
+void MainWindow::addDefectClicked()
+{
+    defectForm->show();
 }

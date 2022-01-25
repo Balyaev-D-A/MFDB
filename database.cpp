@@ -71,6 +71,11 @@ bool Database::deployTables()
 
     if (!pq->exec("create table if not exists normativactions (na_id serial primary key, na_dev varchar(50), na_worktype char(2), "
                   "na_actions text)")) return false;
+    if (!pq->exec("create table if not exists defects (def_id serial primary key, def_kks varchar(50), def_journaldesc text, "
+                  "def_realdesc text, def_repairdesc text")) return false;
+    if (!pq->exec("create table if not exists defrealdescs (drd_id serial primary key, drd_dev varchar(50), drd_desc text")) return false;
+    if (!pq->exec("create table if not exists defrepairdescs (drp_id serial primary key, drp_realdefdesc integer references defrealdescs(drd_id), "
+                  "drp_repairdesc text")) return false;
 
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
     if (!pq->exec("create table if not exists rasp (rasp_id serial primary key, rasp_num char(6), rasp_date char(10), rasp_btime char(5), "

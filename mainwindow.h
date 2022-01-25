@@ -6,6 +6,7 @@
 #include "dictionaryform.h"
 #include "raspform.h"
 #include "normativeform.h"
+#include "defectform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,6 +27,7 @@ private:
     bool adminMode;
     DictionaryForm *dictionaryForm;
     NormativeForm *normativeForm;
+    DefectForm *defectForm;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
 private slots:
@@ -47,6 +49,7 @@ private slots:
     void raspCellDoubleClicked(int row, int column);
     void editorInputAccepted(FieldEditor *editor);
     void editorInputRejected(FieldEditor *editor);
+    void addDefectClicked();
 
 protected:
     void showEvent(QShowEvent *event);

@@ -14,6 +14,7 @@ SOURCES += \
     csvreader.cpp \
     database.cpp \
     defectform.cpp \
+    deviceselectorform.cpp \
     dictionaryform.cpp \
     dragdroplist.cpp \
     dragdroptable.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     csvreader.h \
     database.h \
     defectform.h \
+    deviceselectorform.h \
     dictionaryform.h \
     dragdroplist.h \
     dragdroptable.h \
@@ -56,6 +58,7 @@ HEADERS += \
 
 FORMS += \
     defectform.ui \
+    deviceselectorform.ui \
     dictionaryform.ui \
     importform.ui \
     mainwindow.ui \
