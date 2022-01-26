@@ -52,7 +52,7 @@ void MainWindow::showEvent(QShowEvent *event)
     QMainWindow::showEvent(event);
 
     if (!connectDB("alpha.prostore.ru", "radico22", "radico", "coolpass")) {
-        QMessageBox::critical(this, "Ошибка!!!", "Невозможно установить соединение с сервером БД!");
+        db->showError(this);
         return;
     }
     ui->raspDateEdit->setDate(QDate::currentDate());
@@ -342,4 +342,5 @@ void MainWindow::printRaspClicked()
 void MainWindow::addDefectClicked()
 {
     defectForm->show();
+
 }
