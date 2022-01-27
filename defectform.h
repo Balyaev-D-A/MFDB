@@ -5,17 +5,17 @@
 #include "database.h"
 #include "deviceselectorform.h"
 
-typedef enum {
-    EXTERNREVIEW = 0,
-    EXTERNCONN = 1,
-    INTERNCONN = 2,
-    ELECTRICPAR = 3
-} DefectStage;
+
+const int EXTERNREVIEW = 0;
+const int EXTERNCONN = 1;
+const int INTERNCONN = 2;
+const int ELECTRICPAR = 3;
+
 
 typedef struct {
     int id;
     QString description;
-    DefectStage stage;
+    int stage;
 } Defect;
 
 typedef QList<Defect> DefectList;
@@ -47,13 +47,24 @@ private:
     SelectedDevice device;
     DefectList defectList;
     RepairList repairList;
+    int currentDefect;
+    int currentRepair;
     void updateDefects();
     void updateRepairs();
+    void updateDefectText();
+    void updateRepairText();
 
 private slots:
     void deviceButtonClicked();
     void selectorClosed(DeviceSelectorForm *sender);
     void deviceChoosed(SelectedDevice device);
+    void addDefectClicked();
+    void saveDefectClicked();
+    void deleteDefectClicked();
+    void prevDefectClicked() {currentDefect--; updateDefectText();}
+    void nextDefectClicked() {currentDefect++; updateDefectText();}
+    void prevRepairClicked() {currentRepair--; updateRepairText();}
+    void nextRepairClicked() {currentRepair++; updateRepairText();}
 };
 
 #endif // DEFECTFORM_H

@@ -200,6 +200,9 @@
            <property name="text">
             <string>Внешний осмотр</string>
            </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup</string>
+           </attribute>
           </widget>
          </item>
          <item>
@@ -207,6 +210,9 @@
            <property name="text">
             <string>Внешние разъёмы</string>
            </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup</string>
+           </attribute>
           </widget>
          </item>
          <item>
@@ -214,6 +220,9 @@
            <property name="text">
             <string>Внутренние соединения</string>
            </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup</string>
+           </attribute>
           </widget>
          </item>
          <item>
@@ -221,6 +230,9 @@
            <property name="text">
             <string>Электрические параметры</string>
            </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup</string>
+           </attribute>
           </widget>
          </item>
         </layout>
@@ -241,7 +253,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QToolButton" name="prevRepeirButton">
+         <widget class="QToolButton" name="prevRepairButton">
           <property name="text">
            <string>&lt;</string>
           </property>
@@ -281,7 +293,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QToolButton" name="nextRepeirButton">
+         <widget class="QToolButton" name="nextRepairButton">
           <property name="text">
            <string>&gt;</string>
           </property>
@@ -383,14 +395,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="QToolButton" name="addMaterial">
+         <widget class="QToolButton" name="addMaterialButton">
           <property name="text">
            <string>&lt;</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="removeMaterial">
+         <widget class="QToolButton" name="removeMaterialButton">
           <property name="text">
            <string>&gt;</string>
           </property>
@@ -464,4 +476,7 @@
   <include location="resource.qrc"/>
  </resources>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>
