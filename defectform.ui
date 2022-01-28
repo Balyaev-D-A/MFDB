@@ -377,7 +377,38 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QTableWidget" name="addedMatTable"/>
+       <widget class="DragDropTable" name="addedMatTable">
+        <property name="acceptDrops">
+         <bool>true</bool>
+        </property>
+        <property name="dragDropOverwriteMode">
+         <bool>false</bool>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::DragDrop</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Id</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Наименование</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Кол-во</string>
+         </property>
+        </column>
+       </widget>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -424,13 +455,38 @@
        </layout>
       </item>
       <item>
-       <widget class="QTableWidget" name="materialTable">
+       <widget class="DragDropTable" name="materialTable">
         <property name="maximumSize">
          <size>
           <width>250</width>
           <height>16777215</height>
          </size>
         </property>
+        <property name="acceptDrops">
+         <bool>true</bool>
+        </property>
+        <property name="dragDropOverwriteMode">
+         <bool>false</bool>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::DragDrop</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Id</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Наименование</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>
@@ -472,6 +528,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DragDropTable</class>
+   <extends>QTableWidget</extends>
+   <header>dragdroptable.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resource.qrc"/>
  </resources>

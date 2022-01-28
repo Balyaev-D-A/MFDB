@@ -116,9 +116,9 @@ void DeviceSelectorForm::okClicked()
         return;
     }
 
-    dev.devKKS = items[0]->text(0);
-    dev.devName = ui->deviceBox->currentData().toString();
-    dev.devType = ui->deviceBox->currentText();
+    dev.kks = items[0]->text(0);
+    dev.name = ui->deviceBox->currentData().toString();
+    dev.type = ui->deviceBox->currentText();
 
     emit deviceChoosed(dev);
     close();

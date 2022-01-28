@@ -341,6 +341,6 @@ void MainWindow::printRaspClicked()
 
 void MainWindow::addDefectClicked()
 {
+    defectForm->newDefect();
     defectForm->show();
-
 }

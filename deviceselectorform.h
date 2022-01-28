@@ -5,9 +5,9 @@
 #include "database.h"
 
 typedef struct {
-    QString devType;
-    QString devName;
-    QString devKKS;
+    QString type;
+    QString name;
+    QString kks;
 } SelectedDevice;
 
 class QTreeWidgetItem;

@@ -39,6 +39,8 @@ public:
     explicit DefectForm(QWidget *parent = nullptr);
     ~DefectForm();
     void setDatabase(Database *db);
+    void newDefect();
+    void editRasp(QString defId);
 
 private:
     Ui::DefectForm *ui;
@@ -47,12 +49,17 @@ private:
     SelectedDevice device;
     DefectList defectList;
     RepairList repairList;
+    QString defId;
+    bool matsChanged;
     int currentDefect;
     int currentRepair;
     void updateDefects();
     void updateRepairs();
     void updateDefectText();
     void updateRepairText();
+    void updateAddedMaterials();
+    void updateMaterials();
+    bool saveDefect();
 
 private slots:
     void deviceButtonClicked();
@@ -61,10 +68,16 @@ private slots:
     void addDefectClicked();
     void saveDefectClicked();
     void deleteDefectClicked();
-    void prevDefectClicked() {currentDefect--; updateDefectText();}
-    void nextDefectClicked() {currentDefect++; updateDefectText();}
+    void addRepairClicked();
+    void deleteRepairClicked();
+    void saveRepairClicked();
+    void prevDefectClicked() {currentDefect--; updateDefectText(); updateRepairs();}
+    void nextDefectClicked() {currentDefect++; updateDefectText(); updateRepairs();}
     void prevRepairClicked() {currentRepair--; updateRepairText();}
     void nextRepairClicked() {currentRepair++; updateRepairText();}
+    void addMaterialClicked();
+    void removeMaterialClicked();
+
 };
 
 #endif // DEFECTFORM_H
