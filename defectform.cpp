@@ -21,6 +21,8 @@ DefectForm::DefectForm(QWidget *parent) :
     connect(ui->removeMaterialButton, &QToolButton::clicked, this, &DefectForm::removeMaterialClicked);
     connect(ui->addedMatTable, &DragDropTable::itemDroped, this, &DefectForm::addMaterialClicked);
     connect(ui->materialTable, &DragDropTable::itemDroped, this, &DefectForm::removeMaterialClicked);
+    connect(ui->okButton, &QPushButton::clicked, this, &DefectForm::okClicked);
+    connect(ui->cancelButton, &QPushButton::clicked, this, &DefectForm::cancelClicked);
 
     ui->buttonGroup->setId(ui->externRevievRB, EXTERNREVIEW);
     ui->buttonGroup->setId(ui->externConnRB, EXTERNCONN);
@@ -58,10 +60,62 @@ void DefectForm::newDefect()
     ui->addedMatTable->setDisabled(true);
     ui->addMaterialButton->setDisabled(true);
     ui->removeMaterialButton->setDisabled(true);
-    updateDefectText();
-    updateRepairText();
+    updateDefects();
+    updateRepairs();
     updateAddedMaterials();
     updateMaterials();
+}
+
+void DefectForm::editDefect(QString defId)
+{
+    QString query;
+    int stage;
+
+    this->defId = defId;
+
+    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc WHERE def_id = '%1'";
+    query = query.arg(defId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    if (db->nextRecord()) {
+        device.type = db->fetchValue(0).toString();
+        device.kks = db->fetchValue(1).toString();
+        ui->journalDefectEdit->setText(db->fetchValue(2).toString());
+        ui->defectEdit->setText(db->fetchValue(3).toString());
+        stage = db->fetchValue(4).toInt();
+        ui->repairEdit->setText(db->fetchValue(5).toString());
+
+        switch (stage) {
+        case EXTERNREVIEW:
+            ui->externRevievRB->setChecked(true);
+            break;
+        case EXTERNCONN:
+            ui->externConnRB->setChecked(true);
+            break;
+        case INTERNCONN:
+            ui->internConnRB->setChecked(true);
+            break;
+        case ELECTRICPAR:
+            ui->electricParRB->setChecked(true);
+            break;
+        }
+    }
+
+    query = "SELECT sch_name from schedule WHERE sch_type = '%1' AND sch_kks = '%2' LIMIT 1";
+    query = query.arg(device.type).arg(device.kks);
+
+    if (db->execQuery(query))
+        if (db->nextRecord())
+            device.name = db->fetchValue(0).toString();
+    ui->deviceEdit->setText(device.name + " " + device.type + " " + device.kks);
+    updateAddedMaterials();
+    updateMaterials();
+    updateDefects();
+    updateRepairs();
 }
 
 void DefectForm::deviceButtonClicked()
@@ -456,11 +510,42 @@ bool DefectForm::saveDefect()
             db->rollbackTransaction();
             return false;
         }
-        db->commitTransaction();
-        return true;
     }
     else {
         query = "INSERT INTO defects (def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc) "
                 "VALUES ('%1', '%2', '%3', '%4', '%5', '%6')";
+        query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text()).arg(ui->defectEdit->text());
+        query = query.arg(ui->buttonGroup->checkedId()).arg(ui->repairEdit->text());
+
+        if (!db->execQuery(query)) {
+            db->showError(this);
+            db->rollbackTransaction();
+            return false;
+        }
+
+        query = "INSERT INTO defadditionalmats (dam_defect, dam_material, dam_count) VALUES ('%1', '%2', '%3')";
+
+        for (int i=0; i<ui->addedMatTable->rowCount(); i++)
+        {
+            prepQuery = query.arg(defId).arg(ui->addedMatTable->item(i, 0)->text()).arg(ui->addedMatTable->item(i, 2)->text());
+
+            if (!db->execQuery(prepQuery)) {
+                db->showError(this);
+                db->rollbackTransaction();
+                return false;
+            }
+        }
     }
+    db->commitTransaction();
+    return true;
+}
+
+void DefectForm::okClicked()
+{
+    if (saveDefect()) close();
+}
+
+void DefectForm::cancelClicked()
+{
+    close();
 }

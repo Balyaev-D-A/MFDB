@@ -40,7 +40,7 @@ public:
     ~DefectForm();
     void setDatabase(Database *db);
     void newDefect();
-    void editRasp(QString defId);
+    void editDefect(QString defId);
 
 private:
     Ui::DefectForm *ui;
@@ -77,6 +77,8 @@ private slots:
     void nextRepairClicked() {currentRepair++; updateRepairText();}
     void addMaterialClicked();
     void removeMaterialClicked();
+    void okClicked();
+    void cancelClicked();
 
 };
 

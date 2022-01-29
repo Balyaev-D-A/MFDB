@@ -344,3 +344,27 @@ void MainWindow::addDefectClicked()
     defectForm->newDefect();
     defectForm->show();
 }
+
+void MainWindow::updateDefectsTable()
+{
+    int rc;
+    QString query = "SELECT def_id, def_num, def_devtype, def_kks, def_begdate, def_enddate, rasp_num FROM defects AS d "
+                    "LEFT JOIN rasp AS r ON d.def_rasp = r.rasp_id;";
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    while (ui->defectsTable->rowCount()) ui->defectsTable->removeRow(0);
+
+    while (db->nextRecord())
+    {
+        rc = ui->defectsTable->rowCount();
+        ui->defectsTable->insertRow(rc);
+        rc--;
+        for (int i=0; i<7; i++)
+        {
+            ui->defectsTable->setItem(rc, i, new QTableWidgetItem(db->fetchValue(i).toString()));
+        }
+    }
+}
