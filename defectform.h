@@ -80,6 +80,9 @@ private slots:
     void okClicked();
     void cancelClicked();
 
+signals:
+    void defectSaved();
+
 };
 
 #endif // DEFECTFORM_H

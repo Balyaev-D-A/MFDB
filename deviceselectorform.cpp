@@ -56,7 +56,19 @@ void DeviceSelectorForm::fillDeviceBox()
 void DeviceSelectorForm::updateDeviceTree()
 {
     QTreeWidgetItem *unitItem, *kksItem;
-    QString query = "SELECT DISTINCT ON (sch_kks) unit_name, sch_kks FROM schedule AS s LEFT JOIN units AS u ON s.sch_unit = u.unit_id "
+    QStringList usedKKS;
+
+    QString query = "SELECT DISTINCT ON (def_kks) def_kks FROM defects WHERE def_devtype = '%1' ORDER BY def_kks";
+    query = query.arg(ui->deviceBox->currentText());
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    while (db->nextRecord()) usedKKS.append(db->fetchValue(0).toString());
+
+    query = "SELECT DISTINCT ON (sch_kks) unit_name, sch_kks FROM schedule AS s LEFT JOIN units AS u ON s.sch_unit = u.unit_id "
                     "WHERE sch_type = '%1' AND sch_executor = 'ИТЦРК' ORDER BY sch_kks";
     query = query.arg(ui->deviceBox->currentText());
     if (!db->execQuery(query)) {
@@ -86,6 +98,7 @@ void DeviceSelectorForm::updateDeviceTree()
 
         kksItem = new QTreeWidgetItem();
         kksItem->setText(0, db->fetchValue(1).toString());
+        if (usedKKS.contains(db->fetchValue(1).toString())) kksItem->setBackground(0, QBrush(Qt::red));
         unitItem->addChild(kksItem);
     }
 

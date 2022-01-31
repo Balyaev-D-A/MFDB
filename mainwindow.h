@@ -51,6 +51,7 @@ private slots:
     void editorInputRejected(FieldEditor *editor);
     void addDefectClicked();
     void updateDefectsTable();
+    void dtCellDoubleClicked(int row, int column);
 
 protected:
     void showEvent(QShowEvent *event);

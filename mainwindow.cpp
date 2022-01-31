@@ -1,6 +1,7 @@
 #include <QMessageBox>
 #include <QShowEvent>
-#include <QDebug>
+#include <QDate>
+#include <QCalendarWidget>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -14,6 +15,35 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     ui->raspTable->hideColumn(0);
+    ui->defectsTable->hideColumn(0);
+
+    int month = QDate::currentDate().month();
+    int quarter;
+
+    switch (month) {
+    case 1:
+    case 2:
+    case 3:
+        quarter = 1;
+        break;
+    case 4:
+    case 5:
+    case 6:
+        quarter = 2;
+        break;
+    case 7:
+    case 8:
+    case 9:
+        quarter = 3;
+        break;
+    case 10:
+    case 11:
+    case 12:
+        quarter = 4;
+        break;
+    }
+
+    ui->quarterBox->setCurrentIndex(quarter - 1);
 
     db = new Database;
     dictionaryForm = new DictionaryForm();
@@ -39,6 +69,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->printButton, &QToolButton::clicked, this, &MainWindow::printRaspClicked);
     connect(ui->updateRaspButton, &QToolButton::clicked, this, &MainWindow::updateRaspTable);
     connect(ui->addDefectButton, &QToolButton::clicked, this, &MainWindow::addDefectClicked);
+    connect(ui->updateDefectsButton, &QToolButton::clicked, this, &MainWindow::updateDefectsTable);
+    connect(defectForm, &DefectForm::defectSaved, this, &MainWindow::updateDefectsTable);
+    connect(ui->quarterBox, &QComboBox::currentTextChanged, this, &MainWindow::updateDefectsTable);
+    connect(ui->defectsTable, &QTableWidget::cellDoubleClicked, this, &MainWindow::dtCellDoubleClicked);
 }
 
 MainWindow::~MainWindow()
@@ -62,6 +96,7 @@ void MainWindow::showEvent(QShowEvent *event)
     while (db->nextRecord())
         ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
     updateRaspTable();
+    updateDefectsTable();
 }
 
 bool MainWindow::connectDB(QString host, QString dbname, QString user, QString password)
@@ -348,23 +383,45 @@ void MainWindow::addDefectClicked()
 void MainWindow::updateDefectsTable()
 {
     int rc;
-    QString query = "SELECT def_id, def_num, def_devtype, def_kks, def_begdate, def_enddate, rasp_num FROM defects AS d "
-                    "LEFT JOIN rasp AS r ON d.def_rasp = r.rasp_id;";
+    QString query = "SELECT def_id, def_num, unit_name, def_devtype, def_kks, def_begdate, def_enddate, rasp_num FROM defects AS d "
+                    "LEFT JOIN rasp AS r ON d.def_rasp = r.rasp_id "
+                    "LEFT JOIN schedule AS s ON d.def_kks = s.sch_kks "
+                    "LEFT JOIN units AS u ON s.sch_unit = u.unit_id "
+                    "WHERE def_quarter = '%1'";
+    query = query.arg(ui->quarterBox->currentIndex() + 1);
     if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
 
     while (ui->defectsTable->rowCount()) ui->defectsTable->removeRow(0);
-
+    ui->defectsTable->setSortingEnabled(false);
     while (db->nextRecord())
     {
         rc = ui->defectsTable->rowCount();
         ui->defectsTable->insertRow(rc);
-        rc--;
-        for (int i=0; i<7; i++)
+        for (int i=0; i<8; i++)
         {
-            ui->defectsTable->setItem(rc, i, new QTableWidgetItem(db->fetchValue(i).toString()));
+                ui->defectsTable->setItem(rc, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
+    }
+    ui->defectsTable->setSortingEnabled(true);
+    ui->defectsTable->sortItems(0);
+    ui->defectsTable->resizeColumnsToContents();
+}
+
+void MainWindow::dtCellDoubleClicked(int row, int column)
+{
+    QRect itemRect;
+    QPoint calOrigin;
+    int leftFrameWidth = this->geometry().left() - this->pos().x();
+    int topFrameHeight = this->geometry().top() - this->pos().y();
+    if (column == 5 or column == 6) {
+        itemRect = ui->defectsTable->visualItemRect(ui->defectsTable->item(row, column));
+        QCalendarWidget *cw = new QCalendarWidget();
+        cw->setWindowFlag(Qt::Popup, true);
+        calOrigin = ui->defectsTable->mapToGlobal(itemRect.bottomLeft());
+        cw->move(calOrigin.x() + leftFrameWidth, calOrigin.y() + topFrameHeight);
+        cw->show();
     }
 }

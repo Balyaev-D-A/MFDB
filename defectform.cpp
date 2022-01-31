@@ -54,6 +54,7 @@ void DefectForm::newDefect()
     device.kks = "";
     device.name = "";
     device.type = "";
+    matsChanged = false;
     ui->deviceEdit->setText("");
     ui->journalDefectEdit->setDisabled(true);
     ui->materialTable->setDisabled(true);
@@ -71,9 +72,11 @@ void DefectForm::editDefect(QString defId)
     QString query;
     int stage;
 
+    matsChanged = false;
+
     this->defId = defId;
 
-    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc WHERE def_id = '%1'";
+    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_quarter WHERE def_id = '%1'";
     query = query.arg(defId);
 
     if (!db->execQuery(query)) {
@@ -103,6 +106,7 @@ void DefectForm::editDefect(QString defId)
             ui->electricParRB->setChecked(true);
             break;
         }
+        ui->quarterBox->setCurrentIndex(db->fetchValue(6).toInt());
     }
 
     query = "SELECT sch_name from schedule WHERE sch_type = '%1' AND sch_kks = '%2' LIMIT 1";
@@ -464,11 +468,13 @@ void DefectForm::addMaterialClicked()
                                    ui->materialTable->item(ui->materialTable->currentRow(), 1)->text()));
     ui->addedMatTable->setSortingEnabled(true);
     ui->materialTable->removeRow(ui->materialTable->currentRow());
+    matsChanged = true;
 }
 
 void DefectForm::removeMaterialClicked()
 {
     ui->addedMatTable->removeRow(ui->addedMatTable->currentRow());
+    matsChanged = true;
     updateMaterials();
 }
 
@@ -500,8 +506,9 @@ bool DefectForm::saveDefect()
                 }
             }
         }
-        query = "UPDATE defects SET def_devtype = '%1', def_kks = '%2', def_journaldesc = '%3', def_realdesc = '%4', "
-                "def_stage = '%5', def_repairdesc = '%6'";
+        query = "UPDATE defects SET def_quarter = '%1', def_devtype = '%2', def_kks = '%3', def_journaldesc = '%4', def_realdesc = '%5', "
+                "def_stage = '%6', def_repairdesc = '%7'";
+        query = query.arg(ui->quarterBox->currentIndex()+1);
         query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text());
         query = query.arg(ui->defectEdit->text()).arg(ui->buttonGroup->checkedId()).arg(ui->repairEdit->text());
 
@@ -512,8 +519,9 @@ bool DefectForm::saveDefect()
         }
     }
     else {
-        query = "INSERT INTO defects (def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc) "
-                "VALUES ('%1', '%2', '%3', '%4', '%5', '%6')";
+        query = "INSERT INTO defects (def_quarter, def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc) "
+                "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7')";
+        query = query.arg(ui->quarterBox->currentIndex() + 1);
         query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text()).arg(ui->defectEdit->text());
         query = query.arg(ui->buttonGroup->checkedId()).arg(ui->repairEdit->text());
 
@@ -522,6 +530,8 @@ bool DefectForm::saveDefect()
             db->rollbackTransaction();
             return false;
         }
+
+        defId = db->lastInsertId().toString();
 
         query = "INSERT INTO defadditionalmats (dam_defect, dam_material, dam_count) VALUES ('%1', '%2', '%3')";
 
@@ -537,12 +547,15 @@ bool DefectForm::saveDefect()
         }
     }
     db->commitTransaction();
+    emit defectSaved();
     return true;
 }
 
 void DefectForm::okClicked()
 {
-    if (saveDefect()) close();
+    if (saveDefect()) {
+        close();
+    }
 }
 
 void DefectForm::cancelClicked()
