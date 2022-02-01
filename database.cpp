@@ -44,56 +44,56 @@ bool Database::deployTables()
 
 /////////////////////////////////////////////////////////// Справочники //////////////////////////////////////////////////
 
-    if (!pq->exec("create table if not exists employees (emp_id serial primary key, emp_num smallint unique, emp_name varchar(100), "
-                  "emp_position varchar(255), emp_group smallint, emp_tld smallint unique, emp_admin bool default 'false', "
-                  "emp_metrolog bool default 'false', emp_hidden bool default 'false')")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS employees (emp_id sSERIAL PRIMARY KEY, emp_num SMALLINT UNIQUE, emp_name VARCHAR(100), "
+                  "emp_position VARCHAR(255), emp_group SMALLINT, emp_tld SMALLINT UNIQUE, emp_admin BOOL DEFAULT 'FALSE', "
+                  "emp_metrolog BOOL DEFAULT 'FALSE', emp_hidden BOOL DEFAULT 'FALSE')")) return false;
 
-    if (!pq->exec("create table if not exists units (unit_id serial primary key, unit_name varchar(20))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS units (unit_id SERIAL PRIMARY KEY, unit_name VARCHAR(20))")) return false;
 
-    if (!pq->exec("create table if not exists schedule (sch_id serial primary key, sch_unit integer references units(unit_id), "
-                  "sch_kks varchar(50), sch_invno varchar(20), sch_name varchar(255), sch_type varchar(50), sch_tdoc varchar(255), sch_date varchar(10), "
-                  "sch_reportdate varchar(10), sch_worktype char(2), sch_hours decimal(5,2), sch_executor char(10), sch_done bool default 'false', "
-                  "sch_note varchar(1000))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS schedule (sch_id SERIAL PRIMARY KEY, sch_unit INTEGER REFERENCES units(unit_id), "
+                  "sch_kks VARCHAR(50), sch_invno VARCHAR(20), sch_name VARCHAR(255), sch_type VARCHAR(50), sch_tdoc VARCHAR(255), sch_date VARCHAR(10), "
+                  "sch_reportdate VARCHAR(10), sch_worktype CHAR(2), sch_hours DECIMAL(5,2), sch_executor CHAR(10), sch_done BOOL DEFAULT 'FALSE', "
+                  "sch_note VARCHAR(1000))")) return false;
 
-    if (!pq->exec("create table if not exists locations (loc_kks varchar(50) primary key, loc_location varchar(100))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS locations (loc_kks VARCHAR(50) PRIMARY KEY, loc_location VARCHAR(100))")) return false;
 
-    if (!pq->exec("create table if not exists issuers (iss_id serial primary key, iss_name varchar(50), iss_loc varchar(20), "
-                  "iss_default bool default false)")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS issuers (iss_id SERIAL PRIMARY KEY, iss_name VARCHAR(50), iss_loc VARCHAR(20), "
+                  "iss_default BOOL DEFAULT FALSE)")) return false;
 
-    if (!pq->exec("create table if not exists materials (mat_id serial primary key, mat_name varchar(150), mat_doc varchar(150), "
-                  "mat_measure varchar(10))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS materials (mat_id SERIAL PRIMARY KEY, mat_name VARCHAR(150), mat_doc VARCHAR(150), "
+                  "mat_measure VARCHAR(10))")) return false;
 
-    if (!pq->exec("create table if not exists normativmat (nm_id serial primary key, nm_dev varchar(50), nm_worktype char(2), "
-                  "nm_material integer references materials(mat_id), nm_count decimal(5,2))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS normativmat (nm_id SERIAL PRIMARY KEY, nm_dev VARCHAR(50), nm_worktype CHAR(2), "
+                  "nm_material INTEGER REFERENCES materials(mat_id), nm_count DECIMAL(5,2))")) return false;
 
-    if (!pq->exec("create table if not exists normativwork (nw_id serial primary key, nw_dev varchar(50), nw_worktype char(2), "
-                  "nw_oesn varchar(255), nw_work decimal(5,2))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS normativwork (nw_id SERIAL PRIMARY KEY, nw_dev VARCHAR(50), nw_worktype CHAR(2), "
+                  "nw_oesn VARCHAR(255), nw_work DECIMAL(5,2))")) return false;
 
-    if (!pq->exec("create table if not exists normativactions (na_id serial primary key, na_dev varchar(50), na_worktype char(2), "
-                  "na_actions text)")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS normativactions (na_id SERIAL PRIMARY KEY, na_dev VARCHAR(50), na_worktype CHAR(2), "
+                  "na_actions TEXT)")) return false;
 
-    if (!pq->exec("create table if not exists defects (def_id serial primary key, def_quarter smallint, def_num varchar(10), def_devtype varchar(50), def_kks varchar(50), "
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS defects (def_id serial primary key, def_quarter smallint, def_num varchar(10), def_devtype varchar(50), def_kks varchar(50), "
                   "def_journaldesc text, def_realdesc text, def_stage integer, def_repairdesc text, def_begdate char(10), def_enddate char(10), "
                   "def_rasp integer references rasp (rasp_id))")) return false;
 
-    if (!pq->exec("create table if not exists defrealdescs (drd_id serial primary key, drd_dev varchar(50), drd_stage integer, drd_desc text)")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS defrealdescs (drd_id SERIAL PRIMARY KEY, drd_dev VARCHAR(50), drd_stage INTEGER, drd_desc TEXT)")) return false;
 
-    if (!pq->exec("create table if not exists defrepairdescs (drp_id serial primary key, drp_realdefdesc integer references defrealdescs(drd_id), "
-                  "drp_repairdesc text)")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS defrepairdescs (drp_id SERIAL PRIMARY KEY, drp_realdefdesc INTEGER REFERENCES defrealdescs(drd_id), "
+                  "drp_repairdesc TEXT)")) return false;
 
-    if (!pq->exec("create table if not exists defadditionalmats (dam_id serial primary key, dam_defect integer references defects(def_id), "
-                  "dam_material integer references materials (mat_id), dam_count decimal(5,2))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS defadditionalmats (dam_id SERIAL PRIMARY KEY, dam_defect INTEGER REFERENCES defects(def_id), "
+                  "dam_material INTEGER REFERENCES materials (mat_id), dam_count DECIMAL(5,2))")) return false;
 
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
-    if (!pq->exec("create table if not exists rasp (rasp_id serial primary key, rasp_num char(6), rasp_date char(10), rasp_btime char(5), "
-                  "rasp_etime char(5), rasp_issuer integer references issuers(iss_id), rasp_executor integer references employees(emp_id), "
-                  "rasp_completed bool default 'false')")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS rasp (rasp_id SERIAL PRIMARY KEY, rasp_num CHAR(6), rasp_date CHAR(10), rasp_btime CHAR(5), "
+                  "rasp_etime CHAR(5), rasp_issuer INTEGER REFERENCES issuers(iss_id), rasp_executor INTEGER REFERENCES employees(emp_id), "
+                  "rasp_completed BOOL DEFAULT 'FALSE')")) return false;
 
-    if (!pq->exec("create table if not exists rmembers (rm_id serial primary key, rm_rasp integer references rasp(rasp_id) on delete cascade, "
-                  "rm_emp integer references employees(emp_id))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS rmembers (rm_id SERIAL PRIMARY KEY, rm_rasp INTEGER REFERENCES rasp(rasp_id) ON DELETE CASCADE, "
+                  "rm_emp INTEGER REFERENCES employees(emp_id))")) return false;
 
-    if (!pq->exec("create table if not exists requipment (re_id serial primary key, re_rasp integer references rasp(rasp_id) on delete cascade, "
-                  "re_equip integer references schedule(sch_id), re_worktype char(16))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS requipment (re_id SERIAL PRIMARY KEY, re_rasp INTEGER REFERENCES rasp(rasp_id) ON DELETE CASCADE, "
+                  "re_equip INTEGER REFERENCES schedule(sch_id), re_worktype CHAR(16))")) return false;
 
     return true;
 }
