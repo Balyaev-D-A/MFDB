@@ -69,14 +69,14 @@ void DefectForm::newDefect()
 
 void DefectForm::editDefect(QString defId)
 {
-    QString query;
+    QString query, defect, repair;
     int stage;
 
     matsChanged = false;
 
     this->defId = defId;
 
-    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_quarter WHERE def_id = '%1'";
+    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_quarter FROM defects WHERE def_id = '%1'";
     query = query.arg(defId);
 
     if (!db->execQuery(query)) {
@@ -88,9 +88,9 @@ void DefectForm::editDefect(QString defId)
         device.type = db->fetchValue(0).toString();
         device.kks = db->fetchValue(1).toString();
         ui->journalDefectEdit->setText(db->fetchValue(2).toString());
-        ui->defectEdit->setText(db->fetchValue(3).toString());
+        defect = db->fetchValue(3).toString();
         stage = db->fetchValue(4).toInt();
-        ui->repairEdit->setText(db->fetchValue(5).toString());
+        repair = db->fetchValue(5).toString();
 
         switch (stage) {
         case EXTERNREVIEW:
@@ -106,7 +106,7 @@ void DefectForm::editDefect(QString defId)
             ui->electricParRB->setChecked(true);
             break;
         }
-        ui->quarterBox->setCurrentIndex(db->fetchValue(6).toInt());
+        ui->quarterBox->setCurrentIndex(db->fetchValue(6).toInt() - 1);
     }
 
     query = "SELECT sch_name from schedule WHERE sch_type = '%1' AND sch_kks = '%2' LIMIT 1";
@@ -120,6 +120,8 @@ void DefectForm::editDefect(QString defId)
     updateMaterials();
     updateDefects();
     updateRepairs();
+    ui->defectEdit->setText(defect);
+    ui->repairEdit->setText(repair);
 }
 
 void DefectForm::deviceButtonClicked()

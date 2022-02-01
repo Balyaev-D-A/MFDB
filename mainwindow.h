@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QCalendarWidget>
 #include "database.h"
 #include "dictionaryform.h"
 #include "raspform.h"
@@ -28,6 +29,7 @@ private:
     DictionaryForm *dictionaryForm;
     NormativeForm *normativeForm;
     DefectForm *defectForm;
+    QCalendarWidget *datePicker;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
 private slots:
@@ -47,11 +49,16 @@ private slots:
     void selectAllRaspClicked();
     void printRaspClicked();
     void raspCellDoubleClicked(int row, int column);
-    void editorInputAccepted(FieldEditor *editor);
+    void raspEditorInputAccepted(FieldEditor *editor);
+    void defEditorInputAccepted(FieldEditor *editor);
     void editorInputRejected(FieldEditor *editor);
     void addDefectClicked();
     void updateDefectsTable();
     void dtCellDoubleClicked(int row, int column);
+    void datePicked(const QDate &date);
+    void clearCellPressed();
+    void editDefectClicked();
+    void deleteDefectClicked();
 
 protected:
     void showEvent(QShowEvent *event);

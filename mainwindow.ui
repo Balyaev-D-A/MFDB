@@ -525,7 +525,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
-           <widget class="QTableWidget" name="defectsTable">
+           <widget class="DefectsTable" name="defectsTable">
             <property name="editTriggers">
              <set>QAbstractItemView::NoEditTriggers</set>
             </property>
@@ -620,7 +620,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="toolButton_5">
+             <widget class="QToolButton" name="editDefectButton">
               <property name="text">
                <string>...</string>
               </property>
@@ -637,7 +637,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="removeDefectButton">
+             <widget class="QToolButton" name="deleteDefectButton">
               <property name="text">
                <string>...</string>
               </property>
@@ -797,6 +797,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DefectsTable</class>
+   <extends>QTableWidget</extends>
+   <header>defectstable.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resource.qrc"/>
  </resources>

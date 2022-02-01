@@ -1,7 +1,6 @@
 #include <QMessageBox>
 #include <QShowEvent>
 #include <QDate>
-#include <QCalendarWidget>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -52,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
     normativeForm->setDatabase(db);
     defectForm = new DefectForm();
     defectForm->setDatabase(db);
+    datePicker = new QCalendarWidget();
+    datePicker->setWindowFlag(Qt::Popup, true);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -72,7 +73,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->updateDefectsButton, &QToolButton::clicked, this, &MainWindow::updateDefectsTable);
     connect(defectForm, &DefectForm::defectSaved, this, &MainWindow::updateDefectsTable);
     connect(ui->quarterBox, &QComboBox::currentTextChanged, this, &MainWindow::updateDefectsTable);
-    connect(ui->defectsTable, &QTableWidget::cellDoubleClicked, this, &MainWindow::dtCellDoubleClicked);
+    connect(ui->defectsTable, &DefectsTable::cellDoubleClicked, this, &MainWindow::dtCellDoubleClicked);
+    connect(datePicker, &QCalendarWidget::activated, this, &MainWindow::datePicked);
+    connect(ui->defectsTable, &DefectsTable::clearCellPressed, this, &MainWindow::clearCellPressed);
+    connect(ui->editDefectButton, &QToolButton::clicked, this, &MainWindow::editDefectClicked);
+    connect(ui->deleteDefectButton, &QToolButton::clicked, this, &MainWindow::deleteDefectClicked);
 }
 
 MainWindow::~MainWindow()
@@ -278,7 +283,7 @@ void MainWindow::raspCellDoubleClicked(int row, int column)
         editor->setText(ui->raspTable->item(row, 1)->text());
         editor->setCell(row, 1);
         editor->setGeometry(ui->raspTable->visualItemRect(ui->raspTable->item(row, 1)));
-        connect(editor, &FieldEditor::acceptInput, this, &MainWindow::editorInputAccepted);
+        connect(editor, &FieldEditor::acceptInput, this, &MainWindow::raspEditorInputAccepted);
         connect(editor, &FieldEditor::rejectInput, this, &MainWindow::editorInputRejected);
         editor->show();
         editor->selectAll();
@@ -293,7 +298,7 @@ void MainWindow::raspCellDoubleClicked(int row, int column)
     }
 }
 
-void MainWindow::editorInputAccepted(FieldEditor *editor)
+void MainWindow::raspEditorInputAccepted(FieldEditor *editor)
 {
     QString query = "update rasp set rasp_num = '%1' where rasp_id = '%2'";
     QStringList s = editor->text().split("/");
@@ -414,14 +419,167 @@ void MainWindow::dtCellDoubleClicked(int row, int column)
 {
     QRect itemRect;
     QPoint calOrigin;
-    int leftFrameWidth = this->geometry().left() - this->pos().x();
-    int topFrameHeight = this->geometry().top() - this->pos().y();
-    if (column == 5 or column == 6) {
-        itemRect = ui->defectsTable->visualItemRect(ui->defectsTable->item(row, column));
-        QCalendarWidget *cw = new QCalendarWidget();
-        cw->setWindowFlag(Qt::Popup, true);
-        calOrigin = ui->defectsTable->mapToGlobal(itemRect.bottomLeft());
-        cw->move(calOrigin.x() + leftFrameWidth, calOrigin.y() + topFrameHeight);
-        cw->show();
+    QDate minDate, maxDate;
+
+    if (column == 1) {
+        FieldEditor *fe = new FieldEditor(ui->defectsTable->viewport());
+        fe->setGeometry(ui->defectsTable->visualItemRect(ui->defectsTable->item(row, column)));
+        fe->setType(EINT);
+        fe->setCell(row, column);
+        connect(fe, &FieldEditor::acceptInput, this, &MainWindow::defEditorInputAccepted);
+        connect(fe, &FieldEditor::rejectInput, this, &MainWindow::editorInputRejected);
+        fe->setText(ui->defectsTable->item(row, column)->text());
+        fe->show();
+        fe->selectAll();
+        fe->setFocus();
+        return;
     }
+
+    if (column == 5 || column == 6) {
+        switch (ui->quarterBox->currentIndex() + 1) {
+        case 1:
+            minDate.setDate(QDate::currentDate().year(), 1, 1);
+            maxDate.setDate(QDate::currentDate().year(), 3, 31);
+            break;
+        case 2:
+            minDate.setDate(QDate::currentDate().year(), 4, 1);
+            maxDate.setDate(QDate::currentDate().year(), 6, 30);
+            break;
+        case 3:
+            minDate.setDate(QDate::currentDate().year(), 7, 1);
+            maxDate.setDate(QDate::currentDate().year(), 9, 30);
+            break;
+        case 4:
+            minDate.setDate(QDate::currentDate().year(), 10, 1);
+            maxDate.setDate(QDate::currentDate().year(), 12, 31);
+            break;
+        }
+        int leftFrameWidth = this->geometry().left() - this->pos().x();
+        int topFrameHeight = this->geometry().top() - this->pos().y();
+        itemRect = ui->defectsTable->visualItemRect(ui->defectsTable->item(row, column));
+        calOrigin = ui->defectsTable->mapToGlobal(itemRect.bottomLeft());
+        datePicker->move(calOrigin.x() + leftFrameWidth, calOrigin.y() + topFrameHeight);
+        datePicker->setDateRange(minDate, maxDate);
+        if (QDate::currentDate() < minDate)
+            datePicker->setSelectedDate(minDate);
+        else if (QDate::currentDate() > maxDate)
+            datePicker->setSelectedDate(maxDate);
+        else
+            datePicker->setSelectedDate(QDate::currentDate());
+
+        datePicker->show();
+        return;
+    }
+    editDefectClicked();
+}
+
+void MainWindow::datePicked(const QDate &date)
+{
+    QString query = "UPDATE defects SET %1 = '%2' WHERE def_id = '%3'";
+    int curRow, curCol;
+    curRow = ui->defectsTable->currentItem()->row();
+    curCol = ui->defectsTable->currentItem()->column();
+    if (curCol == 5)
+        query = query.arg("def_begdate");
+    else if (curCol == 6)
+        query = query.arg("def_enddate");
+    else {
+        datePicker->close();
+        return;
+    }
+    query = query.arg(date.toString("dd.MM.yyyy"));
+    query = query.arg(ui->defectsTable->item(curRow, 0)->text());
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        datePicker->close();
+        return;
+    }
+    ui->defectsTable->currentItem()->setText(date.toString("dd.MM.yyyy"));
+    datePicker->close();
+}
+
+void MainWindow::clearCellPressed()
+{
+    int curRow, curCol;
+    if (!ui->defectsTable->currentItem()) return;
+    curRow = ui->defectsTable->currentItem()->row();
+    curCol = ui->defectsTable->currentItem()->column();
+    if (curCol != 5)
+        if (curCol != 6)
+            return;
+    QMessageBox::StandardButton btn;
+    btn = QMessageBox::question(this, "Внимание!!!", "Вы действительно хотите очистить значение?");
+    if (btn == QMessageBox::No) return;
+    QString query = "UPDATE defects SET %1 = NULL WHERE def_id = '%2'";
+    if (curCol == 5)
+        query = query.arg("def_begdate");
+    else if (curCol == 6)
+        query = query.arg("def_enddate");
+    query = query.arg(ui->defectsTable->item(curRow, 0)->text());
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+    ui->defectsTable->currentItem()->setText("");
+}
+
+void MainWindow::defEditorInputAccepted(FieldEditor *editor)
+{
+    QString query = "UPDATE defects SET %1 = %2 WHERE def_id = '%3'";
+    if (editor->getColumn() == 1)
+        query = query.arg("def_num");
+    else {
+        editor->close();
+        editor->deleteLater();
+        return;
+    }
+    if (editor->text() == "")
+        query = query.arg("NULL");
+    else
+        query = query.arg(editor->text());
+    query = query.arg(ui->defectsTable->item(editor->getRow(), 0)->text());
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        editor->close();
+        editor->deleteLater();
+        return;
+    }
+    ui->defectsTable->item(editor->getRow(), editor->getColumn())->setText(editor->text());
+    editor->close();
+    editor->deleteLater();
+}
+
+void MainWindow::editDefectClicked()
+{
+    if (!ui->defectsTable->currentItem()) return;
+
+    defectForm->editDefect(ui->defectsTable->item(ui->defectsTable->currentRow(), 0)->text());
+    defectForm->show();
+}
+
+void MainWindow::deleteDefectClicked()
+{
+    QString query;
+
+    if (!ui->defectsTable->currentItem()) return;
+
+    db->startTransaction();
+    query = "DELETE FROM defadditionalmats WHERE dam_defect = '%1'";
+    query = query.arg(ui->defectsTable->item(ui->defectsTable->currentRow(), 0)->text());
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    query = "DELETE FROM defects WHERE def_id = '%1'";
+    query = query.arg(ui->defectsTable->item(ui->defectsTable->currentRow(), 0)->text());
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    ui->defectsTable->removeRow(ui->defectsTable->currentRow());
+    db->commitTransaction();
 }
