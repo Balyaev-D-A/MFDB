@@ -521,6 +521,9 @@
                <property name="text">
                 <string>В работе</string>
                </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -547,6 +550,9 @@
                </property>
                <property name="text">
                 <string>Завершённые</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>

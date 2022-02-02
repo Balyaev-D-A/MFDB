@@ -94,19 +94,31 @@ void RaspForm::updateWorkTable()
     QString query;
     QString month = "";
     QStringList choosedWorks;
+    QStringList idsInRasps;
     int row;
+    bool done;
+    bool inRasps;
+    bool colored;
+    Qt::GlobalColor color;
+
+    query = "SELECT re_equip FROM requipment";
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    idsInRasps.clear();
+
+    while (db->nextRecord())
+    {
+        idsInRasps.append(db->fetchValue(0).toString());
+    }
 
     while (ui->workTable->rowCount()>0) ui->workTable->removeRow(0);
 
-    query = "select sch_id, sch_kks, sch_type, sch_worktype, loc_location, sch_hours, sch_state from schedule left join locations on schedule.sch_kks = locations.loc_kks "
-            "where schedule.sch_executor = 'ИТЦРК' and sch_unit = '" + ui->unitBox->currentData().toString() + "' and (sch_state = 16535";
-    if (ui->newCheckBox->isChecked())
-        query += " or sch_state = 0";
-    if (ui->inworkCheckBox->isChecked())
-        query += " or sch_state = 1";
-    if (ui->completedCheckBox->isChecked())
-        query += " or sch_state = 2";
-    query += ")";
+    query = "select sch_id, sch_kks, sch_type, sch_worktype, loc_location, sch_hours, sch_done from schedule left join locations on schedule.sch_kks = locations.loc_kks "
+            "where schedule.sch_executor = 'ИТЦРК' and sch_unit = '%1'";
+    query = query.arg(ui->unitBox->currentData().toString());
     if (ui->monthBox->currentIndex() != 0) {
         if (ui->monthBox->currentIndex() == 13){
             month = "ППР-" + QString::number(QDate::currentDate().year());
@@ -116,7 +128,7 @@ void RaspForm::updateWorkTable()
         }
     }
     if (month != "")
-        query += "and sch_date = '" + month + "'";
+        query += " and sch_date = '" + month + "'";
 
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -133,22 +145,29 @@ void RaspForm::updateWorkTable()
     while (db->nextRecord())
     {
         if (choosedWorks.contains(db->fetchValue(0).toString())) continue;
+        done = db->fetchValue(6).toBool();
+        inRasps = idsInRasps.contains(db->fetchValue("sch_id").toString());
+        if (!ui->completedCheckBox->isChecked() && done) continue;
+        if (!ui->inworkCheckBox->isChecked() && inRasps) continue;
+        if (!ui->newCheckBox->isChecked() && !done && !inRasps) continue;
+        if (done) {
+            colored = true;
+            color = Qt::green;
+        }
+        else if (inRasps) {
+            colored = true;
+            color = Qt::yellow;
+        }
+        else
+            colored = false;
+
         row = ui->workTable->rowCount();
         ui->workTable->insertRow(row);
         for (int j=0; j<6; j++)
         {
             ui->workTable->setItem(row, j, new QTableWidgetItem(db->fetchValue(j).toString()));
-            switch (db->fetchValue(6).toInt())
-            {
-            case 1:
-                ui->workTable->item(row, j)->setBackground(QBrush(Qt::yellow));
-                break;
-            case 2:
-                ui->workTable->item(row, j)->setBackground(QBrush(Qt::green));
-                break;
-            default:
-                break;
-            }
+            if (colored)
+                ui->workTable->item(row, j)->setBackground(QBrush(color));
         }
     }
     ui->workTable->setSortingEnabled(true);
