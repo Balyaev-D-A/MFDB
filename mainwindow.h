@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QCalendarWidget>
+#include <QListWidget>
 #include "database.h"
 #include "dictionaryform.h"
 #include "raspform.h"
@@ -30,6 +31,7 @@ private:
     NormativeForm *normativeForm;
     DefectForm *defectForm;
     QCalendarWidget *datePicker;
+    QListWidget *raspPicker;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
 private slots:

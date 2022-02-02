@@ -53,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent)
     defectForm->setDatabase(db);
     datePicker = new QCalendarWidget();
     datePicker->setWindowFlag(Qt::Popup, true);
+    raspPicker = new QListWidget();
+    raspPicker->setWindowFlag(Qt::Popup, true);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -388,8 +390,7 @@ void MainWindow::addDefectClicked()
 void MainWindow::updateDefectsTable()
 {
     int rc;
-    QString query = "SELECT def_id, def_num, unit_name, def_devtype, def_kks, def_begdate, def_enddate, rasp_num FROM defects AS d "
-                    "LEFT JOIN rasp AS r ON d.def_rasp = r.rasp_id "
+    QString query = "SELECT def_id, def_num, unit_name, def_devtype, def_kks, def_begdate, def_enddate, def_rasp FROM defects AS d "
                     "LEFT JOIN schedule AS s ON d.def_kks = s.sch_kks "
                     "LEFT JOIN units AS u ON s.sch_unit = u.unit_id "
                     "WHERE def_quarter = '%1'";
@@ -425,6 +426,20 @@ void MainWindow::dtCellDoubleClicked(int row, int column)
         FieldEditor *fe = new FieldEditor(ui->defectsTable->viewport());
         fe->setGeometry(ui->defectsTable->visualItemRect(ui->defectsTable->item(row, column)));
         fe->setType(EINT);
+        fe->setCell(row, column);
+        connect(fe, &FieldEditor::acceptInput, this, &MainWindow::defEditorInputAccepted);
+        connect(fe, &FieldEditor::rejectInput, this, &MainWindow::editorInputRejected);
+        fe->setText(ui->defectsTable->item(row, column)->text());
+        fe->show();
+        fe->selectAll();
+        fe->setFocus();
+        return;
+    }
+    if (column == 7) {
+        FieldEditor *fe = new FieldEditor(ui->defectsTable->viewport());
+        fe->setGeometry(ui->defectsTable->visualItemRect(ui->defectsTable->item(row, column)));
+        fe->setType(ESTRING);
+        fe->setInputMask("000/00");
         fe->setCell(row, column);
         connect(fe, &FieldEditor::acceptInput, this, &MainWindow::defEditorInputAccepted);
         connect(fe, &FieldEditor::rejectInput, this, &MainWindow::editorInputRejected);
@@ -506,7 +521,8 @@ void MainWindow::clearCellPressed()
     curCol = ui->defectsTable->currentItem()->column();
     if (curCol != 5)
         if (curCol != 6)
-            return;
+            if (curCol != 7)
+                return;
     QMessageBox::StandardButton btn;
     btn = QMessageBox::question(this, "Внимание!!!", "Вы действительно хотите очистить значение?");
     if (btn == QMessageBox::No) return;
@@ -515,6 +531,8 @@ void MainWindow::clearCellPressed()
         query = query.arg("def_begdate");
     else if (curCol == 6)
         query = query.arg("def_enddate");
+    else if (curCol == 7)
+        query = query.arg("def_rasp");
     query = query.arg(ui->defectsTable->item(curRow, 0)->text());
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -528,15 +546,17 @@ void MainWindow::defEditorInputAccepted(FieldEditor *editor)
     QString query = "UPDATE defects SET %1 = %2 WHERE def_id = '%3'";
     if (editor->getColumn() == 1)
         query = query.arg("def_num");
+    else if (editor->getColumn() == 7)
+        query = query.arg("def_rasp");
     else {
         editor->close();
         editor->deleteLater();
         return;
     }
-    if (editor->text() == "")
+    if (editor->text().simplified() == "" || editor->text().simplified() == "/")
         query = query.arg("NULL");
     else
-        query = query.arg(editor->text());
+        query = query.arg("'"+editor->text()+"'");
     query = query.arg(ui->defectsTable->item(editor->getRow(), 0)->text());
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -544,7 +564,10 @@ void MainWindow::defEditorInputAccepted(FieldEditor *editor)
         editor->deleteLater();
         return;
     }
-    ui->defectsTable->item(editor->getRow(), editor->getColumn())->setText(editor->text());
+    if (editor->text().simplified() == "/")
+        ui->defectsTable->item(editor->getRow(), editor->getColumn())->setText("");
+    else
+        ui->defectsTable->item(editor->getRow(), editor->getColumn())->setText(editor->text());
     editor->close();
     editor->deleteLater();
 }

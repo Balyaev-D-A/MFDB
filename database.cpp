@@ -74,7 +74,7 @@ bool Database::deployTables()
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS defects (def_id serial primary key, def_quarter smallint, def_num varchar(10), def_devtype varchar(50), def_kks varchar(50), "
                   "def_journaldesc text, def_realdesc text, def_stage integer, def_repairdesc text, def_begdate char(10), def_enddate char(10), "
-                  "def_rasp integer references rasp (rasp_id))")) return false;
+                  "def_rasp CHAR(6))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS defrealdescs (drd_id SERIAL PRIMARY KEY, drd_dev VARCHAR(50), drd_stage INTEGER, drd_desc TEXT)")) return false;
 
