@@ -1,4 +1,5 @@
 #include <QDate>
+#include <QMessageBox>
 
 #include "krselectorform.h"
 #include "ui_krselectorform.h"
@@ -77,4 +78,27 @@ void KRSelectorForm::updateTable()
         }
     }
 
+}
+
+void KRSelectorForm::cancelClicked()
+{
+    close();
+}
+
+void KRSelectorForm::okClicked()
+{
+    SelectedDevice result;
+
+    if (!ui->scheduleTable->currentItem()) {
+        QMessageBox::critical(this, "Ошибка!!!", "Не выбрано ни одного устройства");
+        return;
+    }
+
+    result.selSched = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 0)->text();
+    result.selDevice = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 2)->text();
+    result.selType = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 3)->text();
+    result.selType = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 4)->text();
+
+    emit selected(result);
+    close();
 }
