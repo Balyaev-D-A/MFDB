@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KRSelectorForm</class>
+ <widget class="QWidget" name="KRSelectorForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1041</width>
+    <height>424</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Месяц по графику</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="monthBox">
+       <item>
+        <property name="text">
+         <string>Все</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Январь</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Февраль</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Март</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Апрель</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Май</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Июнь</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Июль</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Август</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Сентябрь</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Октябрь</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Ноябрь</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Декабрь</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ППР</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="scheduleTable">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Id</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Блок</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Устройство</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Тип</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>KKS</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Дата</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton">
+       <property name="text">
+        <string>Отмена</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="okButton">
+       <property name="text">
+        <string>Ок</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

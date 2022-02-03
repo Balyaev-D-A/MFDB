@@ -23,6 +23,8 @@ SOURCES += \
     fieldeditor.cpp \
     headercombobox.cpp \
     importform.cpp \
+    krform.cpp \
+    krselectorform.cpp \
     main.cpp \
     mainwindow.cpp \
     normativeform.cpp \
@@ -48,6 +50,8 @@ HEADERS += \
     fieldeditor.h \
     headercombobox.h \
     importform.h \
+    krform.h \
+    krselectorform.h \
     mainwindow.h \
     normativeform.h \
     progressform.h \
@@ -63,6 +67,8 @@ FORMS += \
     deviceselectorform.ui \
     dictionaryform.ui \
     importform.ui \
+    krform.ui \
+    krselectorform.ui \
     mainwindow.ui \
     normativeform.ui \
     progressform.ui \
