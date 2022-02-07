@@ -35,6 +35,8 @@ private slots:
     void removeMaterialClicked();
     void cancelClicked();
     void okClicked();
+    void selectorClosed();
+    void deviceSelected();
 
 signals:
     void krSaved();

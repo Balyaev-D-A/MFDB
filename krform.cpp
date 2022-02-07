@@ -1,5 +1,6 @@
 #include "krform.h"
 #include "ui_krform.h"
+#include "krselectorform.h"
 
 KRForm::KRForm(QWidget *parent) :
     QWidget(parent),
@@ -15,6 +16,11 @@ KRForm::~KRForm()
     delete ui;
     ui->addedMatTable->setAcceptFrom(ui->materialTable);
     ui->materialTable->setAcceptFrom(ui->addedMatTable);
+    connect(ui->selectDeviceButton, &QToolButton::clicked, this, &KRForm::selectDeviceClicked);
+    connect(ui->addMaterialButton, &QToolButton::clicked, this, &KRForm::addMaterialClicked);
+    connect(ui->removeMaterialButton, &QToolButton::clicked, this, &KRForm::removeMaterialClicked);
+    connect(ui->cancelButton, &QToolButton::clicked, this, &KRForm::cancelClicked);
+    connect(ui->okButton, &QToolButton::clicked, this, &KRForm::okClicked);
 }
 
 void KRForm::setDatabase(Database *db)
@@ -45,7 +51,11 @@ void KRForm::editKR(QString KRId)
 
 void KRForm::selectDeviceClicked()
 {
-
+    KRSelectorForm *ksf = new KRSelectorForm();
+    ksf->setDatabase(db);
+    connect(ksf, &KRSelectorForm::closed, this, &KRForm::selectorClosed);
+    connect(ksf, &KRSelectorForm::selected, this, &KRForm::deviceSelected);
+    ksf->show();
 }
 
 void KRForm::updateAddedMaterials()
@@ -191,6 +201,8 @@ bool KRForm::saveKR()
     emit krSaved();
     return true;
 }
+
+
 
 void KRForm::cancelClicked()
 {
