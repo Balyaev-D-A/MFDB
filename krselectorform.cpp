@@ -11,7 +11,7 @@ KRSelectorForm::KRSelectorForm(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->cancelButton, &QPushButton::clicked, this, &KRSelectorForm::cancelClicked);
     connect(ui->okButton, &QPushButton::clicked, this, &KRSelectorForm::okClicked);
-    connect(ui->scheduleTable, &QTableWidget::cellDoubleClicked, &KRSelectorForm::okClicked);
+    connect(ui->scheduleTable, &QTableWidget::cellDoubleClicked, this, &KRSelectorForm::okClicked);
     updateTable();
 }
 
