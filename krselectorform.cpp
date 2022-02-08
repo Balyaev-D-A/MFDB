@@ -1,5 +1,6 @@
 #include <QDate>
 #include <QMessageBox>
+#include <QDebug>
 
 #include "krselectorform.h"
 #include "ui_krselectorform.h"
@@ -9,15 +10,22 @@ KRSelectorForm::KRSelectorForm(QWidget *parent) :
     ui(new Ui::KRSelectorForm)
 {
     ui->setupUi(this);
+    ui->scheduleTable->hideColumn(0);
     connect(ui->cancelButton, &QPushButton::clicked, this, &KRSelectorForm::cancelClicked);
     connect(ui->okButton, &QPushButton::clicked, this, &KRSelectorForm::okClicked);
     connect(ui->scheduleTable, &QTableWidget::cellDoubleClicked, this, &KRSelectorForm::okClicked);
-    updateTable();
+    connect(ui->monthBox, &QComboBox::currentTextChanged, this, &KRSelectorForm::updateTable);
 }
 
 KRSelectorForm::~KRSelectorForm()
 {
     delete ui;
+}
+
+void KRSelectorForm::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    updateTable();
 }
 
 void KRSelectorForm::setDatabase(Database *db)
@@ -37,7 +45,7 @@ void KRSelectorForm::updateTable()
 
     query = "SELECT kr_sched FROM kaprepairs";
 
-    if (db->execQuery(query)) {
+    if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
@@ -61,22 +69,26 @@ void KRSelectorForm::updateTable()
         query = query.arg(date);
     }
 
+    QMessageBox::information(this, "Info", query);
     if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
 
     while (ui->scheduleTable->rowCount()) ui->scheduleTable->removeRow(0);
+    ui->scheduleTable->setSortingEnabled(false);
     while (db->nextRecord())
     {
         if (usedKRs.contains(db->fetchValue(0).toString())) continue;
         curRow = ui->scheduleTable->rowCount();
         ui->scheduleTable->insertRow(curRow);
-        for (int i=0; i<5; i++)
+        for (int i=0; i<6; i++)
         {
             ui->scheduleTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
+    ui->scheduleTable->setSortingEnabled(true);
+    ui->scheduleTable->resizeColumnsToContents();
 
 }
 
@@ -87,18 +99,24 @@ void KRSelectorForm::cancelClicked()
 
 void KRSelectorForm::okClicked()
 {
-    SelectedDevice result;
+    KRDevice result;
 
     if (!ui->scheduleTable->currentItem()) {
         QMessageBox::critical(this, "Ошибка!!!", "Не выбрано ни одного устройства");
         return;
     }
 
-    result.selSched = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 0)->text();
-    result.selDevice = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 2)->text();
-    result.selType = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 3)->text();
-    result.selType = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 4)->text();
+    result.sched = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 0)->text();
+    result.device = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 2)->text();
+    result.type = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 3)->text();
+    result.kks = ui->scheduleTable->item(ui->scheduleTable->currentRow(), 4)->text();
 
     emit selected(result);
     close();
+}
+
+void KRSelectorForm::closeEvent(QCloseEvent *event)
+{
+    QWidget::closeEvent(event);
+    emit closed(this);
 }

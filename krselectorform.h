@@ -10,11 +10,11 @@ class KRSelectorForm;
 }
 
 typedef struct {
-    QString selSched;
-    QString selDevice;
-    QString selType;
-    QString selKKS;
-} SelectedDevice;
+    QString sched;
+    QString device;
+    QString type;
+    QString kks;
+} KRDevice;
 
 class KRSelectorForm : public QWidget
 {
@@ -28,18 +28,19 @@ public:
 private:
     Ui::KRSelectorForm *ui;
     Database *db;
-    void updateTable();
 
 private slots:
     void cancelClicked();
     void okClicked();
+    void updateTable();
 
 protected:
+    void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
 
 signals:
     void closed(KRSelectorForm *sender);
-    void selected(const SelectedDevice &device);
+    void selected(const KRDevice &device);
 };
 
 #endif // KRSELECTORFORM_H

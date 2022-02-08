@@ -1,6 +1,5 @@
 #include "krform.h"
 #include "ui_krform.h"
-#include "krselectorform.h"
 
 KRForm::KRForm(QWidget *parent) :
     QWidget(parent),
@@ -8,19 +7,22 @@ KRForm::KRForm(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
-}
-
-KRForm::~KRForm()
-{
-    delete ui;
     ui->addedMatTable->setAcceptFrom(ui->materialTable);
     ui->materialTable->setAcceptFrom(ui->addedMatTable);
+    ui->addedMatTable->hideColumn(0);
+    ui->materialTable->hideColumn(0);
     connect(ui->selectDeviceButton, &QToolButton::clicked, this, &KRForm::selectDeviceClicked);
     connect(ui->addMaterialButton, &QToolButton::clicked, this, &KRForm::addMaterialClicked);
     connect(ui->removeMaterialButton, &QToolButton::clicked, this, &KRForm::removeMaterialClicked);
     connect(ui->cancelButton, &QToolButton::clicked, this, &KRForm::cancelClicked);
     connect(ui->okButton, &QToolButton::clicked, this, &KRForm::okClicked);
+    connect(ui->addedMatTable, &DragDropTable::itemDroped, this, &KRForm::addMaterialClicked);
+    connect(ui->materialTable, &DragDropTable::itemDroped, this, &KRForm::removeMaterialClicked);
+}
+
+KRForm::~KRForm()
+{
+    delete ui;
 }
 
 void KRForm::setDatabase(Database *db)
@@ -45,8 +47,59 @@ void KRForm::newKR()
 
 void KRForm::editKR(QString KRId)
 {
+    int curRow;
+    QString query;
     this->KRId = KRId;
     matsChanged = false;
+    ui->materialTable->setDisabled(true);
+    ui->addedMatTable->setDisabled(true);
+    ui->addMaterialButton->setDisabled(true);
+    ui->removeMaterialButton->setDisabled(true);
+    ui->okButton->setDisabled(true);
+
+    query = "SELECT kr_sched, sch_name, sch_type, sch_kks FROM kaprepairs AS kr "
+            "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
+            "WHERE kr_id = '%1'";
+    query = query.arg(KRId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    if (db->nextRecord()) {
+        selectedSched = db->fetchValue(0).toString();
+        ui->deviceEdit->setText(db->fetchValue(1).toString() + " " + db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
+    }
+    else
+        return;
+
+    query = "SELECT kam_material, mat_name, kam_count FROM kradditionalmats AS k "
+            "LEFT JOIN materials AS m ON k.kam_material = m.mat_id "
+            "WHERE kam_kr = '%1'";
+    query = query.arg(KRId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+    while (ui->addedMatTable->rowCount()) ui->addedMatTable->removeRow(0);
+    ui->addedMatTable->setSortingEnabled(false);
+    while (db->nextRecord())
+    {
+        curRow = ui->addedMatTable->rowCount();
+        ui->addedMatTable->insertRow(curRow);
+        for (int i=0; i<3; i++)
+            ui->addedMatTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
+    }
+    ui->addedMatTable->setSortingEnabled(true);
+    ui->addedMatTable->resizeColumnsToContents();
+    updateMaterials();
+    ui->materialTable->setDisabled(false);
+    ui->addedMatTable->setDisabled(false);
+    ui->addMaterialButton->setDisabled(false);
+    ui->removeMaterialButton->setDisabled(false);
+    ui->okButton->setDisabled(false);
 }
 
 void KRForm::selectDeviceClicked()
@@ -56,31 +109,6 @@ void KRForm::selectDeviceClicked()
     connect(ksf, &KRSelectorForm::closed, this, &KRForm::selectorClosed);
     connect(ksf, &KRSelectorForm::selected, this, &KRForm::deviceSelected);
     ksf->show();
-}
-
-void KRForm::updateAddedMaterials()
-{
-    QString query = "SELECT kam_material, mat_name, kam_count FROM kradditionalmats AS kam LEFT JOIN materials AS m ON kam.kam_material = m.mat_id "
-                    "WHERE kam_kr = '%1'";
-    query = query.arg(KRId);
-
-    while (ui->addedMatTable->rowCount() > 0) ui->addedMatTable->removeRow(0);
-
-    if (!db->execQuery(query)) {
-        db->showError(this);
-        return;
-    }
-
-    ui->addedMatTable->setSortingEnabled(false);
-    while (db->nextRecord())
-    {
-        ui->addedMatTable->insertRow(0);
-        ui->addedMatTable->setItem(0, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
-        ui->addedMatTable->setItem(0, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
-        ui->addedMatTable->setItem(0, 2, new QTableWidgetItem(db->fetchValue(2).toString()));
-    }
-    ui->addedMatTable->setSortingEnabled(true);
-    ui->addedMatTable->resizeColumnsToContents();
 }
 
 void KRForm::updateMaterials()
@@ -124,6 +152,7 @@ void KRForm::addMaterialClicked()
                                    ui->materialTable->item(ui->materialTable->currentRow(), 1)->text()));
     ui->addedMatTable->setSortingEnabled(true);
     ui->materialTable->removeRow(ui->materialTable->currentRow());
+    ui->addedMatTable->resizeColumnsToContents();
     matsChanged = true;
 }
 
@@ -184,7 +213,7 @@ bool KRForm::saveKR()
 
         KRId = db->lastInsertId().toString();
 
-        query = "INSERT INTO kradditionalmats (kam_defect, kam_material, kam_count) VALUES ('%1', '%2', '%3')";
+        query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_count) VALUES ('%1', '%2', '%3')";
 
         for (int i=0; i<ui->addedMatTable->rowCount(); i++)
         {
@@ -212,4 +241,20 @@ void KRForm::cancelClicked()
 void KRForm::okClicked()
 {
     if (saveKR()) close();
+}
+
+void KRForm::selectorClosed(KRSelectorForm *sender)
+{
+    sender->deleteLater();
+}
+
+void KRForm::deviceSelected(const KRDevice &device)
+{
+    selectedSched = device.sched;
+    ui->deviceEdit->setText(device.device + " " + device.type + " " + device.kks);
+    ui->materialTable->setDisabled(false);
+    ui->addedMatTable->setDisabled(false);
+    ui->addMaterialButton->setDisabled(false);
+    ui->removeMaterialButton->setDisabled(false);
+    ui->okButton->setDisabled(false);
 }

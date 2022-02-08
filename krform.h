@@ -3,10 +3,13 @@
 
 #include <QWidget>
 #include "database.h"
+#include "krselectorform.h"
+
 
 namespace Ui {
 class KRForm;
 }
+
 
 class KRForm : public QWidget
 {
@@ -25,7 +28,6 @@ private:
     QString KRId;
     QString selectedSched;
     bool matsChanged;
-    void updateAddedMaterials();
     void updateMaterials();
     bool saveKR();
 
@@ -35,8 +37,8 @@ private slots:
     void removeMaterialClicked();
     void cancelClicked();
     void okClicked();
-    void selectorClosed();
-    void deviceSelected();
+    void selectorClosed(KRSelectorForm *sender);
+    void deviceSelected(const KRDevice &device);
 
 signals:
     void krSaved();

@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->raspTable->hideColumn(0);
     ui->defectsTable->hideColumn(0);
+    ui->krTable->hideColumn(0);
 
     int month = QDate::currentDate().month();
     int quarter;
@@ -55,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent)
     datePicker->setWindowFlag(Qt::Popup, true);
     raspPicker = new QListWidget();
     raspPicker->setWindowFlag(Qt::Popup, true);
+    krform = new KRForm();
+    krform->setDatabase(db);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -77,9 +80,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->quarterBox, &QComboBox::currentTextChanged, this, &MainWindow::updateDefectsTable);
     connect(ui->defectsTable, &DefectsTable::cellDoubleClicked, this, &MainWindow::dtCellDoubleClicked);
     connect(datePicker, &QCalendarWidget::activated, this, &MainWindow::datePicked);
-    connect(ui->defectsTable, &DefectsTable::clearCellPressed, this, &MainWindow::clearCellPressed);
+    connect(ui->defectsTable, &DefectsTable::clearCellPressed, this, &MainWindow::defClearCellPressed);
     connect(ui->editDefectButton, &QToolButton::clicked, this, &MainWindow::editDefectClicked);
     connect(ui->deleteDefectButton, &QToolButton::clicked, this, &MainWindow::deleteDefectClicked);
+    connect(ui->addKRButton, &QToolButton::clicked, this, &MainWindow::addKRClicked);
+    connect(ui->updateKRButton, &QToolButton::clicked, this, &MainWindow::updateKRTable);
+    connect(krform, &KRForm::krSaved, this, &MainWindow::updateKRTable);
+    connect(ui->krTable, &DefectsTable::cellDoubleClicked, this, &MainWindow::krCellDoubleClicked);
+    connect(ui->krTable, &DefectsTable::clearCellPressed, this, &MainWindow::krClearCellPressed);
+    connect(ui->editKRButton, &QToolButton::clicked, this, &MainWindow::editKRClicked);
 }
 
 MainWindow::~MainWindow()
@@ -104,6 +113,7 @@ void MainWindow::showEvent(QShowEvent *event)
         ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
     updateRaspTable();
     updateDefectsTable();
+    updateKRTable();
 }
 
 bool MainWindow::connectDB(QString host, QString dbname, QString user, QString password)
@@ -469,6 +479,7 @@ void MainWindow::dtCellDoubleClicked(int row, int column)
             maxDate.setDate(QDate::currentDate().year(), 12, 31);
             break;
         }
+        defectChangingDate = true;
         int leftFrameWidth = this->geometry().left() - this->pos().x();
         int topFrameHeight = this->geometry().top() - this->pos().y();
         itemRect = ui->defectsTable->visualItemRect(ui->defectsTable->item(row, column));
@@ -490,30 +501,59 @@ void MainWindow::dtCellDoubleClicked(int row, int column)
 
 void MainWindow::datePicked(const QDate &date)
 {
-    QString query = "UPDATE defects SET %1 = '%2' WHERE def_id = '%3'";
+    QString query;
     int curRow, curCol;
-    curRow = ui->defectsTable->currentItem()->row();
-    curCol = ui->defectsTable->currentItem()->column();
-    if (curCol == 5)
-        query = query.arg("def_begdate");
-    else if (curCol == 6)
-        query = query.arg("def_enddate");
-    else {
+    if (defectChangingDate) {
+        defectChangingDate = false;
+        query = "UPDATE defects SET %1 = '%2' WHERE def_id = '%3'";
+        curRow = ui->defectsTable->currentItem()->row();
+        curCol = ui->defectsTable->currentItem()->column();
+        if (curCol == 5)
+            query = query.arg("def_begdate");
+        else if (curCol == 6)
+            query = query.arg("def_enddate");
+        else {
+            datePicker->close();
+            return;
+        }
+        query = query.arg(date.toString("dd.MM.yyyy"));
+        query = query.arg(ui->defectsTable->item(curRow, 0)->text());
+        if (!db->execQuery(query)) {
+            db->showError(this);
+            datePicker->close();
+            return;
+        }
+        ui->defectsTable->currentItem()->setText(date.toString("dd.MM.yyyy"));
         datePicker->close();
-        return;
     }
-    query = query.arg(date.toString("dd.MM.yyyy"));
-    query = query.arg(ui->defectsTable->item(curRow, 0)->text());
-    if (!db->execQuery(query)) {
-        db->showError(this);
+    else if (krChangingDate) {
+        krChangingDate = false;
+        query = "UPDATE kaprepairs SET %1 = '%2' WHERE kr_id = '%3'";
+        curRow = ui->krTable->currentRow();
+        curCol = ui->krTable->currentColumn();
+        if (curCol == 5)
+            query = query.arg("kr_begdate");
+        else if (curCol == 6)
+            query = query.arg("kr_enddate");
+        else {
+            datePicker->close();
+            return;
+        }
+        query = query.arg(date.toString("dd.MM.yyyy"));
+        query = query.arg(ui->krTable->item(curRow, 0)->text());
+
+        if (!db->execQuery(query)) {
+            db->showError(this);
+            datePicker->close();
+            return;
+        }
+
+        ui->krTable->currentItem()->setText(date.toString("dd.MM.yyyy"));
         datePicker->close();
-        return;
     }
-    ui->defectsTable->currentItem()->setText(date.toString("dd.MM.yyyy"));
-    datePicker->close();
 }
 
-void MainWindow::clearCellPressed()
+void MainWindow::defClearCellPressed()
 {
     int curRow, curCol;
     if (!ui->defectsTable->currentItem()) return;
@@ -605,4 +645,91 @@ void MainWindow::deleteDefectClicked()
 
     ui->defectsTable->removeRow(ui->defectsTable->currentRow());
     db->commitTransaction();
+}
+
+void MainWindow::addKRClicked()
+{
+    krform->newKR();
+    krform->show();
+}
+
+void MainWindow::updateKRTable()
+{
+    int curRow;
+    QString query = "SELECT kr_id, unit_name, sch_name, sch_type, sch_kks, kr_begdate, kr_enddate FROM kaprepairs AS kr "
+                    "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
+                    "LEFT JOIN units AS u ON sch.sch_unit = u.unit_id";
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    while (ui->krTable->rowCount()) ui->krTable->removeRow(0);
+    ui->krTable->setSortingEnabled(false);
+    while (db->nextRecord())
+    {
+        curRow = ui->krTable->rowCount();
+        ui->krTable->insertRow(curRow);
+        for (int i=0; i<7; i++)
+        {
+            ui->krTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
+        }
+    }
+    ui->krTable->setSortingEnabled(true);
+    ui->krTable->resizeColumnsToContents();
+}
+
+void MainWindow::krCellDoubleClicked(int row, int column)
+{
+    QRect itemRect;
+    QPoint calOrigin;
+    QDate minDate, maxDate;
+
+    if (column == 5 || column == 6) {
+        krChangingDate = true;
+        int leftFrameWidth = this->geometry().left() - this->pos().x();
+        int topFrameHeight = this->geometry().top() - this->pos().y();
+        itemRect = ui->krTable->visualItemRect(ui->krTable->item(row, column));
+        calOrigin = ui->krTable->mapToGlobal(itemRect.bottomLeft());
+        datePicker->move(calOrigin.x() + leftFrameWidth, calOrigin.y() + topFrameHeight);
+        minDate.setDate(QDate::currentDate().year(), 1, 1);
+        maxDate.setDate(QDate::currentDate().year(),12, 31);
+        datePicker->setDateRange(minDate, maxDate);
+        datePicker->setSelectedDate(QDate::currentDate());
+        datePicker->show();
+    }
+    else
+        editKRClicked();
+}
+
+void MainWindow::krClearCellPressed()
+{
+    int curRow, curCol;
+    if (!ui->krTable->currentItem()) return;
+    curRow = ui->krTable->currentRow();
+    curCol = ui->krTable->currentColumn();
+    if (curCol != 5)
+        if (curCol != 6)
+            return;
+    QMessageBox::StandardButton btn;
+    btn = QMessageBox::question(this, "Внимание!!!", "Вы действительно хотите очистить значение?");
+    if (btn == QMessageBox::No) return;
+    QString query = "UPDATE kaprepairs SET %1 = NULL WHERE kr_id = '%2'";
+    if (curCol == 5)
+        query = query.arg("kr_begdate");
+    else if (curCol == 6)
+        query = query.arg("kr_enddate");
+    query = query.arg(ui->krTable->item(curRow, 0)->text());
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+    ui->krTable->currentItem()->setText("");
+}
+
+void MainWindow::editKRClicked()
+{
+    if (!ui->krTable->currentItem()) return;
+    krform->editKR(ui->krTable->item(ui->krTable->currentRow(), 0)->text());
+    krform->show();
 }

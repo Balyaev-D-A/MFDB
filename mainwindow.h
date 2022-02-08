@@ -9,6 +9,7 @@
 #include "raspform.h"
 #include "normativeform.h"
 #include "defectform.h"
+#include "krform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,11 +28,14 @@ private:
     Ui::MainWindow *ui;
     Database *db;
     bool adminMode;
+    bool defectChangingDate = false;
+    bool krChangingDate = false;
     DictionaryForm *dictionaryForm;
     NormativeForm *normativeForm;
     DefectForm *defectForm;
     QCalendarWidget *datePicker;
     QListWidget *raspPicker;
+    KRForm *krform;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
 private slots:
@@ -58,9 +62,14 @@ private slots:
     void updateDefectsTable();
     void dtCellDoubleClicked(int row, int column);
     void datePicked(const QDate &date);
-    void clearCellPressed();
+    void defClearCellPressed();
     void editDefectClicked();
     void deleteDefectClicked();
+    void addKRClicked();
+    void updateKRTable();
+    void krCellDoubleClicked(int row, int column);
+    void krClearCellPressed();
+    void editKRClicked();
 
 protected:
     void showEvent(QShowEvent *event);

@@ -85,7 +85,7 @@ bool Database::deployTables()
                   "dam_material INTEGER REFERENCES materials (mat_id), dam_count DECIMAL(5,2))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kaprepairs (kr_id serial primary key, kr_sched INTEGER REFERENCES schedule(sch_id) UNIQUE, "
-                  "kr_begdate char(10), def_enddate char(10))")) return false;
+                  "kr_begdate char(10), kr_enddate char(10))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kradditionalmats (kam_id SERIAL PRIMARY KEY, kam_kr INTEGER REFERENCES kaprepairs(kr_id), "
                   "kam_material INTEGER REFERENCES materials (mat_id), kam_count DECIMAL(5,2))")) return false;

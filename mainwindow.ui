@@ -673,15 +673,25 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <item>
-           <widget class="QTableWidget" name="krTable">
+           <widget class="DefectsTable" name="krTable">
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::SingleSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
             <column>
              <property name="text">
               <string>Id</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>KRId</string>
              </property>
             </column>
             <column>
@@ -691,7 +701,12 @@
             </column>
             <column>
              <property name="text">
-              <string>Тип устр.</string>
+              <string>Устройство</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Тип</string>
              </property>
             </column>
             <column>
@@ -810,7 +825,7 @@
      <x>0</x>
      <y>0</y>
      <width>1235</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
