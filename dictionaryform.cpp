@@ -190,7 +190,7 @@ void DictionaryForm::updateData()
 {
     ui->table->setSortingEnabled(false);
     while (ui->table->rowCount()>0) ui->table->removeRow(0);
-    if (!db->execQuery("select " + db->explodeFields(fields, 0) + " from " + dbTable)) {
+    if (!db->execQuery("SELECT " + db->explodeFields(fields, 0) + " FROM " + dbTable)) {
         db->showError(this);
         return;
     }
@@ -223,7 +223,7 @@ void DictionaryForm::updateData()
 void DictionaryForm::addRecord()
 {
     QVariant lId;
-    if (db->execQuery("insert into " + dbTable + " default values" )) {
+    if (db->execQuery("INSERT INTO " + dbTable + " DEFAULT VALUES" )) {
         lId = db->lastInsertId();
        if (lId.isValid()) {
             ui->table->setSortingEnabled(false);
@@ -255,7 +255,7 @@ void DictionaryForm::deleteRecord()
     if (cr<0) return;
     QString crId = ui->table->item(cr,0)->text();
 
-    if (db->execQuery("delete from " + dbTable + " where " + fields.at(0) + "=" + crId))
+    if (db->execQuery("DELETE FROM " + dbTable + " WHERE " + fields.at(0) + "=" + crId))
         ui->table->removeRow(cr);
     else
         db->showError(this);
@@ -266,7 +266,7 @@ void DictionaryForm::cellDoubleClicked(int row, int column)
     QString crId = ui->table->item(row, 0)->text();
     if (fieldTypes.at(column) == "bool") {
         bool cs = (ui->table->item(row, column)->checkState() == Qt::Checked);
-        if(db->execQuery("update " + dbTable + " set " + fields.at(column) + "=" + QVariant(!cs).toString() + " where " + fields.at(0) + "=" + crId)) {
+        if(db->execQuery("UPDATE " + dbTable + " SET " + fields.at(column) + "=" + QVariant(!cs).toString() + " WHERE " + fields.at(0) + "=" + crId)) {
             if (cs)
                 ui->table->item(row, column)->setCheckState(Qt::Unchecked);
             else
@@ -311,8 +311,8 @@ void DictionaryForm::inputAccepted()
 {
     QString crId = ui->table->item(editor->getRow(), 0)->text();
 
-    if (db->execQuery("update " + dbTable + " set " + fields.at(editor->getColumn()) + "='" +
-                     editor->text() + "'where " + fields.at(0) + "=" + crId)){
+    if (db->execQuery("UPDATE " + dbTable + " SET " + fields.at(editor->getColumn()) + "='" +
+                     editor->text() + "'WHERE " + fields.at(0) + "=" + crId)){
         ui->table->item(editor->getRow(), editor->getColumn())->setText(editor->text());
         ui->table->resizeColumnToContents(editor->getColumn());
     } else

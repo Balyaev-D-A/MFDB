@@ -112,7 +112,7 @@ void MainWindow::showEvent(QShowEvent *event)
     }
     ui->raspDateEdit->setDate(QDate::currentDate());
     ui->taskDateEdit->setDate(QDate::currentDate());
-    db->execQuery("select emp_name, emp_id from employees where emp_metrolog = false and emp_hidden = false order by emp_name");
+    db->execQuery("SELECT emp_name, emp_id FROM employees WHERE emp_metrolog = false AND emp_hidden = false ORDER BY emp_name");
     ui->employeeBox->addItem("Все", 0);
     while (db->nextRecord())
         ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
@@ -189,12 +189,12 @@ void MainWindow::raspFormClosed(RaspForm *sender)
 
 void MainWindow::updateRaspTable()
 {
-    QString query = "select rasp_id, rasp_num, emp_name, unit_name, sum(sch_hours) from rasp r "
-                    "left join requipment re on r.rasp_id = re.re_rasp "
-                    "left join schedule sh on sh.sch_id = re.re_equip "
-                    "left join units u on sh.sch_unit = u.unit_id "
-                    "left join employees e on e.emp_id = r.rasp_executor "
-                    "where rasp_date = '%1' group by emp_name, rasp_id, unit_name order by rasp_id";
+    QString query = "SELECT rasp_id, rasp_num, emp_name, unit_name, SUM(sch_hours) FROM rasp AS r "
+                    "LEFT JOIN requipment AS re ON r.rasp_id = re.re_rasp "
+                    "LEFT JOIN schedule AS sh ON sh.sch_id = re.re_equip "
+                    "LEFT JOIN units AS u ON sh.sch_unit = u.unit_id "
+                    "LEFT JOIN employees AS e ON e.emp_id = r.rasp_executor "
+                    "WHERE rasp_date = '%1' GROUP BY emp_name, rasp_id, unit_name ORDER BY rasp_id";
     query = query.arg(ui->raspDateEdit->text());
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -212,7 +212,7 @@ void MainWindow::updateRaspTable()
         ui->raspTable->setItem(i, 3, new QTableWidgetItem(db->fetchValue(3).toString()));
         ui->raspTable->setItem(i, 6, new QTableWidgetItem(db->fetchValue(4).toString()));
     }
-    query = "select sch_type, re_worktype  from requipment re left join schedule sch on re.re_equip = sch.sch_id where re_rasp = ";
+    query = "SELECT sch_type, re_worktype  FROM requipment AS re LEFT JOIN schedule AS sch ON re.re_equip = sch.sch_id WHERE re_rasp = ";
     QStringList equip;
     QStringList wt;
     for (int i=0; i<ui->raspTable->rowCount(); i++)
@@ -317,7 +317,7 @@ void MainWindow::raspCellDoubleClicked(int row, int column)
 
 void MainWindow::raspEditorInputAccepted(FieldEditor *editor)
 {
-    QString query = "update rasp set rasp_num = '%1' where rasp_id = '%2'";
+    QString query = "UPDATE rasp SET rasp_num = '%1' WHERE rasp_id = '%2'";
     QStringList s = editor->text().split("/");
     QString num = s[0].simplified() + "/" + s[1].simplified();
     query = query.arg(num).arg(ui->raspTable->item(editor->getRow(), 0)->text());
@@ -352,7 +352,7 @@ void MainWindow::deleteRaspClicked()
         }
     }
 
-    query = "delete from rasp where ";
+    query = "DELETE FROM rasp WHERE ";
     for (int i=0; i<raspsToDel.count(); i++)
     {
         query += "rasp_id = '" + raspsToDel[i] + "'";

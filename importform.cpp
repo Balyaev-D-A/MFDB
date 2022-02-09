@@ -82,10 +82,10 @@ void ImportForm::importButtonClicked()
     usedfields = fieldsmap.keys();
     for (int i=0; i<ui->table->rowCount(); i++)
     {
-        query = "insert into " + dbTable + " (";
+        query = "INSERT INTO " + dbTable + " (";
         if (dbTable == "schedule")
             query += "sch_unit, ";
-        query += db->explodeFields(usedfields, 0) + ") values (";
+        query += db->explodeFields(usedfields, 0) + ") VALUES (";
         if (dbTable == "schedule")
             query += ui->unitBox->currentData().toString() + ", ";
         for (int j=0; j<usedfields.count(); j++)
@@ -108,7 +108,7 @@ void ImportForm::setTable(QString table)
 {
     dbTable = table;
     if (table == "schedule") {
-        if (db->execQuery("select unit_name, unit_id from units order by unit_name")) {
+        if (db->execQuery("SELECT unit_name, unit_id FROM units ORDER BY unit_name")) {
             while (db->nextRecord())
             {
                 ui->unitBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
