@@ -58,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
     raspPicker->setWindowFlag(Qt::Popup, true);
     krform = new KRForm();
     krform->setDatabase(db);
+    receiptsForm = new ReceiptsForm();
+    receiptsForm->setDatabase(db);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -89,6 +91,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->krTable, &DefectsTable::cellDoubleClicked, this, &MainWindow::krCellDoubleClicked);
     connect(ui->krTable, &DefectsTable::clearCellPressed, this, &MainWindow::krClearCellPressed);
     connect(ui->editKRButton, &QToolButton::clicked, this, &MainWindow::editKRClicked);
+    connect(ui->deleteKRButton, &QToolButton::clicked, this, &MainWindow::deleteKRClicked);
+    connect(ui->krMonthBox, &QComboBox::currentTextChanged, this, &MainWindow::updateKRTable);
+    connect(ui->receiptsAction, &QAction::triggered, this, &MainWindow::receiptsTriggered);
 }
 
 MainWindow::~MainWindow()
@@ -656,9 +661,21 @@ void MainWindow::addKRClicked()
 void MainWindow::updateKRTable()
 {
     int curRow;
+    QString month = "";
     QString query = "SELECT kr_id, unit_name, sch_name, sch_type, sch_kks, kr_begdate, kr_enddate FROM kaprepairs AS kr "
                     "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
                     "LEFT JOIN units AS u ON sch.sch_unit = u.unit_id";
+    if (ui->krMonthBox->currentIndex() != 0) {
+        query += " WHERE sch.sch_date = '%1'";
+        if (ui->krMonthBox->currentIndex() < 10)
+            month = QString("0%1.").arg(ui->krMonthBox->currentIndex());
+        else if (ui->krMonthBox->currentIndex() < 13)
+            month = QString("%1.").arg(ui->krMonthBox->currentIndex());
+        else
+            month = "ППР-";
+        month += QDate::currentDate().toString("yyyy");
+        query = query.arg(month);
+    }
     if (!db->execQuery(query)) {
         db->showError(this);
         return;
@@ -732,4 +749,41 @@ void MainWindow::editKRClicked()
     if (!ui->krTable->currentItem()) return;
     krform->editKR(ui->krTable->item(ui->krTable->currentRow(), 0)->text());
     krform->show();
+}
+
+void MainWindow::deleteKRClicked()
+{
+    QString query;
+    QString krId;
+
+    if (!ui->krTable->currentItem()) return;
+
+    krId = ui->krTable->item(ui->krTable->currentRow(), 0)->text();
+
+    db->startTransaction();
+    query = "DELETE FROM kradditionalmats WHERE kam_kr = '%1'";
+    query = query.arg(krId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    query = "DELETE FROM kaprepairs WHERE kr_id = '%1'";
+    query = query.arg(krId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return;
+    }
+
+    ui->krTable->removeRow(ui->krTable->currentRow());
+    db->commitTransaction();
+}
+
+void MainWindow::receiptsTriggered()
+{
+    receiptsForm->show();
 }

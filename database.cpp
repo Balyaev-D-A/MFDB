@@ -84,11 +84,17 @@ bool Database::deployTables()
     if (!pq->exec("CREATE TABLE IF NOT EXISTS defadditionalmats (dam_id SERIAL PRIMARY KEY, dam_defect INTEGER REFERENCES defects(def_id), "
                   "dam_material INTEGER REFERENCES materials (mat_id), dam_count DECIMAL(5,2))")) return false;
 
-    if (!pq->exec("CREATE TABLE IF NOT EXISTS kaprepairs (kr_id serial primary key, kr_sched INTEGER REFERENCES schedule(sch_id) UNIQUE, "
-                  "kr_begdate char(10), kr_enddate char(10))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS kaprepairs (kr_id SERIAL PRIMARY KEY, kr_sched INTEGER REFERENCES schedule(sch_id) UNIQUE, "
+                  "kr_begdate CHAR(10), kr_enddate CHAR(10))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kradditionalmats (kam_id SERIAL PRIMARY KEY, kam_kr INTEGER REFERENCES kaprepairs(kr_id), "
                   "kam_material INTEGER REFERENCES materials (mat_id), kam_count DECIMAL(5,2))")) return false;
+
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS receipts (rec_id serial primary key, rec_date CHAR(10), "
+                  "rec_description VARCHAR(255))")) return false;
+
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS recmaterials (rcm_id SERIAL PRIMARY KEY, rcm_rec INTEGER REFERENCES receipts(rec_id), "
+                  "rcm_material INTEGER REFERENCES materials (mat_id), rcm_count DECIMAL(5,2))")) return false;
 
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
     if (!pq->exec("CREATE TABLE IF NOT EXISTS rasp (rasp_id SERIAL PRIMARY KEY, rasp_num CHAR(6), rasp_date CHAR(10), rasp_btime CHAR(5), "

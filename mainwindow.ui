@@ -653,6 +653,11 @@
               <string>Декабрь</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>ППР</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
@@ -872,7 +877,7 @@
     <property name="title">
      <string>Материалы КР</string>
     </property>
-    <addaction name="action"/>
+    <addaction name="receiptsAction"/>
     <addaction name="action_2"/>
     <addaction name="action_3"/>
    </widget>
@@ -948,9 +953,9 @@
     <string>Нормативы ОЭСН...</string>
    </property>
   </action>
-  <action name="action">
+  <action name="receiptsAction">
    <property name="text">
-    <string>Поступление...</string>
+    <string>Поступления...</string>
    </property>
   </action>
   <action name="action_2">

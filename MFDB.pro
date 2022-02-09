@@ -31,6 +31,8 @@ SOURCES += \
     progressform.cpp \
     raspform.cpp \
     raspprintpreviewform.cpp \
+    receiptform.cpp \
+    receiptsform.cpp \
     settings.cpp \
     worktypewidget.cpp \
     wtbutton.cpp \
@@ -57,6 +59,8 @@ HEADERS += \
     progressform.h \
     raspform.h \
     raspprintpreviewform.h \
+    receiptform.h \
+    receiptsform.h \
     settings.h \
     worktypewidget.h \
     wtbutton.h \
@@ -74,6 +78,8 @@ FORMS += \
     progressform.ui \
     raspform.ui \
     raspprintpreviewform.ui \
+    receiptform.ui \
+    receiptsform.ui \
     worktypewidget.ui
 
 # Default rules for deployment.

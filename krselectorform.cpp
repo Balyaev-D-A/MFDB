@@ -69,7 +69,6 @@ void KRSelectorForm::updateTable()
         query = query.arg(date);
     }
 
-    QMessageBox::information(this, "Info", query);
     if (!db->execQuery(query)) {
         db->showError(this);
         return;

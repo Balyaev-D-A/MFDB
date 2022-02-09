@@ -10,6 +10,7 @@
 #include "normativeform.h"
 #include "defectform.h"
 #include "krform.h"
+#include "receiptsform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,6 +37,7 @@ private:
     QCalendarWidget *datePicker;
     QListWidget *raspPicker;
     KRForm *krform;
+    ReceiptsForm *receiptsForm;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
 private slots:
@@ -70,6 +72,8 @@ private slots:
     void krCellDoubleClicked(int row, int column);
     void krClearCellPressed();
     void editKRClicked();
+    void deleteKRClicked();
+    void receiptsTriggered();
 
 protected:
     void showEvent(QShowEvent *event);
