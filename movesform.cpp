@@ -57,6 +57,7 @@ void MovesForm::updateMaterials()
 void MovesForm::updateMoves()
 {
     int curRow;
+    float total;
     QString query;
 
     if (!ui->materialBox->count()) return;
@@ -81,6 +82,21 @@ void MovesForm::updateMoves()
             ui->incomesTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
+
+    total = 0;
+    for (int i=0; i<ui->incomesTable->rowCount(); i++)
+    {
+        total += ui->incomesTable->item(i, 1)->text().toFloat();
+    }
+    curRow = ui->incomesTable->rowCount();
+    ui->incomesTable->insertRow(curRow);
+    ui->incomesTable->setItem(curRow, 0, new QTableWidgetItem("Итого:"));
+    ui->incomesTable->setItem(curRow, 1, new QTableWidgetItem(QString("%1").arg(total)));
+
+    QFont font = ui->incomesTable->item(curRow, 0)->font();
+    font.setBold(true);
+    ui->incomesTable->item(curRow, 0)->setFont(font);
+    ui->incomesTable->item(curRow, 1)->setFont(font);
     ui->incomesTable->resizeColumnsToContents();
 
     query = "SELECT kr_enddate, kam_count, sch_name || ' ' || sch_type || ' ' || sch_kks AS dev FROM kradditionalmats "
@@ -104,5 +120,17 @@ void MovesForm::updateMoves()
             ui->expensesTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
+
+    total = 0;
+    for (int i=0; i<ui->expensesTable->rowCount(); i++)
+    {
+        total += ui->expensesTable->item(i, 1)->text().toFloat();
+    }
+    curRow = ui->expensesTable->rowCount();
+    ui->expensesTable->insertRow(curRow);
+    ui->expensesTable->setItem(curRow, 0, new QTableWidgetItem("Итого:"));
+    ui->expensesTable->setItem(curRow, 1, new QTableWidgetItem(QString("%1").arg(total)));
+    ui->expensesTable->item(curRow, 0)->setFont(font);
+    ui->expensesTable->item(curRow, 1)->setFont(font);
     ui->expensesTable->resizeColumnsToContents();
 }
