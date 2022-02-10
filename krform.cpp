@@ -5,6 +5,7 @@ KRForm::KRForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::KRForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     ui->addedMatTable->setAcceptFrom(ui->materialTable);

@@ -6,6 +6,7 @@ DeviceSelectorForm::DeviceSelectorForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DeviceSelectorForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
     connect(ui->deviceBox, &QComboBox::currentTextChanged, this, &DeviceSelectorForm::updateDeviceTree);
     connect(ui->okButton, &QPushButton::clicked, this, &DeviceSelectorForm::okClicked);

@@ -9,6 +9,7 @@ KRSelectorForm::KRSelectorForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::KRSelectorForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
     ui->scheduleTable->hideColumn(0);
     connect(ui->cancelButton, &QPushButton::clicked, this, &KRSelectorForm::cancelClicked);

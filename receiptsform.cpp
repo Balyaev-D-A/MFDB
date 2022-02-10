@@ -5,6 +5,7 @@ ReceiptsForm::ReceiptsForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ReceiptsForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     ui->receiptsTable->hideColumn(0);

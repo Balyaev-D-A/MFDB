@@ -46,20 +46,24 @@ MainWindow::MainWindow(QWidget *parent)
     ui->quarterBox->setCurrentIndex(quarter - 1);
 
     db = new Database;
-    dictionaryForm = new DictionaryForm();
+    dictionaryForm = new DictionaryForm(this);
     dictionaryForm->setDatabase(db);
-    normativeForm = new NormativeForm();
+    normativeForm = new NormativeForm(this);
     normativeForm->setDatabase(db);
-    defectForm = new DefectForm();
+    defectForm = new DefectForm(this);
     defectForm->setDatabase(db);
-    datePicker = new QCalendarWidget();
-    datePicker->setWindowFlag(Qt::Popup, true);
-    raspPicker = new QListWidget();
-    raspPicker->setWindowFlag(Qt::Popup, true);
-    krform = new KRForm();
+    datePicker = new QCalendarWidget(this);
+    datePicker->setWindowFlags(Qt::Window | Qt::Popup);
+    raspPicker = new QListWidget(this);
+    raspPicker->setWindowFlags(Qt::Window | Qt::Popup);
+    krform = new KRForm(this);
     krform->setDatabase(db);
-    receiptsForm = new ReceiptsForm();
+    receiptsForm = new ReceiptsForm(this);
     receiptsForm->setDatabase(db);
+    verifyForm = new VerifyForm(this);
+    verifyForm->setDatabase(db);
+    movesForm = new MovesForm(this);
+    movesForm->setDatabase(db);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -94,6 +98,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->deleteKRButton, &QToolButton::clicked, this, &MainWindow::deleteKRClicked);
     connect(ui->krMonthBox, &QComboBox::currentTextChanged, this, &MainWindow::updateKRTable);
     connect(ui->receiptsAction, &QAction::triggered, this, &MainWindow::receiptsTriggered);
+    connect(ui->verifyAction, &QAction::triggered, this, &MainWindow::verifyTriggered);
+    connect(ui->movesAction, &QAction::triggered, this, &MainWindow::movesTriggered);
 }
 
 MainWindow::~MainWindow()
@@ -786,4 +792,14 @@ void MainWindow::deleteKRClicked()
 void MainWindow::receiptsTriggered()
 {
     receiptsForm->show();
+}
+
+void MainWindow::verifyTriggered()
+{
+    verifyForm->show();
+}
+
+void MainWindow::movesTriggered()
+{
+    movesForm->show();
 }

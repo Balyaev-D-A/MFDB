@@ -6,6 +6,7 @@ NormativeForm::NormativeForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NormativeForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     ui->materialsTable->hideColumn(0);

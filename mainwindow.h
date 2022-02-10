@@ -11,6 +11,8 @@
 #include "defectform.h"
 #include "krform.h"
 #include "receiptsform.h"
+#include "verifyform.h"
+#include "movesform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,6 +40,8 @@ private:
     QListWidget *raspPicker;
     KRForm *krform;
     ReceiptsForm *receiptsForm;
+    VerifyForm *verifyForm;
+    MovesForm *movesForm;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
 private slots:
@@ -74,6 +78,8 @@ private slots:
     void editKRClicked();
     void deleteKRClicked();
     void receiptsTriggered();
+    void verifyTriggered();
+    void movesTriggered();
 
 protected:
     void showEvent(QShowEvent *event);

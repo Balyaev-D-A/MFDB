@@ -5,6 +5,7 @@ DefectForm::DefectForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DefectForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
     connect(ui->deviceButton, &QToolButton::clicked, this, &DefectForm::deviceButtonClicked);
     connect(ui->addDefectButton, &QToolButton::clicked, this, &DefectForm::addDefectClicked);

@@ -10,6 +10,7 @@ ImportForm::ImportForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ImportForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
     connect(ui->fileButton, &QToolButton::clicked, this, &ImportForm::fileButtonClicked);
     connect(ui->readButton, &QPushButton::clicked, this, &ImportForm::readButtonClicked);

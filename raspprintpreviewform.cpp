@@ -10,6 +10,7 @@ RaspPrintPreviewForm::RaspPrintPreviewForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RaspPrintPreviewForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     connect(ui->saveButton, &QPushButton::clicked, this, &RaspPrintPreviewForm::saveToPDFClicked);

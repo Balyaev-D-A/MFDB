@@ -6,6 +6,7 @@ ReceiptForm::ReceiptForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ReceiptForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     ui->addedMatTable->hideColumn(0);

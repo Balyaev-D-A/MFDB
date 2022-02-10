@@ -8,7 +8,7 @@
 
 
 DictionaryForm::DictionaryForm(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::DictionaryForm)
 {
     ui->setupUi(this);

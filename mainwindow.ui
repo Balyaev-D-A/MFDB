@@ -878,8 +878,8 @@
      <string>Материалы КР</string>
     </property>
     <addaction name="receiptsAction"/>
-    <addaction name="action_2"/>
-    <addaction name="action_3"/>
+    <addaction name="verifyAction"/>
+    <addaction name="movesAction"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -958,14 +958,14 @@
     <string>Поступления...</string>
    </property>
   </action>
-  <action name="action_2">
+  <action name="verifyAction">
    <property name="text">
-    <string>Движение...</string>
+    <string>Сверка...</string>
    </property>
   </action>
-  <action name="action_3">
+  <action name="movesAction">
    <property name="text">
-    <string>Остатки...</string>
+    <string>Движение...</string>
    </property>
   </action>
  </widget>

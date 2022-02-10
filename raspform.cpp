@@ -8,6 +8,7 @@ RaspForm::RaspForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RaspForm)
 {
+    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
     wEditor = new FieldEditor(ui->workTable->viewport());
     wEditor->hide();

@@ -26,6 +26,7 @@ SOURCES += \
     krselectorform.cpp \
     main.cpp \
     mainwindow.cpp \
+    movesform.cpp \
     normativeform.cpp \
     progressform.cpp \
     raspform.cpp \
@@ -33,6 +34,7 @@ SOURCES += \
     receiptform.cpp \
     receiptsform.cpp \
     settings.cpp \
+    verifyform.cpp \
     worktypewidget.cpp \
     wtbutton.cpp \
     wtcheckbox.cpp
@@ -53,6 +55,7 @@ HEADERS += \
     krform.h \
     krselectorform.h \
     mainwindow.h \
+    movesform.h \
     normativeform.h \
     progressform.h \
     raspform.h \
@@ -60,6 +63,7 @@ HEADERS += \
     receiptform.h \
     receiptsform.h \
     settings.h \
+    verifyform.h \
     worktypewidget.h \
     wtbutton.h \
     wtcheckbox.h
@@ -72,12 +76,14 @@ FORMS += \
     krform.ui \
     krselectorform.ui \
     mainwindow.ui \
+    movesform.ui \
     normativeform.ui \
     progressform.ui \
     raspform.ui \
     raspprintpreviewform.ui \
     receiptform.ui \
     receiptsform.ui \
+    verifyform.ui \
     worktypewidget.ui
 
 # Default rules for deployment.
