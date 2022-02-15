@@ -10,8 +10,9 @@
             table{ page-break-inside: avoid; }
             }
             table { border-collapse:collapse; empty-cells:show; font-family: 'Times New Roman'; font-size: 12pt; table-layout: fixed; }
-            <!--Columns-->
-            .col1 {width: 1.79cm;}
+            td{ text-align: left; vertical-align:middle; border-style: solid; border-width: 1px; padding: 3px; padding-top: 0px; padding-bottom: 0px; }
+            
+            .col1 { width: 0.79cm; }
             .col2 {width: 1.83cm;}
             .col3 {width: 0.93cm;}
             .col4 {width: 1.19cm;}
@@ -27,7 +28,7 @@
             .col14 {width: 0.66cm;}
             .col15 {width: 1.08cm;}
             .col16 {width: 1.85cm;}
-            <!--Rows-->
+
             .row1 {height: 0.56cm;}
             .row2 {height: 0.53cm;}
             .row3 {height: 0.64cm;}
@@ -55,7 +56,7 @@
             .row25 {height: 0.6cm;}
             .row26 {height: 0.6cm;}
             .row27 {height: 0.6cm;}
-             td{text-align: left; vertical-align:middle; border-style: solid; border-width: 1px; padding: 3px; padding-top: 0px; padding-bottom: 0px;}
+             
             .vc {vertical-align: middle;}
             .hc {text-align: center;}
             .hr {text-align: right;}
@@ -75,7 +76,6 @@
         </style>
     </head>
     <body>
-        <div style="width: 18cm;">
         <table>
             <colgroup>
                 <col class="col1">
@@ -155,8 +155,7 @@
                 <td colspan="2" class="border-r">31.11.2021</td>
             </tr>
             <tr class="row13">
-                <td class="border-l">1.</td>
-                <td colspan="15" class="border-r">Работы выполнены в соответствии с</td>
+                <td colspan="16" class="border-rl">1. Работы выполнены в соответствии с</td>
             </tr>
             <tr class="row14">
                 <td class="hr border-l">-</td>
@@ -173,8 +172,7 @@
                 <td colspan="16" class="border-rl"></td>
             </tr>
             <tr class="row18">
-                <td class="border-l">2.</td>
-                <td colspan="16" class="border-r">При оценке технического состояния оборудования после выполнения работ комиссией рассмотрены следующие документы:</td>
+                <td colspan="16" class="border-rl">2. При оценке технического состояния оборудования после выполнения работ комиссией рассмотрены следующие документы:</td>
             </tr>
             <tr class="row19">
                 <td class="hr border-l">-</td>
@@ -189,8 +187,7 @@
                 <td colspan="15" class="border-r"></td>
             </tr>
             <tr class="row21">
-                <td class="border-lb">3.</td>
-                <td colspan="15" class="border-rb">На основании документов технического контроля и протоколов проверки  оборудования в работе после ремонта его техническому состоянию и выполненным работам устанавливаются оценки:</td>
+                <td colspan="16" class="border-rbl">3. На основании документов технического контроля и протоколов проверки  оборудования в работе после ремонта его техническому состоянию и выполненным работам устанавливаются оценки:</td>
             </tr>
             <tr class="row22">
                 <td colspan="6" class="vc hc">Обозначение, наименование оборудования</td>
@@ -218,6 +215,5 @@
             </tr>
         </table>
         <div style="position: fixed; bottom: 0px; right: 0px; color: grey;">П.00.52 Д.10.6</div>
-        </div>
     </body>
 </html>
