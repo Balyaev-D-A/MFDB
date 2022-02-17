@@ -5,9 +5,18 @@
         <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
         <title xml:lang="ru-RU"></title>
         <style type="text/css">
-            table { border-collapse:collapse; empty-cells:show; font-family: 'Times New Roman'; font-size: 12pt; table-layout: fixed; }
+            @media screen {
+                div.footer {
+                    display: none;
+                }
+}
+            @media print {
+            table{ page-break-inside: avoid; }
+            }
+            @page { margin: 1cm 1cm 0.5cm 2cm; }
+            table { border-collapse:collapse; empty-cells:show; font-family: 'Times New Roman'; font-size: 12pt; table-layout: fixed; height: 27cm; }
             tr {height: min-content;}
-            td{text-align: left; vertical-align:middle; border-style: solid; border-width: 1px; padding: 3px; padding-top: 0px; padding-bottom: 0px;}
+            td{text-align: left; vertical-align:middle; border-style: solid; border-width: 1pt; padding: 3px; padding-top: 0px; padding-bottom: 0px;}
 
             .col2 {width: 2.80cm;}
             .col1 {width: 0.69cm;}
@@ -19,8 +28,30 @@
             .col8 {width: 1.77cm;}
             .col9 {width: 2.51cm;}
 
+            .row1 {height: 0.56cm;}
+            .row2 {height: 0.53cm;}
+            .row3 {height: 0.64cm;}
+            .row4 {height: 0.69cm;}
+            .row5 {height: 0.66cm;}
+            .row6 {height: 0.58cm;}
+            .row7 {height: 0.61cm;}
+            .row8 {height: 0.66cm;}
+            .row9 {height: 0.64cm;}
+            .row10 {height: 0.58cm;}
+            .row11 {height: 1.77cm;}
+            .row12 {height: 0.53cm;}
+            .row13 {height: 0.58cm;}
+            .row14 {height: 0.53cm;}
+            .row15 {height: 0.58cm;}
+            .row16 {height: 0.53cm;}
+            .row17 {height: 0.50cm;}
+            .row18 {height: 1.22cm;}
+            .row19 {height: 0.48cm;}
+            .row20 {height: 0.50cm;}
+
             .sign {height: 0.77cm;}
             .header {height:0.77cm;}
+            .expanding { height:auto;}
 
             .vc {vertical-align: middle;}
             .hc {text-align: center;}
@@ -81,7 +112,7 @@
                     <td colspan="2" class="hc" style="font-size: 11pt;">Перечень подлежащих выполнению работ</td>
                     <td colspan="2" class="hc" style="font-size: 11pt;">Продолжительность вывода из работы</td>
                 </tr>
-                <tr>
+                <tr class="expanding">
                     <td colspan="5" style="font-size: 9pt;">Установка контрольная РЗБ-05 3XR00R19MB, Устройство коммутационное УКК-56Р27 3XQ34R000V, Устройство предварительной обработки информации УНО-209Р 3XQ34R000D, Блок детектирования БДРГ-17С2 3XQ11R11RB, Блок детектирования БДРГ-17С4К 3XQ81R04RB</td>
                     <td colspan="2" class="hc" style="font-size: 11pt;">не требуется</td>
                     <td colspan="2" class="hc" style="font-size: 11pt;">не требуется</td>
@@ -89,11 +120,11 @@
                 <tr>
                     <td colspan="9">5. Устанавливаемые гарантийные сроки эксплуатации оборудования применительно к выполненным работам:</td>
                 </tr>
-                <tr class="row8">
+                <tr>
                     <td colspan="5" class="hc" style="font-size: 11pt;">Обозначение, наименование оборудования</td>
                     <td colspan="4" class="hc" style="font-size: 11pt;">Продолжительность гарантийного срока, календарные месяцы</td>
                 </tr>
-                <tr>
+                <tr class="expanding">
                     <td colspan="5" style="font-size: 9pt;">Установка контрольная РЗБ-05 3XR00R19MB, Устройство коммутационное УКК-56Р27 3XQ34R000V, Устройство предварительной обработки информации УНО-209Р 3XQ34R000D, Блок детектирования БДРГ-17С2 3XQ11R11RB, Блок детектирования БДРГ-17С4К 3XQ81R04RB</td>
                     <td colspan="4" class="hc" style="font-size: 11pt;">18 месяцев</td>
                 </tr>
@@ -105,10 +136,13 @@
                     <td colspan="2" class="hc" style="font-size: 11pt;">Обозначение, наименование ремонтной документации</td>
                     <td colspan="2" class="hc" style="font-size: 11pt;">Замечания и пред-<br/>ложения к ремонтной документации по результатам проведённого ремонта</td>
                 </tr>
-                <tr>
+                <tr class="expanding">
                     <td colspan="5" style="font-size: 9pt;">Установка контрольная РЗБ-05 3XR00R19MB, Устройство коммутационное УКК-56Р27 3XQ34R000V, Устройство предварительной обработки информации УНО-209Р 3XQ34R000D, Блок детектирования БДРГ-17С2 3XQ11R11RB, Блок детектирования БДРГ-17С4К 3XQ81R04RB</td>
                     <td colspan="2" class="hc" style="font-size: 11pt;">Ремонтная документация</td>
                     <td colspan="2" class="hc" style="font-size: 11pt;">Нет</td>
+                </tr>
+                <tr class="">
+                    <td colspan="9" class="border-trl"></td>
                 </tr>
                 <tr>
                     <td colspan="9" class="border-trl">Председатель комиссии:</td>
@@ -170,7 +204,7 @@
                     <td colspan="2" class="border-bl"></td>
                     <td colspan="2" class="hc border-rb" style="font-size: 6pt; vertical-align: top;">(подпись) (И.О. Фамилия)</td>
                 </tr>
+                <div style="position: fixed; bottom: 0px; right: 0.5cm; font-size: 11pt;  color: transparent; text-shadow: 2px 0 rgb(180, 180, 180); ">П.00.52 Д.10.6</div>
             </table>
-            <div style="position: absolute; bottom: 0px; right: 0px; color: grey;">П.00.52 Д.10.6</div>
     </body>
 </html>
