@@ -10,6 +10,7 @@
         <file>icons/edit.png</file>
         <file>icons/print.png</file>
         <file>icons/selectall.png</file>
+        <file>icons/savereport.png</file>
     </qresource>
     <qresource prefix="/tr"/>
 </RCC>

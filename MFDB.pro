@@ -23,6 +23,8 @@ SOURCES += \
     headercombobox.cpp \
     importform.cpp \
     krform.cpp \
+    krreportform.cpp \
+    krreportsform.cpp \
     krselectorform.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -34,6 +36,7 @@ SOURCES += \
     receiptform.cpp \
     receiptsform.cpp \
     settings.cpp \
+    trreportsform.cpp \
     verifyform.cpp \
     worktypewidget.cpp \
     wtbutton.cpp \
@@ -53,6 +56,8 @@ HEADERS += \
     headercombobox.h \
     importform.h \
     krform.h \
+    krreportform.h \
+    krreportsform.h \
     krselectorform.h \
     mainwindow.h \
     movesform.h \
@@ -63,6 +68,7 @@ HEADERS += \
     receiptform.h \
     receiptsform.h \
     settings.h \
+    trreportsform.h \
     verifyform.h \
     worktypewidget.h \
     wtbutton.h \
@@ -74,6 +80,8 @@ FORMS += \
     dictionaryform.ui \
     importform.ui \
     krform.ui \
+    krreportform.ui \
+    krreportsform.ui \
     krselectorform.ui \
     mainwindow.ui \
     movesform.ui \
@@ -83,6 +91,7 @@ FORMS += \
     raspprintpreviewform.ui \
     receiptform.ui \
     receiptsform.ui \
+    trreportsform.ui \
     verifyform.ui \
     worktypewidget.ui
 
