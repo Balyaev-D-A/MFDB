@@ -371,7 +371,8 @@ void RaspForm::cwCellDblClicked(int row, int column)
     }
     if (column == 3) {
         QRect r = ui->currWorkTable->visualItemRect(ui->currWorkTable->item(row, column));
-        wtWidget->setGeometry(r.x()+r.width(), r.y(), wtWidget->width(), wtWidget->height());
+        QPoint orig = ui->currWorkTable->viewport()->mapToGlobal(r.topLeft());
+        wtWidget->setGeometry(orig.x()+r.width(), orig.y(), wtWidget->width(), wtWidget->height());
         wtWidget->setWorkTypes(ui->currWorkTable->item(row, column)->text());
         wtWidget->show();
     }

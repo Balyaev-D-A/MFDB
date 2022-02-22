@@ -80,6 +80,7 @@ private slots:
     void receiptsTriggered();
     void verifyTriggered();
     void movesTriggered();
+    void signersTriggered();
 
 protected:
     void showEvent(QShowEvent *event);

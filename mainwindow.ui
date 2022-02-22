@@ -858,6 +858,7 @@
     <addaction name="aIssuers"/>
     <addaction name="aLocations"/>
     <addaction name="aMaterials"/>
+    <addaction name="aSigners"/>
     <addaction name="separator"/>
     <addaction name="aNormative"/>
    </widget>
@@ -966,6 +967,11 @@
   <action name="movesAction">
    <property name="text">
     <string>Движение...</string>
+   </property>
+  </action>
+  <action name="aSigners">
+   <property name="text">
+    <string>Подписанты...</string>
    </property>
   </action>
  </widget>

@@ -175,6 +175,23 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("Материал");
         headers.append("Документ");
         headers.append("Ед. Изм.");
+        break;
+    case SIGNERS:
+        setWindowTitle("Справочник: Подписанты");
+        dbTable = "signers";
+        fields.append("sig_id");
+        fields.append("sig_name");
+        fields.append("sig_loc");
+        fields.append("sig_hidden");
+        fieldTypes.append("int");
+        fieldTypes.append("string");
+        fieldTypes.append("string");
+        fieldTypes.append("bool");
+        headers.append("id");
+        headers.append("ФИО");
+        headers.append("Должность");
+        headers.append("Скрыт");
+        break;
     }
 
     ui->table->setColumnCount(fields.count());

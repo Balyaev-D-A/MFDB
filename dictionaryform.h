@@ -16,7 +16,8 @@ enum Dictionary {
     SCHEDULE,
     LOCATIONS,
     ISSUERS,
-    MATERIALS
+    MATERIALS,
+    SIGNERS
 };
 
 

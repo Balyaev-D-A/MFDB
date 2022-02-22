@@ -57,7 +57,7 @@ bool Database::deployTables()
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS locations (loc_kks VARCHAR(50) PRIMARY KEY, loc_location VARCHAR(100))")) return false;
 
-    if (!pq->exec("CREATE TABLE IF NOT EXISTS issuers (iss_id SERIAL PRIMARY KEY, iss_name VARCHAR(50), iss_loc VARCHAR(20), "
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS issuers (iss_id SERIAL PRIMARY KEY, iss_name VARCHAR(50), iss_loc VARCHAR(50), "
                   "iss_default BOOL DEFAULT FALSE)")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS materials (mat_id SERIAL PRIMARY KEY, mat_name VARCHAR(150), mat_doc VARCHAR(150), "
@@ -95,6 +95,10 @@ bool Database::deployTables()
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS recmaterials (rcm_id SERIAL PRIMARY KEY, rcm_rec INTEGER REFERENCES receipts(rec_id), "
                   "rcm_material INTEGER REFERENCES materials (mat_id), rcm_count DECIMAL(5,2))")) return false;
+
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS signers (sig_id SERIAL PRIMARY KEY, sig_name VARCHAR(50), sig_loc VARCHAR(50), "
+                  "sig_hidden BOOL DEFAULT FALSE)")) return false;
+
 
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
     if (!pq->exec("CREATE TABLE IF NOT EXISTS rasp (rasp_id SERIAL PRIMARY KEY, rasp_num CHAR(6), rasp_date CHAR(10), rasp_btime CHAR(5), "

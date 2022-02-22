@@ -100,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->receiptsAction, &QAction::triggered, this, &MainWindow::receiptsTriggered);
     connect(ui->verifyAction, &QAction::triggered, this, &MainWindow::verifyTriggered);
     connect(ui->movesAction, &QAction::triggered, this, &MainWindow::movesTriggered);
+    connect(ui->aSigners, &QAction::triggered, this, &MainWindow::signersTriggered);
 }
 
 MainWindow::~MainWindow()
@@ -802,4 +803,10 @@ void MainWindow::verifyTriggered()
 void MainWindow::movesTriggered()
 {
     movesForm->show();
+}
+
+void MainWindow::signersTriggered()
+{
+    dictionaryForm->setDictionary(SIGNERS);
+    dictionaryForm->show();
 }
