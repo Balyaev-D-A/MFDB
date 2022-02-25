@@ -859,6 +859,7 @@
     <addaction name="aLocations"/>
     <addaction name="aMaterials"/>
     <addaction name="aSigners"/>
+    <addaction name="aVariables"/>
     <addaction name="separator"/>
     <addaction name="aNormative"/>
    </widget>
@@ -866,7 +867,8 @@
     <property name="title">
      <string>Документы</string>
     </property>
-    <addaction name="aDocuments"/>
+    <addaction name="aKRReports"/>
+    <addaction name="aTRReports"/>
    </widget>
    <widget class="QMenu" name="menu_5">
     <property name="title">
@@ -972,6 +974,21 @@
   <action name="aSigners">
    <property name="text">
     <string>Подписанты...</string>
+   </property>
+  </action>
+  <action name="aVariables">
+   <property name="text">
+    <string>Переменные...</string>
+   </property>
+  </action>
+  <action name="aKRReports">
+   <property name="text">
+    <string>Отчеты по КР...</string>
+   </property>
+  </action>
+  <action name="aTRReports">
+   <property name="text">
+    <string>Отчеты по ТР...</string>
    </property>
   </action>
  </widget>

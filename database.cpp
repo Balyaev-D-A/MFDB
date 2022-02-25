@@ -48,7 +48,7 @@ bool Database::deployTables()
                   "emp_position VARCHAR(255), emp_group SMALLINT, emp_tld SMALLINT UNIQUE, emp_admin BOOL DEFAULT 'FALSE', "
                   "emp_metrolog BOOL DEFAULT 'FALSE', emp_hidden BOOL DEFAULT 'FALSE')")) return false;
 
-    if (!pq->exec("CREATE TABLE IF NOT EXISTS units (unit_id SERIAL PRIMARY KEY, unit_name VARCHAR(20))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS units (unit_id SERIAL PRIMARY KEY, unit_name VARCHAR(20), unit_subsys VARCHAR(20), unit_schednum VARCHAR(50))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS schedule (sch_id SERIAL PRIMARY KEY, sch_unit INTEGER REFERENCES units(unit_id), "
                   "sch_kks VARCHAR(50), sch_invno VARCHAR(20), sch_name VARCHAR(255), sch_type VARCHAR(50), sch_tdoc VARCHAR(255), sch_date VARCHAR(10), "
@@ -99,6 +99,7 @@ bool Database::deployTables()
     if (!pq->exec("CREATE TABLE IF NOT EXISTS signers (sig_id SERIAL PRIMARY KEY, sig_name VARCHAR(50), sig_loc VARCHAR(50), "
                   "sig_hidden BOOL DEFAULT FALSE)")) return false;
 
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS variables (var_id SERIAL PRIMARY KEY, var_name VARCHAR(50) UNIQUE, var_value TEXT)")) return false;
 
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
     if (!pq->exec("CREATE TABLE IF NOT EXISTS rasp (rasp_id SERIAL PRIMARY KEY, rasp_num CHAR(6), rasp_date CHAR(10), rasp_btime CHAR(5), "

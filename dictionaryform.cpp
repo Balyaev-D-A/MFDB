@@ -129,10 +129,16 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         dbTable = "units";
         fields.append("unit_id");
         fields.append("unit_name");
+        fields.append("unit_subsys");
+        fields.append("unit_schednum");
         fieldTypes.append("int");
+        fieldTypes.append("string");
+        fieldTypes.append("string");
         fieldTypes.append("string");
         headers.append("id");
         headers.append("Наименование");
+        headers.append("Подсистема РК");
+        headers.append("Номер графика");
         break;
     case LOCATIONS:
         setWindowTitle("Справочник: Размещение оборудования");
@@ -191,6 +197,19 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         headers.append("ФИО");
         headers.append("Должность");
         headers.append("Скрыт");
+        break;
+    case VARIABLES:
+        setWindowTitle("Справочник: Переменные");
+        dbTable = "variables";
+        fields.append("var_id");
+        fields.append("var_name");
+        fields.append("var_value");
+        fieldTypes.append("int");
+        fieldTypes.append("string");
+        fieldTypes.append("string");
+        headers.append("id");
+        headers.append("Переменная");
+        headers.append("Значение");
         break;
     }
 

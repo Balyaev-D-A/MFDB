@@ -17,7 +17,8 @@ enum Dictionary {
     LOCATIONS,
     ISSUERS,
     MATERIALS,
-    SIGNERS
+    SIGNERS,
+    VARIABLES
 };
 
 

@@ -64,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent)
     verifyForm->setDatabase(db);
     movesForm = new MovesForm(this);
     movesForm->setDatabase(db);
+    krReportsForm = new KRReportsForm(this);
+    krReportsForm->setDatabase(db);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -101,6 +103,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->verifyAction, &QAction::triggered, this, &MainWindow::verifyTriggered);
     connect(ui->movesAction, &QAction::triggered, this, &MainWindow::movesTriggered);
     connect(ui->aSigners, &QAction::triggered, this, &MainWindow::signersTriggered);
+    connect(ui->aVariables, &QAction::triggered, this, &MainWindow::variablesTriggered);
+    connect(ui->aKRReports, &QAction::triggered, this, &MainWindow::krReportsTriggered);
 }
 
 MainWindow::~MainWindow()
@@ -113,7 +117,7 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
 
-    if (!connectDB("alpha.prostore.ru", "radico22", "radico", "coolpass")) {
+    if (!connectDB("127.0.0.1", "radico22", "radico", "coolpass")) {
         db->showError(this);
         return;
     }
@@ -809,4 +813,15 @@ void MainWindow::signersTriggered()
 {
     dictionaryForm->setDictionary(SIGNERS);
     dictionaryForm->show();
+}
+
+void MainWindow::variablesTriggered()
+{
+    dictionaryForm->setDictionary(VARIABLES);
+    dictionaryForm->show();
+}
+
+void MainWindow::krReportsTriggered()
+{
+    krReportsForm->show();
 }
