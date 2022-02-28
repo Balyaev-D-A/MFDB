@@ -101,6 +101,15 @@ bool Database::deployTables()
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS variables (var_id SERIAL PRIMARY KEY, var_name VARCHAR(50) UNIQUE, var_value TEXT)")) return false;
 
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS krreports (krr_id SERIAL PRIMARY KEY, krr_desc VARCHAR(200), krr_unit INTEGER REFERENCES units(unit_id), "
+                  "krr_planbeg CHAR(10), krr_planend CHAR(10), krr_docnum VARCHAR(10))")) return false;
+
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS krsigners (krs_id SERIAL PRIMARY KEY, krs_report INTEGER REFERENCES krreports(krr_id) ON DELETE CASCADE, "
+                  "krs_signer INTEGER REFERENCES signers(sig_id) ON DELETE RESTRICT, krs_role INTEGER)")) return false;
+
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS krrworks (krw_id SERIAL PRIMARY KEY, krw_work INTEGER REFERENCES kaprepairs(kr_id) ON DELETE RESTRICT, "
+                  "krw_report INTEGER REFERENCES krreports(krr_id) ON DELETE CASCADE)")) return false;
+
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
     if (!pq->exec("CREATE TABLE IF NOT EXISTS rasp (rasp_id SERIAL PRIMARY KEY, rasp_num CHAR(6), rasp_date CHAR(10), rasp_btime CHAR(5), "
                   "rasp_etime CHAR(5), rasp_issuer INTEGER REFERENCES issuers(iss_id), rasp_executor INTEGER REFERENCES employees(emp_id), "

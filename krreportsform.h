@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "database.h"
+#include "krreportform.h"
 
 namespace Ui {
 class KRReportsForm;
@@ -21,6 +22,9 @@ private:
     Ui::KRReportsForm *ui;
     Database *db;
     void addButtonClicked();
+private slots:
+    void reportFormClosed(KRReportForm *sender);
+    void reportSaved();
 };
 
 #endif // KRREPORTSFORM_H

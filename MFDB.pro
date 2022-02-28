@@ -16,6 +16,7 @@ SOURCES += \
     defectstable.cpp \
     deviceselectorform.cpp \
     dictionaryform.cpp \
+    dragdropedit.cpp \
     dragdroplist.cpp \
     dragdroptable.cpp \
     dragdroptree.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     defectstable.h \
     deviceselectorform.h \
     dictionaryform.h \
+    dragdropedit.h \
     dragdroplist.h \
     dragdroptable.h \
     dragdroptree.h \

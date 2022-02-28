@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="commonTab">
       <attribute name="title">
@@ -432,7 +432,11 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_13">
                <item>
-                <widget class="QLineEdit" name="ownerEdit"/>
+                <widget class="DragDropEdit" name="ownerEdit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -450,21 +454,33 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_8">
                <item>
-                <widget class="QLineEdit" name="member1Edit"/>
+                <widget class="DragDropEdit" name="member1Edit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_9">
                <item>
-                <widget class="QLineEdit" name="member2Edit"/>
+                <widget class="DragDropEdit" name="member2Edit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_10">
                <item>
-                <widget class="QLineEdit" name="member3Edit"/>
+                <widget class="DragDropEdit" name="member3Edit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -482,7 +498,11 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_14">
                <item>
-                <widget class="QLineEdit" name="repairerEdit"/>
+                <widget class="DragDropEdit" name="repairerEdit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -500,7 +520,11 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_11">
                <item>
-                <widget class="QLineEdit" name="rukEdit"/>
+                <widget class="DragDropEdit" name="chiefEdit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -522,7 +546,41 @@
           </layout>
          </item>
          <item>
-          <widget class="QTableWidget" name="tableWidget"/>
+          <widget class="QTableWidget" name="signersTable">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::DragOnly</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string>Id</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Новый столбец</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Должность</string>
+            </property>
+           </column>
+          </widget>
          </item>
         </layout>
        </item>
@@ -532,7 +590,7 @@
           <enum>QLayout::SetMinimumSize</enum>
          </property>
          <item>
-          <widget class="QPushButton" name="pushButton_3">
+          <widget class="QPushButton" name="backButton">
            <property name="text">
             <string>&lt;&lt; Назад</string>
            </property>
@@ -552,7 +610,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="doneButton">
            <property name="text">
             <string>Готово</string>
            </property>
@@ -571,6 +629,11 @@
    <class>DragDropTable</class>
    <extends>QTableWidget</extends>
    <header>dragdroptable.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DragDropEdit</class>
+   <extends>QLineEdit</extends>
+   <header>dragdropedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -1,6 +1,6 @@
 #include "krreportsform.h"
 #include "ui_krreportsform.h"
-#include "krreportform.h"
+
 
 KRReportsForm::KRReportsForm(QWidget *parent) :
     QWidget(parent, Qt::Window),
@@ -24,5 +24,19 @@ void KRReportsForm::addButtonClicked()
 {
     KRReportForm *krf = new KRReportForm(this);
     krf->setDatabase(db);
+    connect(krf, &KRReportForm::closed, this, &KRReportsForm::reportFormClosed);
+    connect(krf, &KRReportForm::saved, this, &KRReportsForm::reportSaved);
     krf->show();
+}
+
+void KRReportsForm::reportFormClosed(KRReportForm *sender)
+{
+    disconnect(sender, &KRReportForm::closed, this, &KRReportsForm::reportFormClosed);
+    disconnect(sender, &KRReportForm::saved, this, &KRReportsForm::reportSaved);
+    sender->deleteLater();
+}
+
+void KRReportsForm::reportSaved()
+{
+
 }
