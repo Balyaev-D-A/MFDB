@@ -1,0 +1,84 @@
+/*******************************Общие стили *********************************************/
+@page { margin: 1cm 1cm 0.5cm 1cm; }
+@media print {
+table{ page-break-inside: avoid; }
+}
+table { border-collapse:collapse; empty-cells:show; font-family: 'Times New Roman'; font-size: 12pt; table-layout: fixed; }
+td { text-align: left; vertical-align:middle; border-style: solid; border-width: 1pt; padding: 3px; padding-top: 0px; padding-bottom: 0px; overflow: hidden;  text-overflow: clip;}
+
+.expanding { height: 100%;}
+.vc {vertical-align: middle;}
+.hc {text-align: center;}
+.hr {text-align: right;}
+.border-none {border-style: hidden hidden hidden hidden;}
+.border-trb {border-style: solid solid solid hidden;}
+.border-rbl {border-style: hidden solid solid solid;}
+.border-r {border-style: hidden solid hidden hidden;}
+.border-l {border-style: hidden hidden hidden solid;}
+.border-t {border-style: solid hidden hidden hidden;}
+.border-b {border-style: hidden hidden solid hidden;}
+.border-rl {border-style: hidden solid hidden solid;}
+.border-rb {border-style: hidden solid solid hidden;}
+.border-lb {border-style: hidden hidden solid solid;}
+.border-tl {border-style: solid hidden hidden solid;}
+.border-tr {border-style: solid solid hidden hidden;}
+.border-trl {border-style: solid solid hidden solid;}
+
+/**************************Стили для первого листа АВР*********************************/
+
+.avr1col1 {width: 0.79cm;}
+.avr1col2 {width: 1.83cm;}
+.avr1col3 {width: 0.93cm;}
+.avr1col4 {width: 1.19cm;}
+.avr1col5 {width: 0.77cm;}
+.avr1col6 {width: 1.14cm;}
+.avr1col7 {width: 1.01cm;}
+.avr1col8 {width: 1.14cm;}
+.avr1col9 {width: 1.77cm;}
+.avr1col10 {width: 1.24cm;}
+.avr1col11 {width: 0.48cm;}
+.avr1col12 {width: 0.98cm;}
+.avr1col13 {width: 1.40cm;}
+.avr1col14 {width: 0.66cm;}
+.avr1col15 {width: 1.08cm;}
+.avr1col16 {width: 1.85cm;}
+
+.avr1row1 {height: 0.56cm;}
+.avr1row2 {height: 0.53cm;}
+.avr1row3 {height: 0.64cm;}
+.avr1row4 {height: 0.69cm;}
+.avr1row5 {height: 0.66cm;}
+.avr1row6 {height: 0.58cm;}
+.avr1row7 {height: 0.61cm;}
+.avr1row8 {height: 0.66cm;}
+.avr1row9 {height: 0.64cm;}
+.avr1row10 {height: 0.58cm;}
+.avr1row11 {height: 1.77cm;}
+.avr1row12 {height: 0.53cm;}
+.avr1row13 {height: 0.58cm;}
+.avr1row14 {height: 0.53cm;}
+.avr1row15 {height: 0.58cm;}
+.avr1row16 {height: 0.53cm;}
+.avr1row17 {height: 0.50cm;}
+.avr1row18 {height: 1.22cm;}
+.avr1row19 {height: 0.48cm;}
+.avr1row20 {height: 0.50cm;}
+.avr1row21 {height: 0.58cm;}
+.avr1row22 {height: 0.50cm;}
+.avr1row23 {height: 0.50cm;}
+.avr1row24 {height: 0.42cm;}
+.avr1row25 {height: 0.42cm;}
+.avr1row26 {height: 1.69cm;}
+.avr1row27 {height: 1.69cm;}
+.avr1row28 {height: 0.53cm;}
+.avr1row29 {height: 0.53cm;}
+.avr1row30 {height: 0.77cm;}
+.avr1row31 {height: 0.56cm;}
+.avr1row32 {height: 2.86cm;}
+.avr1row33 {height: 0.53cm;}
+.avr1row34 {height: 0.48cm;}
+.avr1row35 {height: 0.79cm;}
+.avr1row36 {height: 0.50cm;}
+
+/**************************Стили для второго листа АВР*********************************/
+

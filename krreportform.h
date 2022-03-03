@@ -45,6 +45,7 @@ private:
     void fillUnitBox();
     bool checkFilling();
     void updateSignersTable();
+    void showErrorMessage(QString message);;
 private slots:
     void updateKRTable();
     void addButtonClicked();

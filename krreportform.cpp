@@ -38,6 +38,7 @@ KRReportForm::KRReportForm(QWidget *parent) :
     connect(ui->member3Edit, &DragDropEdit::itemDroped, this, &KRReportForm::member3Droped);
     connect(ui->repairerEdit, &DragDropEdit::itemDroped, this, &KRReportForm::repairerDroped);
     connect(ui->chiefEdit, &DragDropEdit::itemDroped, this, &KRReportForm::chiefDroped);
+    connect(ui->doneButton, &QPushButton::clicked, this, &KRReportForm::doneButtonClicked);
 }
 
 KRReportForm::~KRReportForm()
@@ -163,8 +164,48 @@ void KRReportForm::backButtonClicked()
     ui->tabWidget->setCurrentIndex(0);
 }
 
+void KRReportForm::showErrorMessage(QString message)
+{
+    QMessageBox::critical(this, "Ошибка!", message);
+}
+
 bool KRReportForm::checkFilling()
 {
+    if (ui->descEdit->text().isEmpty()) {
+        showErrorMessage("Не заполнено описание отчета.");
+        return false;
+    }
+    if (ui->docNumEdit->text().isEmpty()) {
+        showErrorMessage("Не заполнен номер документа.");
+        return false;
+    }
+    if (!ui->selectedKRTable->rowCount()) {
+        showErrorMessage("Не выбрано ни одной работы для отчета.");
+        return false;
+    }
+    if (ui->ownerEdit->text().isEmpty()) {
+        showErrorMessage("Не выбран подписант владельца оборудования.");
+        return false;
+    }
+    if (ui->member1Edit->text().isEmpty()) {
+        showErrorMessage("Не выбран один из членнов комиссии.");
+        return false;
+    }
+    if (ui->member2Edit->text().isEmpty()) {
+        showErrorMessage("Не выбран один из членнов комиссии.");
+        return false;
+    }
+    if (ui->member3Edit->text().isEmpty()) {
+        showErrorMessage("Не выбран один из членнов комиссии.");
+        return false;
+    }
+    if (ui->repairerEdit->text().isEmpty()) {
+        showErrorMessage("Не выбран представитель цеха ответственного за ремонт.");
+        return false;
+    }
+    if (ui->chiefEdit->text().isEmpty()) {
+        showErrorMessage("Не выбран руководитель работ по ремонту оборудования.");
+    }
     return true;
 }
 
@@ -290,7 +331,7 @@ void KRReportForm::doneButtonClicked()
             return;
         }
 
-        query = "DELETE FROM krworks WHERE krw_work = '%1'";
+        query = "DELETE FROM krrworks WHERE krw_work = '%1'";
         query = query.arg(reportId);
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -307,7 +348,7 @@ void KRReportForm::doneButtonClicked()
         }
     }
 
-    query = "INSERT INTO krworks (krw_work, krw_report) VALUES ('%1', '%2')";
+    query = "INSERT INTO krrworks (krw_work, krw_report) VALUES ('%1', '%2')";
 
     for (int i=0; i<ui->selectedKRTable->rowCount(); i++)
     {
@@ -344,6 +385,8 @@ void KRReportForm::doneButtonClicked()
         }
     }
     db->commitTransaction();
+    emit saved();
+    close();
 }
 
 void KRReportForm::editReport(QString Id)
@@ -369,7 +412,7 @@ void KRReportForm::editReport(QString Id)
         ui->docNumEdit->setText(db->fetchValue(4).toString());
     }
 
-    query = "SELECT krw_work, sch_type, sch_kks, kr_begdate, kr_enddate FROM krworks AS kw "
+    query = "SELECT krw_work, sch_type, sch_kks, kr_begdate, kr_enddate FROM krrworks AS kw "
             "LEFT JOIN kaprepairs AS kr ON kr_id = krw_work "
             "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
             "WHERE krw_report = '%1'";

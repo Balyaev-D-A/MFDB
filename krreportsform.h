@@ -21,10 +21,16 @@ public:
 private:
     Ui::KRReportsForm *ui;
     Database *db;
-    void addButtonClicked();
+
+protected:
+    void showEvent(QShowEvent *event);
+
 private slots:
+    void addButtonClicked();
     void reportFormClosed(KRReportForm *sender);
-    void reportSaved();
+    void updateReports();
+    void editButtonClicked();
+    void deleteButtonClicked();
 };
 
 #endif // KRREPORTSFORM_H
