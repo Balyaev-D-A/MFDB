@@ -117,7 +117,7 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
 
-    if (!connectDB("alpha.prostore.ru", "radico22", "radico", "coolpass")) {
+    if (!connectDB("127.0.0.1", "radico22", "radico", "coolpass")) {
         db->showError(this);
         return;
     }

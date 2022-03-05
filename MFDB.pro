@@ -25,6 +25,7 @@ SOURCES += \
     importform.cpp \
     krform.cpp \
     krreportform.cpp \
+    krreportpreviewform.cpp \
     krreportsform.cpp \
     krselectorform.cpp \
     main.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
     importform.h \
     krform.h \
     krreportform.h \
+    krreportpreviewform.h \
     krreportsform.h \
     krselectorform.h \
     mainwindow.h \
@@ -83,6 +85,7 @@ FORMS += \
     importform.ui \
     krform.ui \
     krreportform.ui \
+    krreportpreviewform.ui \
     krreportsform.ui \
     krselectorform.ui \
     mainwindow.ui \
