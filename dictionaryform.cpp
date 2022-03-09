@@ -129,14 +129,17 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         dbTable = "units";
         fields.append("unit_id");
         fields.append("unit_name");
+        fields.append("unit_shortname");
         fields.append("unit_subsys");
         fields.append("unit_schednum");
         fieldTypes.append("int");
         fieldTypes.append("string");
         fieldTypes.append("string");
         fieldTypes.append("string");
+        fieldTypes.append("string");
         headers.append("id");
         headers.append("Наименование");
+        headers.append("Сокр. Наим.");
         headers.append("Подсистема РК");
         headers.append("Номер графика");
         break;

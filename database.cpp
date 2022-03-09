@@ -48,7 +48,8 @@ bool Database::deployTables()
                   "emp_position VARCHAR(255), emp_group SMALLINT, emp_tld SMALLINT UNIQUE, emp_admin BOOL DEFAULT 'FALSE', "
                   "emp_metrolog BOOL DEFAULT 'FALSE', emp_hidden BOOL DEFAULT 'FALSE')")) return false;
 
-    if (!pq->exec("CREATE TABLE IF NOT EXISTS units (unit_id SERIAL PRIMARY KEY, unit_name VARCHAR(20), unit_subsys VARCHAR(20), unit_schednum VARCHAR(50))")) return false;
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS units (unit_id SERIAL PRIMARY KEY, unit_name VARCHAR(20), unit_shortname VARCHAR(10), "
+                  " unit_subsys VARCHAR(20), unit_schednum VARCHAR(50))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS schedule (sch_id SERIAL PRIMARY KEY, sch_unit INTEGER REFERENCES units(unit_id), "
                   "sch_kks VARCHAR(50), sch_invno VARCHAR(20), sch_name VARCHAR(255), sch_type VARCHAR(50), sch_tdoc VARCHAR(255), sch_date VARCHAR(10), "
@@ -102,7 +103,7 @@ bool Database::deployTables()
     if (!pq->exec("CREATE TABLE IF NOT EXISTS variables (var_id SERIAL PRIMARY KEY, var_name VARCHAR(50) UNIQUE, var_value TEXT)")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS krreports (krr_id SERIAL PRIMARY KEY, krr_desc VARCHAR(200), krr_unit INTEGER REFERENCES units(unit_id), "
-                  "krr_planbeg CHAR(10), krr_planend CHAR(10), krr_docnum VARCHAR(10))")) return false;
+                  "krr_planbeg CHAR(10), krr_planend CHAR(10), krr_date CHAR(10), krr_docnum VARCHAR(10))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS krsigners (krs_id SERIAL PRIMARY KEY, krs_report INTEGER REFERENCES krreports(krr_id) ON DELETE CASCADE, "
                   "krs_signer INTEGER REFERENCES signers(sig_id) ON DELETE RESTRICT, krs_role INTEGER)")) return false;

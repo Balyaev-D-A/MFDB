@@ -17,7 +17,14 @@ void KRReportPreviewForm::setDatabase(Database *db)
     this->db = db;
 }
 
-QStringList KRReportPreviewForm::makeAVR()
+QStringList KRReportPreviewForm::makeAVR(QString reportId)
 {
-    QString query = SELECT ;
+    QStringList result;
+    QString page, unitShortName, date, begDate, endDate, planBegDate, planEndDate;
+    QString orderDate, orderNum, schedNum, docNum, works;
+    QString ownerLoc, ownerName, member1Loc, member1Name, member2Loc, member2Name, member3Loc, member3Name;
+    QString chiefLoc, chiefState;
+    QString query = "SELECT krr";
+
+    return result;
 }

@@ -16,6 +16,7 @@ KRReportForm::KRReportForm(QWidget *parent) :
     ui->selectedKRTable->hideColumn(0);
     ui->begDateEdit->setDate(QDate::currentDate());
     ui->endDateEdit->setDate(QDate::currentDate());
+    ui->dateEdit->setDate(QDate::currentDate());
     ui->signersTable->hideColumn(0);
     ui->ownerEdit->setAcceptFrom(ui->signersTable);
     ui->member1Edit->setAcceptFrom(ui->signersTable);
@@ -301,12 +302,13 @@ void KRReportForm::doneButtonClicked()
 
     if (reportId == "0") {
         db->startTransaction();
-        query = "INSERT INTO krreports (krr_desc, krr_unit, krr_planbeg, krr_planend, krr_docnum) "
-                "VALUES ('%1', '%2', '%3', '%4', '%5')";
+        query = "INSERT INTO krreports (krr_desc, krr_unit, krr_planbeg, krr_planend, krr_date, krr_docnum) "
+                "VALUES ('%1', '%2', '%3', '%4', '%5', '%6')";
         query = query.arg(ui->descEdit->text());
         query = query.arg(ui->unitBox->currentData().toString());
         query = query.arg(ui->begDateEdit->text());
         query = query.arg(ui->endDateEdit->text());
+        query = query.arg(ui->dateEdit->text());
         query = query.arg(ui->docNumEdit->text());
 
         if (!db->execQuery(query)) {
@@ -316,12 +318,13 @@ void KRReportForm::doneButtonClicked()
         }
         reportId = db->lastInsertId().toString();
     } else {
-        query = "UPDATE krreports SET krr_desc = '%1', krr_unit = '%2, krr_planbeg = '%3', krr_planend = '%4', krr_docnum = '%5' "
-                "WHERE krr_id = '%6'";
+        query = "UPDATE krreports SET krr_desc = '%1', krr_unit = '%2, krr_planbeg = '%3', krr_planend = '%4', krr_date = '%5',  krr_docnum = '%6' "
+                "WHERE krr_id = '%7'";
         query = query.arg(ui->descEdit->text());
         query = query.arg(ui->unitBox->currentData().toString());
         query = query.arg(ui->begDateEdit->text());
         query = query.arg(ui->endDateEdit->text());
+        query = query.arg(ui->dateEdit->text());
         query = query.arg(ui->docNumEdit->text());
         query = query.arg(reportId);
 
@@ -396,7 +399,7 @@ void KRReportForm::editReport(QString Id)
 
     reportId = Id;
 
-    query = "SELECT krr_desc, krr_unit, krr_planbeg, krr_planend, krr_docnum FROM krreports WHERE krr_id = '%1'";
+    query = "SELECT krr_desc, krr_unit, krr_planbeg, krr_planend, krr_date, krr_docnum FROM krreports WHERE krr_id = '%1'";
 
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
@@ -409,7 +412,8 @@ void KRReportForm::editReport(QString Id)
         unitId = db->fetchValue(1).toInt();
         ui->begDateEdit->setDate(QDate::fromString(db->fetchValue(2).toString(), "dd.MM.yyyy"));
         ui->endDateEdit->setDate(QDate::fromString(db->fetchValue(3).toString(), "dd.MM.yyyy"));
-        ui->docNumEdit->setText(db->fetchValue(4).toString());
+        ui->dateEdit->setDate(QDate::fromString(db->fetchValue(4).toString(), "dd.MM.yyyy"));
+        ui->docNumEdit->setText(db->fetchValue(5).toString());
     }
 
     query = "SELECT krw_work, sch_type, sch_kks, kr_begdate, kr_enddate FROM krrworks AS kw "

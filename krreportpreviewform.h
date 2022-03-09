@@ -26,9 +26,9 @@ private:
     int scriptResult;
     QWebEnginePage testpage;
     void scriptCallback(const QVariant &result);
-    QStringList makeAVR();
-    QStringList makeVVR();
-    QStringList makeVFZM();
+    QStringList makeAVR(QString reportId);
+    QStringList makeVVR(QString reportId);
+    QStringList makeVFZM(QString reportId);
 };
 
 #endif // KRREPORTPREVIEWFORM_H
