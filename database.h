@@ -30,6 +30,7 @@ public:
     bool commitTransaction();
     bool rollbackTransaction();
     QVariant lastInsertId() const;
+    QVariant getVariable(QString varName);
 
 
 private:

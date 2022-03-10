@@ -189,3 +189,16 @@ bool Database::firstRecord()
 {
     return pq->first();
 }
+
+QVariant Database::getVariable(QString varName)
+{
+    QVariant result = NULL;
+    QString query = "SELECT var_value FROM variables WHERE var_name = '%1'";
+    query = query.arg(varName);
+    if (!execQuery(query))
+        return result;
+    if (nextRecord()) {
+        result = fetchValue(0);
+    }
+    return result;
+}
