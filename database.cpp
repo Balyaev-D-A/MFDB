@@ -44,7 +44,7 @@ bool Database::deployTables()
 
 /////////////////////////////////////////////////////////// Справочники //////////////////////////////////////////////////
 
-    if (!pq->exec("CREATE TABLE IF NOT EXISTS employees (emp_id sSERIAL PRIMARY KEY, emp_num SMALLINT UNIQUE, emp_name VARCHAR(100), "
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS employees (emp_id SERIAL PRIMARY KEY, emp_num SMALLINT UNIQUE, emp_name VARCHAR(100), "
                   "emp_position VARCHAR(255), emp_group SMALLINT, emp_tld SMALLINT UNIQUE, emp_admin BOOL DEFAULT 'FALSE', "
                   "emp_metrolog BOOL DEFAULT 'FALSE', emp_hidden BOOL DEFAULT 'FALSE')")) return false;
 

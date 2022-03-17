@@ -4,15 +4,7 @@
 #include <QWidget>
 #include <QWebEnginePage>
 #include "database.h"
-
-enum SignerType {
-    OWNER = 0,
-    MEMBER1,
-    MEMBER2,
-    MEMBER3,
-    REPAIRER,
-    CHIEF
-};
+#include "krreportform.h"
 
 namespace Ui {
 class KRReportPreviewForm;
@@ -31,6 +23,7 @@ public:
 private:
     Ui::KRReportPreviewForm *ui;
     Database *db;
+    QString currentPage;
     int fillerBottom, fillerTop;
     int scriptResult;
     QWebEnginePage testpage;
@@ -40,6 +33,15 @@ private:
     QStringList makeAVR(QString reportId);
     QStringList makeVVR(QString reportId);
     QStringList makeVFZM(QString reportId);
+
+private slots:
+    void saveButtonClicked();
+
+protected:
+    void closeEvent(QCloseEvent *event);
+
+signals:
+    void closed(KRReportPreviewForm *sender);
 };
 
 #endif // KRREPORTPREVIEWFORM_H

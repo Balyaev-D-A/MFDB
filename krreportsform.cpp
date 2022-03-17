@@ -1,7 +1,6 @@
 #include "krreportsform.h"
 #include "ui_krreportsform.h"
 
-
 KRReportsForm::KRReportsForm(QWidget *parent) :
     QWidget(parent, Qt::Window),
     ui(new Ui::KRReportsForm)
@@ -11,6 +10,9 @@ KRReportsForm::KRReportsForm(QWidget *parent) :
     connect(ui->addButton, &QToolButton::clicked, this, &KRReportsForm::addButtonClicked);
     connect(ui->updateButton, &QToolButton::clicked, this, &KRReportsForm::updateReports);
     connect(ui->editButton, &QToolButton::clicked, this, &KRReportsForm::editButtonClicked);
+    connect(ui->deleteButton, &QToolButton::clicked, this, &KRReportsForm::deleteButtonClicked);
+    connect(ui->printButton, &QToolButton::clicked, this, &KRReportsForm::printButtonClicked);
+
 }
 
 KRReportsForm::~KRReportsForm()
@@ -52,6 +54,7 @@ void KRReportsForm::updateReports()
 
 void KRReportsForm::showEvent(QShowEvent *event)
 {
+    QWidget::showEvent(event);
     updateReports();
 }
 
@@ -94,4 +97,20 @@ void KRReportsForm::deleteButtonClicked()
         return;
     }
     ui->table->removeRow(ui->table->currentRow());
+}
+
+void KRReportsForm::printButtonClicked()
+{
+    if (!ui->table->currentItem()) return;
+
+    KRReportPreviewForm *krp = new KRReportPreviewForm(this);
+    connect(krp, &KRReportPreviewForm::closed, this, &KRReportsForm::printFormClosed);
+    krp->setDatabase(db);
+    krp->showPreview(ui->table->item(ui->table->currentRow(), 0)->text());
+}
+
+void KRReportsForm::printFormClosed(KRReportPreviewForm *sender)
+{
+    disconnect(sender, &KRReportPreviewForm::closed, this, &KRReportsForm::printFormClosed);
+    sender->deleteLater();
 }

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "database.h"
 #include "krreportform.h"
+#include "krreportpreviewform.h"
 
 namespace Ui {
 class KRReportsForm;
@@ -31,6 +32,8 @@ private slots:
     void updateReports();
     void editButtonClicked();
     void deleteButtonClicked();
+    void printButtonClicked();
+    void printFormClosed(KRReportPreviewForm *sender);
 };
 
 #endif // KRREPORTSFORM_H
