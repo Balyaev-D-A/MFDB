@@ -33,6 +33,7 @@ KRReportForm::KRReportForm(QWidget *parent) :
     connect(ui->removeAllButton, &QToolButton::clicked, this, &KRReportForm::removeAllButtonClicked);
     connect(ui->cancelButton, &QPushButton::clicked, this, &KRReportForm::close);
     connect(ui->nextButton, &QPushButton::clicked, this, &KRReportForm::nextButtonClicked);
+    connect(ui->backButton, &QPushButton::clicked, this, &KRReportForm::backButtonClicked);
     connect(ui->ownerEdit, &DragDropEdit::itemDroped, this, &KRReportForm::ownerDroped);
     connect(ui->member1Edit, &DragDropEdit::itemDroped, this, &KRReportForm::member1Droped);
     connect(ui->member2Edit, &DragDropEdit::itemDroped, this, &KRReportForm::member2Droped);
@@ -97,7 +98,7 @@ void KRReportForm::updateKRTable()
 
 void KRReportForm::fillUnitBox()
 {
-    QString query = "SELECT unit_id, unit_name FROM units";
+    QString query = "SELECT unit_id, unit_name FROM units ORDER BY unit_name";
 
     ui->unitBox->blockSignals(true);
     while(ui->unitBox->count()) ui->unitBox->removeItem(0);
@@ -109,6 +110,7 @@ void KRReportForm::fillUnitBox()
     {
         ui->unitBox->addItem(db->fetchValue(1).toString(), db->fetchValue(0));
     }
+    if (unitId != -1) ui->unitBox->setCurrentIndex(ui->unitBox->findData(unitId));
     ui->unitBox->blockSignals(false);
 }
 
@@ -366,17 +368,17 @@ void KRReportForm::doneButtonClicked()
     query = "INSERT INTO krsigners (krs_report, krs_signer, krs_role) VALUES ('%1', '%2', '%3')";
 
     queryList.clear();
-    prepQuery = query.arg(reportId).arg(signers.ownerId).arg(OWNER);
+    prepQuery = query.arg(reportId).arg(signers.ownerId).arg(KRSOWNER);
     queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.member1Id).arg(MEMBER1);
+    prepQuery = query.arg(reportId).arg(signers.member1Id).arg(KRSMEMBER1);
     queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.member2Id).arg(MEMBER2);
+    prepQuery = query.arg(reportId).arg(signers.member2Id).arg(KRSMEMBER2);
     queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.member3Id).arg(MEMBER3);
+    prepQuery = query.arg(reportId).arg(signers.member3Id).arg(KRSMEMBER3);
     queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.repairerId).arg(REPAIRER);
+    prepQuery = query.arg(reportId).arg(signers.repairerId).arg(KRSREPAIRER);
     queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.chiefId).arg(CHIEF);
+    prepQuery = query.arg(reportId).arg(signers.chiefId).arg(KRSCHIEF);
     queryList.append(prepQuery);
 
     for (int i=0; i<queryList.size(); i++)
@@ -451,27 +453,27 @@ void KRReportForm::editReport(QString Id)
     while (db->nextRecord())
     {
         switch (db->fetchValue(1).toInt()) {
-        case OWNER:
+        case KRSOWNER:
             signers.ownerId = db->fetchValue(0).toString();
             ui->ownerEdit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
             break;
-        case MEMBER1:
+        case KRSMEMBER1:
             signers.member1Id = db->fetchValue(0).toString();
             ui->member1Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
             break;
-        case MEMBER2:
+        case KRSMEMBER2:
             signers.member2Id = db->fetchValue(0).toString();
             ui->member2Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
             break;
-        case MEMBER3:
+        case KRSMEMBER3:
             signers.member3Id = db->fetchValue(0).toString();
             ui->member3Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
             break;
-        case REPAIRER:
+        case KRSREPAIRER:
             signers.repairerId = db->fetchValue(0).toString();
             ui->repairerEdit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
             break;
-        case CHIEF:
+        case KRSCHIEF:
             signers.chiefId = db->fetchValue(0).toString();
             ui->chiefEdit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
             break;

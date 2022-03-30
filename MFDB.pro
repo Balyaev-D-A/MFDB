@@ -38,6 +38,7 @@ SOURCES += \
     receiptform.cpp \
     receiptsform.cpp \
     settings.cpp \
+    trreportform.cpp \
     trreportsform.cpp \
     verifyform.cpp \
     worktypewidget.cpp \
@@ -72,6 +73,7 @@ HEADERS += \
     receiptform.h \
     receiptsform.h \
     settings.h \
+    trreportform.h \
     trreportsform.h \
     verifyform.h \
     worktypewidget.h \
@@ -96,6 +98,7 @@ FORMS += \
     raspprintpreviewform.ui \
     receiptform.ui \
     receiptsform.ui \
+    trreportform.ui \
     trreportsform.ui \
     verifyform.ui \
     worktypewidget.ui

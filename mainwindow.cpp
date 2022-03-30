@@ -66,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent)
     movesForm->setDatabase(db);
     krReportsForm = new KRReportsForm(this);
     krReportsForm->setDatabase(db);
+    trReportsForm = new TRReportsForm(this);
+    trReportsForm->setDatabase(db);
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -105,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->aSigners, &QAction::triggered, this, &MainWindow::signersTriggered);
     connect(ui->aVariables, &QAction::triggered, this, &MainWindow::variablesTriggered);
     connect(ui->aKRReports, &QAction::triggered, this, &MainWindow::krReportsTriggered);
+    connect(ui->aTRReports, &QAction::triggered, this, &MainWindow::trReportsTriggered);
 }
 
 MainWindow::~MainWindow()
@@ -416,9 +419,8 @@ void MainWindow::addDefectClicked()
 void MainWindow::updateDefectsTable()
 {
     int rc;
-    QString query = "SELECT def_id, def_num, unit_name, def_devtype, def_kks, def_begdate, def_enddate, def_rasp FROM defects AS d "
-                    "LEFT JOIN schedule AS s ON d.def_kks = s.sch_kks "
-                    "LEFT JOIN units AS u ON s.sch_unit = u.unit_id "
+    QString query = "SELECT def_id, def_num, unit_name, def_devtype, def_kks, def_begdate, def_enddate, def_rasp FROM defects "
+                    "LEFT JOIN units ON def_unit = unit_id "
                     "WHERE def_quarter = '%1'";
     query = query.arg(ui->quarterBox->currentIndex() + 1);
     if (!db->execQuery(query)) {
@@ -824,4 +826,9 @@ void MainWindow::variablesTriggered()
 void MainWindow::krReportsTriggered()
 {
     krReportsForm->show();
+}
+
+void MainWindow::trReportsTriggered()
+{
+    trReportsForm->show();
 }

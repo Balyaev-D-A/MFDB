@@ -25,11 +25,6 @@ DefectForm::DefectForm(QWidget *parent) :
     connect(ui->okButton, &QPushButton::clicked, this, &DefectForm::okClicked);
     connect(ui->cancelButton, &QPushButton::clicked, this, &DefectForm::cancelClicked);
 
-    ui->buttonGroup->setId(ui->externRevievRB, EXTERNREVIEW);
-    ui->buttonGroup->setId(ui->externConnRB, EXTERNCONN);
-    ui->buttonGroup->setId(ui->internConnRB, INTERNCONN);
-    ui->buttonGroup->setId(ui->electricParRB, ELECTRICPAR);
-
     ui->addedMatTable->hideColumn(0);
     ui->materialTable->hideColumn(0);
     ui->addedMatTable->sortByColumn(1, Qt::AscendingOrder);
@@ -77,7 +72,7 @@ void DefectForm::editDefect(QString defId)
 
     this->defId = defId;
 
-    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_quarter FROM defects WHERE def_id = '%1'";
+    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_quarter, def_unit FROM defects WHERE def_id = '%1'";
     query = query.arg(defId);
 
     if (!db->execQuery(query)) {
@@ -88,25 +83,14 @@ void DefectForm::editDefect(QString defId)
     if (db->nextRecord()) {
         device.type = db->fetchValue(0).toString();
         device.kks = db->fetchValue(1).toString();
+        device.unitId = db->fetchValue(7).toString();
         ui->journalDefectEdit->setText(db->fetchValue(2).toString());
         defect = db->fetchValue(3).toString();
         stage = db->fetchValue(4).toInt();
         repair = db->fetchValue(5).toString();
 
-        switch (stage) {
-        case EXTERNREVIEW:
-            ui->externRevievRB->setChecked(true);
-            break;
-        case EXTERNCONN:
-            ui->externConnRB->setChecked(true);
-            break;
-        case INTERNCONN:
-            ui->internConnRB->setChecked(true);
-            break;
-        case ELECTRICPAR:
-            ui->electricParRB->setChecked(true);
-            break;
-        }
+        ui->stageBox->setCurrentIndex(stage);
+
         ui->quarterBox->setCurrentIndex(db->fetchValue(6).toInt() - 1);
     }
 
@@ -185,10 +169,7 @@ void DefectForm::updateDefectText()
             ui->addDefectButton->setDisabled(true);
         else
             ui->addDefectButton->setDisabled(false);
-        ui->externRevievRB->setDisabled(true);
-        ui->externConnRB->setDisabled(true);
-        ui->internConnRB->setDisabled(true);
-        ui->electricParRB->setDisabled(true);
+        ui->stageBox->setDisabled(true);
         ui->saveDefectButton->setDisabled(true);
         ui->deleteDefectButton->setDisabled(true);
         ui->nextDefectButton->setDisabled(true);
@@ -197,10 +178,7 @@ void DefectForm::updateDefectText()
     }
 
     ui->defectEdit->setDisabled(false);
-    ui->externRevievRB->setDisabled(false);
-    ui->externConnRB->setDisabled(false);
-    ui->internConnRB->setDisabled(false);
-    ui->electricParRB->setDisabled(false);
+    ui->stageBox->setDisabled(false);
     ui->addDefectButton->setDisabled(false);
     ui->saveDefectButton->setDisabled(false);
     ui->deleteDefectButton->setDisabled(false);
@@ -215,20 +193,8 @@ void DefectForm::updateDefectText()
 
     ui->defectLabel->setText(QString("Дефект %1 из %2").arg(currentDefect + 1).arg(defectList.size()));
     ui->defectEdit->setText(defectList[currentDefect].description);
-    switch (defectList[currentDefect].stage) {
-    case EXTERNREVIEW:
-        ui->externRevievRB->setChecked(true);
-        break;
-    case EXTERNCONN:
-        ui->externConnRB->setChecked(true);
-        break;
-    case INTERNCONN:
-        ui->internConnRB->setChecked(true);
-        break;
-    case ELECTRICPAR:
-        ui->electricParRB->setChecked(true);
-        break;
-    }
+    ui->stageBox->setCurrentIndex(defectList[currentDefect].stage);
+
 }
 
 void DefectForm::updateRepairs()
@@ -510,10 +476,13 @@ bool DefectForm::saveDefect()
             }
         }
         query = "UPDATE defects SET def_quarter = '%1', def_devtype = '%2', def_kks = '%3', def_journaldesc = '%4', def_realdesc = '%5', "
-                "def_stage = '%6', def_repairdesc = '%7'";
+                "def_stage = '%6', def_repairdesc = '%7', def_unit = '%8', def_devname = '%9' WHERE def_id = '%10'";
         query = query.arg(ui->quarterBox->currentIndex()+1);
         query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text());
         query = query.arg(ui->defectEdit->text()).arg(ui->buttonGroup->checkedId()).arg(ui->repairEdit->text());
+        query = query.arg(device.unitId);
+        query = query.arg(device.name);
+        query = query.arg(defId);
 
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -522,11 +491,13 @@ bool DefectForm::saveDefect()
         }
     }
     else {
-        query = "INSERT INTO defects (def_quarter, def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc) "
-                "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7')";
+        query = "INSERT INTO defects (def_quarter, def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_unit, def_devname) "
+                "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9')";
         query = query.arg(ui->quarterBox->currentIndex() + 1);
         query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text()).arg(ui->defectEdit->text());
         query = query.arg(ui->buttonGroup->checkedId()).arg(ui->repairEdit->text());
+        query = query.arg(device.unitId);
+        query = query.arg(device.name);
 
         if (!db->execQuery(query)) {
             db->showError(this);

@@ -14,6 +14,7 @@
 #include "verifyform.h"
 #include "movesform.h"
 #include "krreportsform.h"
+#include "trreportsform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -44,6 +45,7 @@ private:
     VerifyForm *verifyForm;
     MovesForm *movesForm;
     KRReportsForm *krReportsForm;
+    TRReportsForm *trReportsForm;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
 private slots:
@@ -85,6 +87,7 @@ private slots:
     void signersTriggered();
     void variablesTriggered();
     void krReportsTriggered();
+    void trReportsTriggered();
 
 protected:
     void showEvent(QShowEvent *event);

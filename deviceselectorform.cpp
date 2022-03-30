@@ -133,6 +133,17 @@ void DeviceSelectorForm::okClicked()
     dev.kks = items[0]->text(0);
     dev.name = ui->deviceBox->currentData().toString();
     dev.type = ui->deviceBox->currentText();
+    QString query = "SELECT sch_unit FROM schedule WHERE sch_kks = '%1' AND sch_type = '%2' LIMIT 1";
+    query = query.arg(dev.kks).arg(dev.type);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    if (db->nextRecord()){
+        dev.unitId = db->fetchValue(0).toString();
+    }
 
     emit deviceChoosed(dev);
     close();

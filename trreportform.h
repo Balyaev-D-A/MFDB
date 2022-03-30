@@ -1,8 +1,9 @@
-#ifndef KRREPORTFORM_H
-#define KRREPORTFORM_H
+#ifndef TRREPORTFORM_H
+#define TRREPORTFORM_H
 
 #include <QWidget>
 #include "database.h"
+
 
 typedef  struct {
     QString ownerId = "";
@@ -11,43 +12,44 @@ typedef  struct {
     QString member3Id = "";
     QString repairerId = "";
     QString chiefId = "";
-} KRSigners;
+} TRSigners;
 
-enum KRSignerType {
-    KRSOWNER = 0,
-    KRSMEMBER1,
-    KRSMEMBER2,
-    KRSMEMBER3,
-    KRSREPAIRER,
-    KRSCHIEF
+enum TRSignerType {
+    TRSOWNER = 0,
+    TRSMEMBER1,
+    TRSMEMBER2,
+    TRSMEMBER3,
+    TRSREPAIRER,
+    TRSCHIEF
 };
 
 namespace Ui {
-class KRReportForm;
+class TRReportForm;
 }
 
-class KRReportForm : public QWidget
+class TRReportForm : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit KRReportForm(QWidget *parent = nullptr);
-    ~KRReportForm();
+    explicit TRReportForm(QWidget *parent = nullptr);
+    ~TRReportForm();
     void setDatabase(Database *db);
     void editReport(QString Id);
 
 private:
-    Ui::KRReportForm *ui;
+    Ui::TRReportForm *ui;
     Database *db;
-    KRSigners signers;
+    TRSigners signers;
     QString reportId = "0";
     int unitId = -1;
     void fillUnitBox();
-    bool checkFilling();
     void updateSignersTable();
-    void showErrorMessage(QString message);;
+    bool checkFilling();
+    void showErrorMessage(QString message);
+
 private slots:
-    void updateKRTable();
+    void updateTRTable();
     void addButtonClicked();
     void removeButtonClicked();
     void addAllButtonClicked();
@@ -62,14 +64,13 @@ private slots:
     void member3Droped();
     void repairerDroped();
     void chiefDroped();
-
 protected:
     void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
 
 signals:
-    void closed(KRReportForm *sender);
+    void closed(TRReportForm *sender);
     void saved();
 };
 
-#endif // KRREPORTFORM_H
+#endif // TRREPORTFORM_H

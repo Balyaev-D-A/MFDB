@@ -241,44 +241,7 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <widget class="QRadioButton" name="externRevievRB">
-           <property name="text">
-            <string>Внешний осмотр</string>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="externConnRB">
-           <property name="text">
-            <string>Внешние разъёмы</string>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="internConnRB">
-           <property name="text">
-            <string>Внутренние соединения</string>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="electricParRB">
-           <property name="text">
-            <string>Электрические параметры</string>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">buttonGroup</string>
-           </attribute>
-          </widget>
+          <widget class="QComboBox" name="stageBox"/>
          </item>
         </layout>
        </widget>

@@ -5,6 +5,7 @@
 #include "database.h"
 
 typedef struct {
+    QString unitId;
     QString type;
     QString name;
     QString kks;

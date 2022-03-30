@@ -6,10 +6,10 @@
 #include "deviceselectorform.h"
 
 
-const int EXTERNREVIEW = 0;
-const int EXTERNCONN = 1;
-const int INTERNCONN = 2;
-const int ELECTRICPAR = 3;
+const int EXTERNREVIEW = 1;
+const int EXTERNCONN = 2;
+const int INTERNCONN = 3;
+const int ELECTRICPAR = 4;
 
 
 typedef struct {

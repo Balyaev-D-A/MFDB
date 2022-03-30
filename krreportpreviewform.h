@@ -33,6 +33,8 @@ private:
     QStringList makeAVR(QString reportId);
     QStringList makeVVR(QString reportId);
     QStringList makeVFZM(QString reportId);
+    QStringList makePO(QString reportId);
+    int maxInt(int first, int second);
 
 private slots:
     void saveButtonClicked();

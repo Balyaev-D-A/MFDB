@@ -73,7 +73,8 @@ bool Database::deployTables()
     if (!pq->exec("CREATE TABLE IF NOT EXISTS normativactions (na_id SERIAL PRIMARY KEY, na_dev VARCHAR(50), na_worktype CHAR(2), "
                   "na_actions TEXT)")) return false;
 
-    if (!pq->exec("CREATE TABLE IF NOT EXISTS defects (def_id serial primary key, def_quarter smallint, def_num varchar(10), def_devtype varchar(50), def_kks varchar(50), "
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS defects (def_id serial primary key, def_unit INTEGER REFERENCES units(unit_id), def_quarter smallint, def_num varchar(10), "
+                  "def_devname VARCHAR(255), def_devtype varchar(50), def_kks varchar(50), "
                   "def_journaldesc text, def_realdesc text, def_stage integer, def_repairdesc text, def_begdate char(10), def_enddate char(10), "
                   "def_rasp CHAR(6))")) return false;
 
@@ -110,6 +111,15 @@ bool Database::deployTables()
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS krrworks (krw_id SERIAL PRIMARY KEY, krw_work INTEGER REFERENCES kaprepairs(kr_id) ON DELETE RESTRICT, "
                   "krw_report INTEGER REFERENCES krreports(krr_id) ON DELETE CASCADE)")) return false;
+
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS trreports (trr_id SERIAL PRIMARY KEY, trr_desc VARCHAR(200), trr_unit INTEGER REFERENCES units(unit_id), "
+                  "trr_planbeg CHAR(10), trr_planend CHAR(10), trr_date CHAR(10), trr_docnum VARCHAR(10))")) return false;
+
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS trsigners (trs_id SERIAL PRIMARY KEY, trs_report INTEGER REFERENCES trreports(trr_id) ON DELETE CASCADE, "
+                  "trs_signer INTEGER REFERENCES signers(sig_id) ON DELETE RESTRICT, trs_role INTEGER)")) return false;
+
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS trrworks (trw_id SERIAL PRIMARY KEY, trw_work INTEGER REFERENCES defects(def_id) ON DELETE RESTRICT, "
+                  "trw_report INTEGER REFERENCES trreports(trr_id) ON DELETE CASCADE)")) return false;
 
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
     if (!pq->exec("CREATE TABLE IF NOT EXISTS rasp (rasp_id SERIAL PRIMARY KEY, rasp_num CHAR(6), rasp_date CHAR(10), rasp_btime CHAR(5), "

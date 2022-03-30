@@ -3,7 +3,6 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QDebug>
 
 KRReportPreviewForm::KRReportPreviewForm(QWidget *parent) :
     QWidget(parent, Qt::Window),
@@ -134,27 +133,27 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
     while (db->nextRecord())
     {
         switch (db->fetchValue(2).toInt()) {
-        case OWNER:
+        case KRSOWNER:
             ownerLoc = db->fetchValue(0).toString();
             ownerName = db->fetchValue(1).toString();
             break;
-        case MEMBER1:
+        case KRSMEMBER1:
             member1Loc = db->fetchValue(0).toString();
             member1Name = db->fetchValue(1).toString();
             break;
-        case MEMBER2:
+        case KRSMEMBER2:
             member2Loc = db->fetchValue(0).toString();
             member2Name = db->fetchValue(1).toString();
             break;
-        case MEMBER3:
+        case KRSMEMBER3:
             member3Loc = db->fetchValue(0).toString();
             member3Name = db->fetchValue(1).toString();
             break;
-        case REPAIRER:
+        case KRSREPAIRER:
             repairerLoc = db->fetchValue(0).toString();
             repairerName = db->fetchValue(1).toString();
             break;
-        case CHIEF:
+        case KRSCHIEF:
             chiefLoc = db->fetchValue(0).toString();
             chiefName = db->fetchValue(1).toString();
             break;
@@ -304,15 +303,15 @@ QStringList KRReportPreviewForm::makeVVR(QString reportId)
     while (db->nextRecord())
     {
         switch (db->fetchValue(2).toInt()) {
-        case OWNER:
+        case KRSOWNER:
             ownerLoc = db->fetchValue(0).toString();
             ownerName = db->fetchValue(1).toString();
             break;
-        case REPAIRER:
+        case KRSREPAIRER:
             repairerLoc = db->fetchValue(0).toString();
             repairerName = db->fetchValue(1).toString();
             break;
-        case CHIEF:
+        case KRSCHIEF:
             chiefLoc = db->fetchValue(0).toString();
             chiefName = db->fetchValue(1).toString();
             break;
@@ -498,11 +497,11 @@ QStringList KRReportPreviewForm::makeVFZM(QString reportId)
     while (db->nextRecord())
     {
         switch (db->fetchValue(2).toInt()) {
-        case REPAIRER:
+        case KRSREPAIRER:
             repairerLoc = db->fetchValue(0).toString();
             repairerName = db->fetchValue(1).toString();
             break;
-        case CHIEF:
+        case KRSCHIEF:
             chiefLoc = db->fetchValue(0).toString();
             chiefName = db->fetchValue(1).toString();
             break;
@@ -613,7 +612,6 @@ QStringList KRReportPreviewForm::makeVFZM(QString reportId)
                 currBlockSize += rowDefaultHeight;
             else
                 currBlockSize += (strCount * 19);
-            qDebug() << matTable[j][1] << " " << strCount;
         }
 
         if (i == workList.size()-1) {
@@ -702,16 +700,193 @@ QStringList KRReportPreviewForm::makeVFZM(QString reportId)
     return result;
 }
 
+int KRReportPreviewForm::maxInt(int first, int second)
+{
+    if (first > second) return first;
+    else return second;
+}
+
+QStringList KRReportPreviewForm::makePO(QString reportId)
+{
+    const int fillerNS = 786;
+    const int fillerS = 720;
+    const int defaultHeight = 48;
+    const QRect kksRect(0, 0, 108, 46);
+    const QRect nameRect(0, 0, 175,46);
+    const QRect typeRect(0, 0, 232, 46);
+    int rowHeight, allRowsHeight, strCount, pageCount;
+    QFontMetrics *fm = new QFontMetrics(QFont("Times New Roman", 12));
+    QRect bounding;
+    QStringList result;
+    QList<QStringList> table;
+    QStringList tblRow;
+    QString unitShortName, subsystem, docNum, page, chiefLoc, chiefName, row, rows, pageTempSign, pageTempNoSign;
+    QStringList pages;
+    QFile file;
+    QTextStream *ts;
+    QString rowTmpl = "<tr class=\"porow\">\n"
+                  "<td class=\"hc\">$NUM$</td>\n"
+                  "<td colspan=\"2\" class=\"hc\">$KKS$</td>\n"
+                  "<td class=\"hc\">$NAME$</td>\n"
+                  "<td colspan=\"2\" class=\"hc\">$TYPE$</td>\n"
+                  "<td colspan=\"2\" class=\"hc\">КР</td>\n"
+                  "</tr>";
+
+    QString query = "SELECT unit_shortname, unit_subsys, krr_docnum FROM krreports "
+                    "LEFT JOIN units ON krr_unit = unit_id "
+                    "WHERE krr_id = '%1'";
+    query = query.arg(reportId);
+
+    if (db->execQuery(query)) {
+        if (db->nextRecord()) {
+            unitShortName = db->fetchValue(0).toString();
+            subsystem = db->fetchValue(1).toString();
+            docNum = db->fetchValue(2).toString();
+        }
+    } else {
+        db->showError(this);
+        return result;
+    }
+
+    query = "SELECT sch_kks, sch_name, sch_type FROM krrworks "
+            "LEFT JOIN kaprepairs ON krw_work = kr_id "
+            "LEFT JOIN schedule ON kr_sched = sch_id "
+            "WHERE krw_report = '%1'";
+    query = query.arg(reportId);
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return result;
+    }
+
+    table.clear();
+    for (int i=1; db->nextRecord(); i++)
+    {
+        tblRow.clear();
+        tblRow.append(QString("%1").arg(i));
+        tblRow.append(db->fetchValue(0).toString());
+        tblRow.append(db->fetchValue(1).toString());
+        tblRow.append(db->fetchValue(2).toString());
+        table.append(tblRow);
+    }
+
+    allRowsHeight = 0;
+    for (int i=0; i<table.size(); i++)
+    {
+        row = rowTmpl;
+        row.replace("$NUM$", table[i][0]);
+        row.replace("$KKS$", table[i][1]);
+        row.replace("$NAME$", table[i][2]);
+        row.replace("$TYPE$", table[i][3]);
+        strCount = 0;
+        bounding = fm->boundingRect(kksRect, Qt::TextWordWrap | Qt::AlignCenter, table[i][1]);
+        strCount = maxInt((bounding.height()+1)/20, strCount);
+        bounding = fm->boundingRect(nameRect, Qt::TextWordWrap | Qt::AlignCenter, table[i][2]);
+        strCount = maxInt((bounding.height()+1)/20, strCount);
+        bounding = fm->boundingRect(typeRect, Qt::TextWordWrap | Qt::AlignCenter, table[i][3]);
+        strCount = maxInt((bounding.height()+1)/20, strCount);
+        if (strCount < 3) rowHeight = defaultHeight;
+        else rowHeight = strCount * 19;
+        if (i+1 == table.size()) {
+            if (allRowsHeight + rowHeight > fillerS) {
+                pages.append(rows);
+                rows.clear();
+                pages.append(row);
+
+            } else {
+                rows += row;
+                pages.append(rows);
+            }
+        } else {
+            if (allRowsHeight + rowHeight > fillerNS) {
+                pages.append(rows);
+                rows.clear();
+                rows += row;
+                allRowsHeight = rowHeight;
+            } else {
+                rows += row;
+                allRowsHeight += rowHeight;
+            }
+        }
+    }
+
+    query = "SELECT sig_loc, sig_name, krs_role FROM krsigners "
+            "LEFT JOIN signers ON krs_signer = sig_id "
+            "WHERE krs_report = '%1'";
+    query = query.arg(reportId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return result;
+    }
+
+    while (db->nextRecord())
+    {
+        if (db->fetchValue(2).toInt() == KRSCHIEF) {
+            chiefLoc = db->fetchValue(0).toString();
+            chiefName = db->fetchValue(1).toString();
+            break;
+        }
+    }
+
+    file.setFileName(QApplication::applicationDirPath() + "/templates/reports/po-nosign.html");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
+                              QApplication::applicationDirPath() + "/templates/reports/po-nosign.html\n" + file.errorString());
+        return result;
+    }
+    ts = new QTextStream(&file);
+    pageTempNoSign = ts->readAll();
+    delete ts;
+    file.close();
+
+    file.setFileName(QApplication::applicationDirPath() + "/templates/reports/po-sign.html");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
+                              QApplication::applicationDirPath() + "/templates/reports/po-sign.html\n" + file.errorString());
+        return result;
+    }
+    ts = new QTextStream(&file);
+    pageTempSign = ts->readAll();
+    delete ts;
+    file.close();
+
+    pageCount = pages.size();
+
+    for (int i=0; i<pages.size(); i++)
+    {
+        if (i < pages.size()-1)
+            page = pageTempNoSign;
+        else
+            page = pageTempSign;
+
+        page.replace("$USN$", unitShortName);
+        page.replace("$PAGECOUNT$", QString("%1").arg(pageCount));
+        page.replace("$PAGE$", QString("%1").arg(i+1));
+        page.replace("$SUBSYS$", subsystem);
+        page.replace("$DOCNUM$", docNum);
+        page.replace("$ROWS$", pages[i]);
+
+        if (i == pages.size()-1) {
+            page.replace("$CHIEFLOC$", chiefLoc);
+            page.replace("$CHIEFNAME$", chiefName);
+        }
+        result.append(page);
+    }
+
+    return result;
+}
+
 void KRReportPreviewForm::showPreview(QString reportId)
 {
     QString body, page;
-    QStringList avr, vvr, vfzm;
+    QStringList avr, vvr, vfzm, po;
     QFile file;
     QTextStream *ts;
 
     avr = makeAVR(reportId);
     vvr = makeVVR(reportId);
     vfzm = makeVFZM(reportId);
+    po = makePO(reportId);
 
     for (int i=0; i<avr.size(); i++)
         body += avr[i];
@@ -719,6 +894,8 @@ void KRReportPreviewForm::showPreview(QString reportId)
         body += vvr[i];
     for (int i=0; i<vfzm.size(); i++)
         body += vfzm[i];
+    for (int i=0; i<po.size(); i++)
+        body += po[i];
 
     file.setFileName(QApplication::applicationDirPath() + "/templates/reports/report.html");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
