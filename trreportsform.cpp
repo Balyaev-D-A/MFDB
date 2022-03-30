@@ -415,7 +415,8 @@ QStringList TRReportsForm::makeVVR(QString reportId)
     QString pageTempNoSign, pageTempSign, page;
     QFile file;
     QTextStream *ts;
-    int pageCount;
+    int pageCount, stageCounter;
+    QStringList workActList;
     QString query = "SELECT unit_shortname, unit_subsys, trr_date, trr_docnum FROM trreports "
                     "LEFT JOIN units ON trr_unit = unit_id "
                     "WHERE trr_id = '%1'";
@@ -528,16 +529,28 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         }
         if (db->nextRecord()) workActions = db->fetchValue(0).toString();
         else workActions = "";
-        workActions.replace("\n", "<br/>");
 
-        for (int j=1; j<=4; j++)
+        workActList = workActions.split("\n");
+        stageCounter = 0;
+        for (int j=0; j<workActList.size(); j++)
         {
-            if (j == workList[i].stage)
-                workActions.replace(QString("$%1$").arg(j), workList[i].realDesc);
-            else
-                workActions.replace(QString("$%1$").arg(j), "Замечаний нет.");
+            if (workActList[j].startsWith('@')) {
+                if (stageCounter == workList[i].stage)
+                    workActList[j] = workActList[j].remove(0, 1).append(" " + workList[i].realDesc);
+                else
+                    workActList[j] = workActList[j].remove(0, 1).append(" Замечаний нет.");
+                stageCounter++;
+            }
         }
 
+        workActions ="";
+        for (int j=0; j<workActList.size(); j++)
+        {
+            workActions += workActList[j];
+            if (j != workActList.size()-1) workActions += "\n";
+        }
+
+        workActions.replace("\n", "<br/>");
         workActions.replace("$JD$", workList[i].journalDesc);
         workActions.replace("$REP$", workList[i].repairDesc);
 
@@ -558,7 +571,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         page.replace("$WORKS$", works);
         page.replace("$BEGDATE$", workList[i].begDate);
         page.replace("$ENDDATE$", workList[i].endDate);
-        page.replace("$WT$", "КР");
+        page.replace("$WT$", "ТР");
         page.replace("$CURRWORK$", currWork);
         page.replace("$ACTIONS$", workActions);
         page.replace("$HOURS$", workHours.replace(".", ","));

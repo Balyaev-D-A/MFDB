@@ -33,6 +33,7 @@ void KRForm::setDatabase(Database *db)
 
 void KRForm::newKR()
 {
+    setWindowTitle("Новый капитальный ремонт");
     KRId = "0";
     selectedSched = "0";
     matsChanged = false;
@@ -50,6 +51,9 @@ void KRForm::editKR(QString KRId)
 {
     int curRow;
     QString query;
+
+    setWindowTitle("Редактировать капитальный ремонт");
+
     this->KRId = KRId;
     matsChanged = false;
     ui->materialTable->setDisabled(true);

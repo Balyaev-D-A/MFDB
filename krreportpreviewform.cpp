@@ -58,11 +58,17 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
     QStringList result;
     QStringList workList;
     QString page, unitShortName, subsystem, date, begDate, endDate, planBegDate, planEndDate;
-    QString orderDate, orderNum, schedNum, docNum, workType, firstWork, works, accordingDoc;
+    QString orderDate, orderNum, schedNum, docNum, workType, firstWork, otherWorks, works, accordingDoc;
     QString ownerLoc, ownerName, member1Loc, member1Name, member2Loc, member2Name, member3Loc, member3Name;
     QString repairerLoc, repairerName, chiefLoc, chiefName, executor;
     QFile file;
     QTextStream *ts;
+    QFontMetrics *fm = new QFontMetrics(QFont("Times New Roman", 12));
+    QRect bounding;
+    QStringList fwWordList;
+    int breakPos;
+    bool isFit = false;
+    const int firstWorkWidth = 351;
     QString query = "SELECT unit_shortname, unit_subsys, unit_schednum, krr_planbeg, krr_planend, krr_date, krr_docnum FROM krreports "
                     "LEFT JOIN units ON krr_unit = unit_id "
                     "WHERE krr_id = '%1'";
@@ -83,7 +89,7 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
         return result;
     }
 
-    query = "SELECT CONCAT_WS(' ', sch_name, sch_type, sch_kks), kr_begdate, kr_enddate FROM krrworks "
+    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate FROM krrworks "
             "LEFT JOIN kaprepairs ON krw_work = kr_id "
             "LEFT JOIN schedule ON kr_sched = sch_id "
             "WHERE krw_report = '%1'";
@@ -97,26 +103,39 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
     endDate = "00.00.0000";
     while (db->nextRecord())
     {
-        workList.append(db->fetchValue(0).toString());
-        begDate = minDate(begDate, db->fetchValue(1).toString());
-        endDate = maxDate(endDate, db->fetchValue(2).toString());
+        workList.append(db->fetchValue(0).toString() + " " + db->fetchValue(1).toString() + ", " + db->fetchValue(2).toString());
+        begDate = minDate(begDate, db->fetchValue(3).toString());
+        endDate = maxDate(endDate, db->fetchValue(4).toString());
     }
 
-    int minLength = 999999;
-    int mlNum = 0;
-
-    for (int i=0; i<workList.size(); i++)
-    {
-        if (workList[i].size() < minLength) {
-            minLength = workList[i].size();
-            mlNum = i;
+    firstWork = workList[0];
+    firstWork += ";";
+    bounding = fm->boundingRect(firstWork);
+    if (bounding.width() > firstWorkWidth) {
+        fwWordList = firstWork.split(" ");
+        breakPos = fwWordList.size();
+        otherWorks = "";
+        while (!isFit && breakPos)
+        {
+            breakPos--;
+            firstWork = "";
+            for (int i=0; i<breakPos; i++)
+              firstWork  += fwWordList[i] + " ";
+            firstWork.chop(1);
+            bounding = fm->boundingRect(firstWork);
+            isFit = bounding.width() < firstWorkWidth;
         }
+        for (int i=breakPos; i<fwWordList.size(); i++)
+            otherWorks += fwWordList[i] + " ";
     }
-    firstWork = workList[mlNum];
-    workList.removeAt(mlNum);
+
+    for (int i=1; i<workList.size(); i++)
+        otherWorks += workList[i] + "; ";
+    otherWorks.chop(2);
+
     for (int i=0; i<workList.size(); i++)
     {
-        works += workList[i] + ", ";
+        works += workList[i] + "; ";
     }
     works.chop(2);
 
@@ -184,6 +203,7 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
     page.replace("$ORDERNUM$", orderNum);
     page.replace("$WT$", "КР");
     page.replace("$FIRSTWORK$", firstWork);
+    page.replace("$OTHERWORKS$", otherWorks);
     page.replace("$WORKS$", works);
     page.replace("$PLANBEGDATE$", planBegDate);
     page.replace("$PLANENDDATE$", planEndDate);
@@ -213,7 +233,7 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
     page.replace("$BEGDATE$", begDate);
     page.replace("$ENDDATE$", endDate);
     page.replace("$DOCNUM$", docNum);
-    page.replace("$WORKS$", firstWork + ", " + works);
+    page.replace("$WORKS$", works);
     page.replace("$OWNERLOC$", ownerLoc);
     page.replace("$OWNERNAME$", ownerName);
     page.replace("$MEMBER1LOC$", member1Loc);

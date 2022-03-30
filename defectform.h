@@ -59,6 +59,7 @@ private:
     void updateRepairText();
     void updateAddedMaterials();
     void updateMaterials();
+    void updateStages();
     bool saveDefect();
 
 private slots:

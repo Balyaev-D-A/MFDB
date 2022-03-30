@@ -46,12 +46,14 @@ void DefectForm::setDatabase(Database *db)
 
 void DefectForm::newDefect()
 {
+    setWindowTitle("Новый дефект");
     defId = "0";
     device.kks = "";
     device.name = "";
     device.type = "";
     matsChanged = false;
     ui->deviceEdit->setText("");
+    ui->journalDefectEdit->setText("");
     ui->journalDefectEdit->setDisabled(true);
     ui->materialTable->setDisabled(true);
     ui->addedMatTable->setDisabled(true);
@@ -67,6 +69,8 @@ void DefectForm::editDefect(QString defId)
 {
     QString query, defect, repair;
     int stage;
+
+    setWindowTitle("Редактировать дефект");
 
     matsChanged = false;
 
@@ -88,10 +92,9 @@ void DefectForm::editDefect(QString defId)
         defect = db->fetchValue(3).toString();
         stage = db->fetchValue(4).toInt();
         repair = db->fetchValue(5).toString();
-
-        ui->stageBox->setCurrentIndex(stage);
-
         ui->quarterBox->setCurrentIndex(db->fetchValue(6).toInt() - 1);
+        updateStages();
+        ui->stageBox->setCurrentIndex(stage);
     }
 
     query = "SELECT sch_name from schedule WHERE sch_type = '%1' AND sch_kks = '%2' LIMIT 1";
@@ -132,6 +135,7 @@ void DefectForm::deviceChoosed(SelectedDevice device)
     ui->addedMatTable->setDisabled(false);
     ui->addMaterialButton->setDisabled(false);
     ui->removeMaterialButton->setDisabled(false);
+    updateStages();
     updateDefects();
     updateRepairs();
 }
@@ -267,6 +271,31 @@ void DefectForm::updateRepairText()
     ui->repairEdit->setText(repairList[currentRepair].description);
 }
 
+void DefectForm::updateStages()
+{
+    QString actions;
+    QStringList actList;
+    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'";
+
+    query = query.arg(device.type).arg("ТР");
+
+    if (!db->execQuery(query)){
+        db->showError(this);
+        return;
+    }
+
+    ui->stageBox->clear();
+    if (!db->nextRecord()) return;
+
+    actions = db->fetchValue(0).toString();
+    actList = actions.split("\n");
+    for (int i=0; i<actList.size(); i++)
+    {
+        if (actList[i].startsWith('@'))
+                ui->stageBox->addItem(actList[i].remove(0, 1));
+    }
+}
+
 void DefectForm::addDefectClicked()
 {
     Defect defect;
@@ -287,7 +316,7 @@ void DefectForm::addDefectClicked()
 void DefectForm::saveDefectClicked()
 {
     QString query = "UPDATE defrealdescs SET drd_stage = '%1', drd_desc = '%2' WHERE drd_id = '%3'";
-    query = query.arg(ui->buttonGroup->checkedId());
+    query = query.arg(ui->stageBox->currentIndex());
     query = query.arg(ui->defectEdit->text());
     query = query.arg(defectList[currentDefect].id);
 
@@ -295,7 +324,7 @@ void DefectForm::saveDefectClicked()
         db->showError(this);
         return;
     }
-    defectList[currentDefect].stage = ui->buttonGroup->checkedId();
+    defectList[currentDefect].stage = ui->stageBox->currentIndex();
     defectList[currentDefect].description = ui->defectEdit->text();
 }
 
@@ -479,7 +508,7 @@ bool DefectForm::saveDefect()
                 "def_stage = '%6', def_repairdesc = '%7', def_unit = '%8', def_devname = '%9' WHERE def_id = '%10'";
         query = query.arg(ui->quarterBox->currentIndex()+1);
         query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text());
-        query = query.arg(ui->defectEdit->text()).arg(ui->buttonGroup->checkedId()).arg(ui->repairEdit->text());
+        query = query.arg(ui->defectEdit->text()).arg(ui->stageBox->currentIndex()).arg(ui->repairEdit->text());
         query = query.arg(device.unitId);
         query = query.arg(device.name);
         query = query.arg(defId);
@@ -495,7 +524,7 @@ bool DefectForm::saveDefect()
                 "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9')";
         query = query.arg(ui->quarterBox->currentIndex() + 1);
         query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text()).arg(ui->defectEdit->text());
-        query = query.arg(ui->buttonGroup->checkedId()).arg(ui->repairEdit->text());
+        query = query.arg(ui->stageBox->currentIndex()).arg(ui->repairEdit->text());
         query = query.arg(device.unitId);
         query = query.arg(device.name);
 
