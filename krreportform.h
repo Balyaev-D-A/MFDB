@@ -9,6 +9,8 @@ typedef  struct {
     QString member1Id = "";
     QString member2Id = "";
     QString member3Id = "";
+    QString member4Id = "";
+    QString member5Id = "";
     QString repairerId = "";
     QString chiefId = "";
 } KRSigners;
@@ -18,6 +20,8 @@ enum KRSignerType {
     KRSMEMBER1,
     KRSMEMBER2,
     KRSMEMBER3,
+    KRSMEMBER4,
+    KRSMEMBER5,
     KRSREPAIRER,
     KRSCHIEF
 };
@@ -60,8 +64,18 @@ private slots:
     void member1Droped();
     void member2Droped();
     void member3Droped();
+    void member4Droped();
+    void member5Droped();
     void repairerDroped();
     void chiefDroped();
+    void ownerClearClicked();
+    void member1ClearClicked();
+    void member2ClearClicked();
+    void member3ClearClicked();
+    void member4ClearClicked();
+    void member5ClearClicked();
+    void repairerClearClicked();
+    void chiefClearClicked();
 
 protected:
     void showEvent(QShowEvent *event);

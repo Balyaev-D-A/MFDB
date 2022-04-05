@@ -119,7 +119,6 @@ void TRReportsForm::saveButtonClicked()
     vvr = makeVVR(reportId);
     vfzm = makeVFZM(reportId);
     ado = makeADO(reportId);
-    po = makePO(reportId);
 
     for (int i=0; i<avr.size(); i++)
         body += avr[i];
@@ -129,8 +128,11 @@ void TRReportsForm::saveButtonClicked()
         body += vfzm[i];
     for (int i=0; i<ado.size(); i++)
         body += ado[i];
-    for (int i=0; i<po.size(); i++)
-        body += po[i];
+    if (vvr.size() > 5) {
+        po = makePO(reportId);
+        for (int i=0; i<po.size(); i++)
+            body += po[i];
+    }
 
     file.setFileName(QApplication::applicationDirPath() + "/templates/reports/report.html");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -206,9 +208,19 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     QFontMetrics *fm = new QFontMetrics(QFont("Times New Roman", 12));
     QRect bounding;
     QStringList fwWordList;
+    int worksCount;
     int breakPos;
     bool isFit = false;
     const int firstWorkWidth = 351;
+    QString member4Loc = "", member4Name = "", member5Loc = "", member5Name = "";
+    QString additionalMemberRow = "<tr class=\"avr2row18\">\n"
+            "<td class=\"border-l\"></td>\n"
+            "<td colspan=\"3\" class=\"border-none\">%1</td>\n"
+            "<td colspan=\"2\" class=\"hc border-tb f6 vt\">(подпись)</td>\n"
+            "<td class=\"border-none hc\">%2</td>\n"
+            "<td colspan=\"2\" class=\"border-r\">%3</td>\n"
+            "</tr>\n";
+    QString prepAddMemberRow, addMembers = "";
     QString query = "SELECT unit_shortname, unit_subsys, unit_schednum, trr_planbeg, trr_planend, trr_date, trr_docnum FROM trreports "
                     "LEFT JOIN units ON trr_unit = unit_id "
                     "WHERE trr_id = '%1'";
@@ -249,8 +261,16 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     }
     defNums.chop(2);
 
-    firstWork = workList[0];
-    firstWork += ";";
+    worksCount = workList.size();
+    if (worksCount > 5) {
+        firstWork = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        firstWork = firstWork.arg(docNum).arg(worksCount);
+    }
+    else {
+        firstWork = workList[0];
+        firstWork += ";";
+    }
+
     bounding = fm->boundingRect(firstWork); 
     if (bounding.width() > firstWorkWidth) {
         fwWordList = firstWork.split(" ");
@@ -270,15 +290,21 @@ QStringList TRReportsForm::makeAVR(QString reportId)
             otherWorks += fwWordList[i] + " ";
     }
 
-    for (int i=1; i<workList.size(); i++)
-        otherWorks += workList[i] + "; ";
-    otherWorks.chop(2);
-
-    for (int i=0; i<workList.size(); i++)
-    {
-        works += workList[i] + "; ";
+    if (worksCount > 5) {
+        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = works.arg(docNum).arg(worksCount);
     }
-    works.chop(2);
+    else {
+        for (int i=1; i<workList.size(); i++)
+            otherWorks += workList[i] + "; ";
+        otherWorks.chop(2);
+
+        for (int i=0; i<workList.size(); i++)
+        {
+            works += workList[i] + "; ";
+        }
+        works.chop(2);
+    }
 
     query = "SELECT sig_loc, sig_name, trs_role FROM trsigners "
             "LEFT JOIN signers ON trs_signer = sig_id "
@@ -309,6 +335,14 @@ QStringList TRReportsForm::makeAVR(QString reportId)
             member3Loc = db->fetchValue(0).toString();
             member3Name = db->fetchValue(1).toString();
             break;
+        case TRSMEMBER4:
+            member4Loc = db->fetchValue(0).toString();
+            member4Name = db->fetchValue(1).toString();
+            break;
+        case TRSMEMBER5:
+            member5Loc = db->fetchValue(0).toString();
+            member5Name = db->fetchValue(1).toString();
+            break;
         case TRSREPAIRER:
             repairerLoc = db->fetchValue(0).toString();
             repairerName = db->fetchValue(1).toString();
@@ -318,6 +352,16 @@ QStringList TRReportsForm::makeAVR(QString reportId)
             chiefName = db->fetchValue(1).toString();
             break;
         }
+    }
+
+    if (member4Name != "") {
+        prepAddMemberRow = additionalMemberRow.arg(member4Loc).arg(date).arg(member4Name);
+        addMembers += prepAddMemberRow;
+    }
+
+    if (member5Name != "") {
+        prepAddMemberRow = additionalMemberRow.arg(member5Loc).arg(date).arg(member5Name);
+        addMembers += prepAddMemberRow;
     }
 
     orderDate = db->getVariable("ДатаПриказа").toString();
@@ -352,9 +396,9 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     page.replace("$DOC1LABEL$", "-");
     page.replace("$DOC2LABEL$", "-");
     page.replace("$DOC3LABEL$", "-");
-    page.replace("$DOC1$", "Ведомость выполненых работ №33-20/" + docNum + " ВР;");
-    page.replace("$DOC2$", "Ведомость фактических затраченных материалов №33-20/" + docNum + " ВМ;");
-    page.replace("$DOC3$", "Акт о дефектах оборудования №33-20/" + docNum + " АД;");
+    page.replace("$DOC1$", "Ведомость выполненых работ №" + docNum + " ВР;");
+    page.replace("$DOC2$", "Ведомость фактических затраченных материалов №" + docNum + " ВМ;");
+    page.replace("$DOC3$", "Акт о дефектах оборудования №" + docNum + " АД;");
     page.replace("$EXECUTOR$", executor);
 
     result.append(page);
@@ -383,6 +427,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     page.replace("$MEMBER1NAME$", member1Name);
     page.replace("$MEMBER2NAME$", member2Name);
     page.replace("$MEMBER3NAME$", member3Name);
+    page.replace("$AMEMBERS$", addMembers);
     page.replace("$REPAIRERLOC$", repairerLoc);
     page.replace("$REPAIRERNAME$", repairerName);
     page.replace("$CHIEFLOC$", chiefLoc);
@@ -458,6 +503,11 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         workList.append(w);
     }
     works.chop(2);
+
+    if (workList.size() > 5) {
+        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = works.arg(docNum).arg(workList.size());
+    }
 
     query = "SELECT sig_loc, sig_name, trs_role FROM trsigners "
             "LEFT JOIN signers ON trs_signer = sig_id "
@@ -676,6 +726,11 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
     }
     works.chop(2);
 
+    if (workList.size() > 5) {
+        works = "Согласно перечню оборудования к акту %1 АД. Количество %2 шт.";
+        works = works.arg(docNum).arg(workList.size());
+    }
+
     query = "SELECT sig_loc, sig_name, trs_role FROM trsigners "
             "LEFT JOIN signers ON trs_signer = sig_id "
             "WHERE trs_report = '%1'";
@@ -832,7 +887,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
                 rows = "";
                 rows += workRows;
                 workRows = "";
-                allBlocksSize = 0;
+                allBlocksSize = currBlockSize;
                 currBlockSize = 0;
             }
         }
@@ -903,7 +958,8 @@ QStringList TRReportsForm::makeADO(QString reportId)
         QString repair;
     }  Work;
     const int fillerNS = 710;
-    const int fillerS = 420;
+    const int memberRowHeight = 27;
+    int fillerS = 420;
     const QRect workRect(0, 0, 132, 107);
     const QRect tdocRect(0, 0, 173,107);
     const QRect defectRect(0, 0, 186, 107);
@@ -916,17 +972,26 @@ QStringList TRReportsForm::makeADO(QString reportId)
     QList<Work> workList;
     QStringList tblRow;
     QString unitShortName, subsystem, docNum, date, page, tdocStr, work, works, row, rows, pageTempSign, pageTempNoSign;
-    QString ownerLoc, ownerName, member1Loc, member1Name, member2Loc, member2Name, repairerLoc, repairerName, chiefLoc, chiefName;
+    QString ownerLoc, ownerName, member1Loc, member1Name, member2Loc, member2Name, member3Loc, member3Name, repairerLoc, repairerName, chiefLoc, chiefName;
     QStringList pages;
     QFile file;
     QTextStream *ts;
     QString prepQuery;
+    QString member4Loc = "", member4Name = "", member5Loc = "", member5Name = "";
+    QString addMembers = "";
     QString rowTmpl = "<tr class=\"adorow\">\n"
                       "<td colspan=\"3\" class=\"hc\">$WORK$</td>\n"
                       "<td colspan=\"2\" class=\"hc\">Обеспечение работоспособности в соответствии с $TECHDOC$</td>\n"
                       "<td colspan=\"2\" class=\"hc\">$DEFECT$</td>\n"
                       "<td colspan=\"3\" class=\"hc\">$REPAIR$</td>\n"
-                      "</tr>";
+                      "</tr>\n";
+    QString additionalMemberRow ="<tr class=\"adorow12\">\n"
+            "<td class=\"border-l\"></td>\n"
+            "<td colspan=\"3\" class=\"border-none\">%1</td>\n"
+            "<td colspan=\"2\" class=\"hc f6 vt border-tb\">(подпись)</td>\n"
+            "<td class=\"border-none\">%2</td>\n"
+            "<td colspan=\"3\" class=\"border-r\">%3</td>\n"
+            "</tr>\n";
 
     QString query = "SELECT unit_shortname, unit_subsys, trr_date, trr_docnum FROM trreports "
                     "LEFT JOIN units ON trr_unit = unit_id "
@@ -943,6 +1008,63 @@ QStringList TRReportsForm::makeADO(QString reportId)
         subsystem = db->fetchValue(1).toString();
         date = db->fetchValue(2).toString();
         docNum = db->fetchValue(3).toString();
+    }
+
+    query = "SELECT sig_loc, sig_name, trs_role FROM trsigners "
+            "LEFT JOIN signers ON trs_signer = sig_id "
+            "WHERE trs_report = '%1'";
+    query = query.arg(reportId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return result;
+    }
+
+    while (db->nextRecord())
+    {
+        switch (db->fetchValue(2).toInt()) {
+        case TRSOWNER:
+            ownerLoc = db->fetchValue(0).toString();
+            ownerName = db->fetchValue(1).toString();
+            break;
+        case TRSMEMBER1:
+            member1Loc = db->fetchValue(0).toString();
+            member1Name = db->fetchValue(1).toString();
+            break;
+        case TRSMEMBER2:
+            member2Loc = db->fetchValue(0).toString();
+            member2Name = db->fetchValue(1).toString();
+            break;
+        case TRSMEMBER3:
+            member3Loc = db->fetchValue(0).toString();
+            member3Name = db->fetchValue(1).toString();
+            break;
+        case TRSMEMBER4:
+            member4Loc = db->fetchValue(0).toString();
+            member4Name = db->fetchValue(1).toString();
+            break;
+        case TRSMEMBER5:
+            member5Loc = db->fetchValue(0).toString();
+            member5Name = db->fetchValue(1).toString();
+            break;
+        case TRSREPAIRER:
+            repairerLoc = db->fetchValue(0).toString();
+            repairerName = db->fetchValue(1).toString();
+            break;
+        case TRSCHIEF:
+            chiefLoc = db->fetchValue(0).toString();
+            chiefName = db->fetchValue(1).toString();
+            break;
+        }
+    }
+
+    if (member4Name != "") {
+        addMembers += additionalMemberRow.arg(member4Loc).arg(date).arg(member4Loc);
+        fillerS -= memberRowHeight;
+    }
+    if (member5Name != "") {
+        addMembers += additionalMemberRow.arg(member5Loc).arg(date).arg(member5Loc);
+        fillerS -= memberRowHeight;
     }
 
     query = "SELECT def_devname, def_devtype, def_kks, def_realdesc, def_repairdesc FROM trrworks "
@@ -966,6 +1088,11 @@ QStringList TRReportsForm::makeADO(QString reportId)
         workList.append(w);
     }
     works.chop(2);
+
+    if (workList.size() > 5) {
+        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = works.arg(docNum).arg(workList.size());
+    }
 
     query = "SELECT sch_tdoc FROM schedule WHERE sch_type = '%1'";
 
@@ -1027,42 +1154,6 @@ QStringList TRReportsForm::makeADO(QString reportId)
         }
     }
 
-    query = "SELECT sig_loc, sig_name, trs_role FROM trsigners "
-            "LEFT JOIN signers ON trs_signer = sig_id "
-            "WHERE trs_report = '%1'";
-    query = query.arg(reportId);
-
-    if (!db->execQuery(query)) {
-        db->showError(this);
-        return result;
-    }
-
-    while (db->nextRecord())
-    {
-        switch (db->fetchValue(2).toInt()) {
-        case TRSOWNER:
-            ownerLoc = db->fetchValue(0).toString();
-            ownerName = db->fetchValue(1).toString();
-            break;
-        case TRSMEMBER1:
-            member1Loc = db->fetchValue(0).toString();
-            member1Name = db->fetchValue(1).toString();
-            break;
-        case TRSMEMBER2:
-            member2Loc = db->fetchValue(0).toString();
-            member2Name = db->fetchValue(1).toString();
-            break;
-        case TRSREPAIRER:
-            repairerLoc = db->fetchValue(0).toString();
-            repairerName = db->fetchValue(1).toString();
-            break;
-        case TRSCHIEF:
-            chiefLoc = db->fetchValue(0).toString();
-            chiefName = db->fetchValue(1).toString();
-            break;
-        }
-    }
-
     file.setFileName(QApplication::applicationDirPath() + "/templates/reports/ado-nosign.html");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
@@ -1108,8 +1199,11 @@ QStringList TRReportsForm::makeADO(QString reportId)
             page.replace("$OWNERNAME$", ownerName);
             page.replace("$MEMBER1LOC$", member1Loc);
             page.replace("$MEMBER2LOC$", member2Loc);
+            page.replace("$MEMBER3LOC$", member3Loc);
             page.replace("$MEMBER1NAME$", member1Name);
             page.replace("$MEMBER2NAME$", member2Name);
+            page.replace("$MEMBER3NAME$", member3Name);
+            page.replace("$AMEMBERS$", addMembers);
             page.replace("$REPAIRERLOC$", repairerLoc);
             page.replace("$REPAIRERNAME$", repairerName);
             page.replace("$CHIEFLOC$", chiefLoc);

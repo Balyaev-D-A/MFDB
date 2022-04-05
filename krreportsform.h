@@ -4,7 +4,6 @@
 #include <QWidget>
 #include "database.h"
 #include "krreportform.h"
-#include "krreportpreviewform.h"
 
 namespace Ui {
 class KRReportsForm;
@@ -22,6 +21,13 @@ public:
 private:
     Ui::KRReportsForm *ui;
     Database *db;
+    QStringList makeAVR(QString reportId);
+    QStringList makeVVR(QString reportId);
+    QStringList makeVFZM(QString reportId);
+    QStringList makePO(QString reportId);
+    QString minDate(QString date1, QString date2);
+    QString maxDate(QString date1, QString date2);
+    int maxInt(int first, int second);
 
 protected:
     void showEvent(QShowEvent *event);
@@ -32,8 +38,7 @@ private slots:
     void updateReports();
     void editButtonClicked();
     void deleteButtonClicked();
-    void printButtonClicked();
-    void printFormClosed(KRReportPreviewForm *sender);
+    void saveButtonClicked();
 };
 
 #endif // KRREPORTSFORM_H

@@ -69,6 +69,15 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
     int breakPos;
     bool isFit = false;
     const int firstWorkWidth = 351;
+    QString member4Loc = "", member4Name = "", member5Loc = "", member5Name = "";
+    QString additionalMemberRow = "<tr class=\"avr2row18\">\n"
+            "<td class=\"border-l\"></td>\n"
+            "<td colspan=\"3\" class=\"border-none\">%1</td>\n"
+            "<td colspan=\"2\" class=\"hc border-tb f6 vt\">(подпись)</td>\n"
+            "<td class=\"border-none hc\">%2</td>\n"
+            "<td colspan=\"2\" class=\"border-r\">%3</td>\n"
+            "</tr>\n";
+    QString prepAddMemberRow, addMembers = "";
     QString query = "SELECT unit_shortname, unit_subsys, unit_schednum, krr_planbeg, krr_planend, krr_date, krr_docnum FROM krreports "
                     "LEFT JOIN units ON krr_unit = unit_id "
                     "WHERE krr_id = '%1'";
@@ -168,6 +177,14 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
             member3Loc = db->fetchValue(0).toString();
             member3Name = db->fetchValue(1).toString();
             break;
+        case KRSMEMBER4:
+            member4Loc = db->fetchValue(0).toString();
+            member4Name = db->fetchValue(1).toString();
+            break;
+        case KRSMEMBER5:
+            member5Loc = db->fetchValue(0).toString();
+            member5Name = db->fetchValue(1).toString();
+            break;
         case KRSREPAIRER:
             repairerLoc = db->fetchValue(0).toString();
             repairerName = db->fetchValue(1).toString();
@@ -177,6 +194,16 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
             chiefName = db->fetchValue(1).toString();
             break;
         }
+    }
+
+    if (member4Name != "") {
+        prepAddMemberRow = additionalMemberRow.arg(member4Loc).arg(date).arg(member4Name);
+        addMembers += prepAddMemberRow;
+    }
+
+    if (member5Name != "") {
+        prepAddMemberRow = additionalMemberRow.arg(member5Loc).arg(date).arg(member5Name);
+        addMembers += prepAddMemberRow;
     }
 
     orderDate = db->getVariable("ДатаПриказа").toString();
@@ -211,8 +238,8 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
     page.replace("$DOC1LABEL$", "-");
     page.replace("$DOC2LABEL$", "-");
     page.replace("$DOC3LABEL$", "");
-    page.replace("$DOC1$", "Ведомость выполненых работ №33-20/" + docNum + " ВР");
-    page.replace("$DOC2$", "Ведомость фактических затраченных материалов №33-20/" + docNum + " ВМ");
+    page.replace("$DOC1$", "Ведомость выполненых работ №" + docNum + " ВР");
+    page.replace("$DOC2$", "Ведомость фактических затраченных материалов №" + docNum + " ВМ");
     page.replace("$DOC3$", "");
     page.replace("$EXECUTOR$", executor);
 
@@ -242,6 +269,7 @@ QStringList KRReportPreviewForm::makeAVR(QString reportId)
     page.replace("$MEMBER1NAME$", member1Name);
     page.replace("$MEMBER2NAME$", member2Name);
     page.replace("$MEMBER3NAME$", member3Name);
+    page.replace("$AMEMBERS$", addMembers);
     page.replace("$REPAIRERLOC$", repairerLoc);
     page.replace("$REPAIRERNAME$", repairerName);
     page.replace("$CHIEFLOC$", chiefLoc);

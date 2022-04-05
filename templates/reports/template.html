@@ -5,15 +5,15 @@
         <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
         <title xml:lang="ru-RU"></title>
         <style type="text/css">
-            @page { margin: 1cm 1cm 0.5cm 1cm; }
+            @page{ margin: 1cm 100% 0cm 100%; }
             @media print {
             table{ page-break-inside: avoid; }
             div.interpage {display: none;}
             }
             @media screen {
-                div.footer {display: none;}
+               
             }
-            table { border-collapse:collapse; empty-cells:show; font-family: 'Times New Roman'; font-size: 12pt; table-layout: fixed; height: 27cm; }
+            table { border-collapse:collapse; empty-cells:show; font-family: 'Times New Roman'; font-size: 12pt; table-layout: fixed; height: 27cm; margin-left: auto; margin-right: auto; }
             td { text-align: left; vertical-align:middle; border-style: solid; border-width: 1pt; padding: 3px; padding-top: 0px; padding-bottom: 0px; overflow: hidden;  text-overflow: clip;}
             
             .avr1col1 { width: 0.79cm; }
@@ -226,7 +226,8 @@
             .adorow17 {height: 0.56cm;}
             .adorow {height: 0.56cm;}
 
-            .expanding { height: auto;}            
+            .expanding { height: auto;}
+            .tfooter {height: 1cm;}          
             td.zerothin {padding: 0; margin: 0;}
 
             .vc {vertical-align: middle;}
@@ -258,7 +259,7 @@
             .border-tbl {border-style: solid hidden solid solid;}
             .border-tb {border-style: solid hidden solid hidden;}
             div.vert { transform-origin: center;  transform: rotate(-90deg) translateY(50%) translateX(-50%);}
-            div.footer {position: fixed; bottom: 0px; right: 0.5cm; font-size: 11pt;  color: transparent; text-shadow: 2px 0 rgb(180, 180, 180);}
+            .footer {position: fixed; bottom: 0px; right: 0.5cm; font-size: 11pt;  color: transparent; text-shadow: 2px 0 rgb(180, 180, 180);}
             div.interpage {height: 1cm; width: 20cm;}
         </style>
     </head>
@@ -430,9 +431,11 @@
             <tr class="avr1row36">
                 <td colspan="16" class="hc border-rbl" style="font-size: 10pt; vertical-align: top;">(дата) (подпись)</td>
             </tr>
+            <tr class = "tfooter">
+                <td colspan="16" class="hr vb border-t"><div style="position: relative; bottom: 0cm; right: 0cm; color: transparent; text-shadow: 2px 0 rgb(180, 180, 180)">П.00.52 Д.10.6</div></td> 
+            </tr>
         </table>
-        <div class="footer">П.00.52 Д.10.6</div>
-        <div class="interpage"><hr/></div>
+
         <table>
             <col class="avr2col1">
             <col class="avr2col2">
@@ -582,9 +585,11 @@
             <td colspan="2" class="border-bl"></td>
             <td colspan="2" class="hc border-trb" style="font-size: 6pt; vertical-align: top;">(подпись) (И.О. Фамилия)</td>
         </tr>
+        <tr class = "tfooter">
+            <td colspan="9" class="hr vb border-t" style="overflow: visible;"><div style="position: relative; bottom: 0cm; right: -1cm; color: transparent; text-shadow: 2px 0 rgb(180, 180, 180)">П.00.52 Д.10.6</div></td> 
+        </tr>
     </table>
-    <div class="footer">П.00.52 Д.10.6</div>
-    <div class="interpage"><hr/></div>
+
     <table>
         <colgroup>
             <col class="vvrcol1">
@@ -674,7 +679,6 @@
             <td colspan="2" class="border-rbl"></td>
         </tr>
     </table>
-    <div class="footer">П.00.52 Д.10.6</div>
     <div class="interpage"><hr/></div>
     <table>
         <colgroup>
@@ -814,7 +818,6 @@
             <td colspan="2" class="border-trb hc vt f9">(И. О. Фамилия)</td>
         </tr>
     </table>
-    <div class="footer">П.00.52 Д.10.6</div>
     <div class="interpage"><hr/></div>
     <table>
         <colgroup>
@@ -906,7 +909,6 @@
             <td colspan="13" class="zerothin"></td>
         </tr>
     </table>
-    <div class="footer">П.00.52 Д.10.6</div>
     <div class="interpage"><hr/></div>
         <table>
             <colgroup>
@@ -1004,7 +1006,6 @@
                 <td colspan="2" class="border-trb hc vt f9">(дата)</td>
             </tr>
         </table>
-        <div class="footer">П.00.52 Д.10.6</div>
         <div class="interpage"><hr/></div>
         <table>
             <colgroup>
@@ -1068,7 +1069,6 @@
                 </tr>
             </tbody>
         </table>
-        <div class="footer">П.00.52 Д.10.6</div>
         <div class="interpage"><hr/></div>
         <table>
             <colgroup>
@@ -1186,7 +1186,6 @@
                 </tr>
             </tbody>
         </table>
-        <div class="footer">П.00.52 Д.10.6</div>
         <div class="interpage"><hr/></div>
     </body>
 </html>

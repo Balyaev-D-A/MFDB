@@ -22,6 +22,8 @@ KRReportForm::KRReportForm(QWidget *parent) :
     ui->member1Edit->setAcceptFrom(ui->signersTable);
     ui->member2Edit->setAcceptFrom(ui->signersTable);
     ui->member3Edit->setAcceptFrom(ui->signersTable);
+    ui->member4Edit->setAcceptFrom(ui->signersTable);
+    ui->member5Edit->setAcceptFrom(ui->signersTable);
     ui->repairerEdit->setAcceptFrom(ui->signersTable);
     ui->chiefEdit->setAcceptFrom(ui->signersTable);
     connect(ui->unitBox, &QComboBox::currentTextChanged, this, &KRReportForm::unitChanged);
@@ -38,9 +40,19 @@ KRReportForm::KRReportForm(QWidget *parent) :
     connect(ui->member1Edit, &DragDropEdit::itemDroped, this, &KRReportForm::member1Droped);
     connect(ui->member2Edit, &DragDropEdit::itemDroped, this, &KRReportForm::member2Droped);
     connect(ui->member3Edit, &DragDropEdit::itemDroped, this, &KRReportForm::member3Droped);
+    connect(ui->member4Edit, &DragDropEdit::itemDroped, this, &KRReportForm::member4Droped);
+    connect(ui->member5Edit, &DragDropEdit::itemDroped, this, &KRReportForm::member5Droped);
     connect(ui->repairerEdit, &DragDropEdit::itemDroped, this, &KRReportForm::repairerDroped);
     connect(ui->chiefEdit, &DragDropEdit::itemDroped, this, &KRReportForm::chiefDroped);
     connect(ui->doneButton, &QPushButton::clicked, this, &KRReportForm::doneButtonClicked);
+    connect(ui->ownerClearButton, &QToolButton::clicked, this, &KRReportForm::ownerClearClicked);
+    connect(ui->member1ClearButton, &QToolButton::clicked, this, &KRReportForm::member1ClearClicked);
+    connect(ui->member2ClearButton, &QToolButton::clicked, this, &KRReportForm::member2ClearClicked);
+    connect(ui->member3ClearButton, &QToolButton::clicked, this, &KRReportForm::member3ClearClicked);
+    connect(ui->member4ClearButton, &QToolButton::clicked, this, &KRReportForm::member4ClearClicked);
+    connect(ui->member5ClearButton, &QToolButton::clicked, this, &KRReportForm::member5ClearClicked);
+    connect(ui->repairerClearButton, &QToolButton::clicked, this, &KRReportForm::repairerClearClicked);
+    connect(ui->chiefClearButton, &QToolButton::clicked, this, &KRReportForm::chiefClearClicked);
 }
 
 KRReportForm::~KRReportForm()
@@ -65,7 +77,18 @@ void KRReportForm::updateKRTable()
 {
     int curRow;
     QStringList usedIds;
-    QString query = "SELECT kr_id, sch_type, sch_kks, kr_begdate, kr_enddate FROM kaprepairs AS kr "
+    QStringList inReportIds;
+    QString query = "SELECT krw_work FROM krrworks";
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    while (db->nextRecord())
+        inReportIds.append(db->fetchValue(0).toString());
+
+    query = "SELECT kr_id, sch_type, sch_kks, kr_begdate, kr_enddate FROM kaprepairs AS kr "
                     "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
                     "WHERE sch_unit = '%1' AND kr_begdate <> 'NULL' AND kr_enddate <> 'NULL'";
     query = query.arg(ui->unitBox->currentData().toString());
@@ -86,6 +109,7 @@ void KRReportForm::updateKRTable()
     while (db->nextRecord())
     {
         if (usedIds.contains(db->fetchValue(0).toString())) continue;
+        if (inReportIds.contains(db->fetchValue(0).toString())) continue;
         curRow = ui->krTable->rowCount();
         ui->krTable->insertRow(curRow);
         for (int i=0; i<5; i++)
@@ -191,15 +215,15 @@ bool KRReportForm::checkFilling()
         return false;
     }
     if (ui->member1Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членнов комиссии.");
+        showErrorMessage("Не выбран один из членов комиссии.");
         return false;
     }
     if (ui->member2Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членнов комиссии.");
+        showErrorMessage("Не выбран один из членов комиссии.");
         return false;
     }
     if (ui->member3Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членнов комиссии.");
+        showErrorMessage("Не выбран один из членов комиссии.");
         return false;
     }
     if (ui->repairerEdit->text().isEmpty()) {
@@ -221,6 +245,7 @@ void KRReportForm::closeEvent(QCloseEvent *event)
 void KRReportForm::updateSignersTable()
 {
     int curRow;
+    QString sigId;
     QString query = "SELECT sig_id, sig_name, sig_loc FROM signers WHERE sig_hidden = 'FALSE'";
 
     if (!db->execQuery(query)) {
@@ -233,12 +258,25 @@ void KRReportForm::updateSignersTable()
     while (db->nextRecord())
     {
         curRow = ui->signersTable->rowCount();
+
+        sigId = db->fetchValue(0).toString();
+        curRow = ui->signersTable->rowCount();
+        if (sigId == signers.ownerId) continue;
+        if (sigId == signers.member1Id) continue;
+        if (sigId == signers.member2Id) continue;
+        if (sigId == signers.member3Id) continue;
+        if (sigId == signers.member4Id) continue;
+        if (sigId == signers.member5Id) continue;
+        if (sigId == signers.repairerId) continue;
+        if (sigId == signers.chiefId) continue;
+
         ui->signersTable->insertRow(curRow);
         for (int i=0; i<3; i++)
         {
             ui->signersTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
+    ui->signersTable->resizeColumnsToContents();
 }
 
 void KRReportForm::ownerDroped()
@@ -248,6 +286,7 @@ void KRReportForm::ownerDroped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.ownerId = ui->signersTable->item(curRow, 0)->text();
     ui->ownerEdit->setText(text);
+    updateSignersTable();
 }
 
 void KRReportForm::member1Droped()
@@ -257,6 +296,7 @@ void KRReportForm::member1Droped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.member1Id = ui->signersTable->item(curRow, 0)->text();
     ui->member1Edit->setText(text);
+    updateSignersTable();
 }
 
 
@@ -267,6 +307,7 @@ void KRReportForm::member2Droped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.member2Id = ui->signersTable->item(curRow, 0)->text();
     ui->member2Edit->setText(text);
+    updateSignersTable();
 }
 
 void KRReportForm::member3Droped()
@@ -276,6 +317,27 @@ void KRReportForm::member3Droped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.member3Id = ui->signersTable->item(curRow, 0)->text();
     ui->member3Edit->setText(text);
+    updateSignersTable();
+}
+
+void KRReportForm::member4Droped()
+{
+    int curRow = ui->signersTable->currentRow();
+    QString text = "%1 %2";
+    text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
+    signers.member4Id = ui->signersTable->item(curRow, 0)->text();
+    ui->member4Edit->setText(text);
+    updateSignersTable();
+}
+
+void KRReportForm::member5Droped()
+{
+    int curRow = ui->signersTable->currentRow();
+    QString text = "%1 %2";
+    text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
+    signers.member5Id = ui->signersTable->item(curRow, 0)->text();
+    ui->member5Edit->setText(text);
+    updateSignersTable();
 }
 
 void KRReportForm::repairerDroped()
@@ -285,6 +347,7 @@ void KRReportForm::repairerDroped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.repairerId = ui->signersTable->item(curRow, 0)->text();
     ui->repairerEdit->setText(text);
+    updateSignersTable();
 }
 
 void KRReportForm::chiefDroped()
@@ -294,6 +357,63 @@ void KRReportForm::chiefDroped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.chiefId = ui->signersTable->item(curRow, 0)->text();
     ui->chiefEdit->setText(text);
+    updateSignersTable();
+}
+
+void KRReportForm::ownerClearClicked()
+{
+    ui->ownerEdit->clear();
+    signers.ownerId = "";
+    updateSignersTable();
+}
+
+void KRReportForm::member1ClearClicked()
+{
+    ui->member1Edit->clear();
+    signers.member1Id = "";
+    updateSignersTable();
+}
+
+void KRReportForm::member2ClearClicked()
+{
+    ui->member2Edit->clear();
+    signers.member2Id = "";
+    updateSignersTable();
+}
+
+void KRReportForm::member3ClearClicked()
+{
+    ui->member3Edit->clear();
+    signers.member3Id = "";
+    updateSignersTable();
+}
+
+void KRReportForm::member4ClearClicked()
+{
+    ui->member4Edit->clear();
+    signers.member4Id = "";
+    updateSignersTable();
+}
+
+void KRReportForm::member5ClearClicked()
+{
+    ui->member5Edit->clear();
+    signers.member5Id = "";
+    updateSignersTable();
+}
+
+void KRReportForm::repairerClearClicked()
+{
+    ui->repairerEdit->clear();
+    signers.repairerId = "";
+    updateSignersTable();
+}
+
+void KRReportForm::chiefClearClicked()
+{
+    ui->chiefEdit->clear();
+    signers.chiefId = "";
+    updateSignersTable();
 }
 
 void KRReportForm::doneButtonClicked()
@@ -301,9 +421,8 @@ void KRReportForm::doneButtonClicked()
     QString query, prepQuery;
     QStringList queryList;
     if (!checkFilling()) return;
-
+    db->startTransaction();
     if (reportId == "0") {
-        db->startTransaction();
         query = "INSERT INTO krreports (krr_desc, krr_unit, krr_planbeg, krr_planend, krr_date, krr_docnum) "
                 "VALUES ('%1', '%2', '%3', '%4', '%5', '%6')";
         query = query.arg(ui->descEdit->text());
@@ -320,7 +439,7 @@ void KRReportForm::doneButtonClicked()
         }
         reportId = db->lastInsertId().toString();
     } else {
-        query = "UPDATE krreports SET krr_desc = '%1', krr_unit = '%2, krr_planbeg = '%3', krr_planend = '%4', krr_date = '%5',  krr_docnum = '%6' "
+        query = "UPDATE krreports SET krr_desc = '%1', krr_unit = '%2', krr_planbeg = '%3', krr_planend = '%4', krr_date = '%5',  krr_docnum = '%6' "
                 "WHERE krr_id = '%7'";
         query = query.arg(ui->descEdit->text());
         query = query.arg(ui->unitBox->currentData().toString());
@@ -336,7 +455,7 @@ void KRReportForm::doneButtonClicked()
             return;
         }
 
-        query = "DELETE FROM krrworks WHERE krw_work = '%1'";
+        query = "DELETE FROM krrworks WHERE krw_report = '%1'";
         query = query.arg(reportId);
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -376,6 +495,14 @@ void KRReportForm::doneButtonClicked()
     queryList.append(prepQuery);
     prepQuery = query.arg(reportId).arg(signers.member3Id).arg(KRSMEMBER3);
     queryList.append(prepQuery);
+    if (signers.member4Id != "") {
+        prepQuery = query.arg(reportId).arg(signers.member4Id).arg(KRSMEMBER4);
+        queryList.append(prepQuery);
+    }
+    if (signers.member5Id != "") {
+        prepQuery = query.arg(reportId).arg(signers.member5Id).arg(KRSMEMBER5);
+        queryList.append(prepQuery);
+    }
     prepQuery = query.arg(reportId).arg(signers.repairerId).arg(KRSREPAIRER);
     queryList.append(prepQuery);
     prepQuery = query.arg(reportId).arg(signers.chiefId).arg(KRSCHIEF);
@@ -468,6 +595,14 @@ void KRReportForm::editReport(QString Id)
         case KRSMEMBER3:
             signers.member3Id = db->fetchValue(0).toString();
             ui->member3Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
+            break;
+        case KRSMEMBER4:
+            signers.member4Id = db->fetchValue(0).toString();
+            ui->member4Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
+            break;
+        case KRSMEMBER5:
+            signers.member5Id = db->fetchValue(0).toString();
+            ui->member5Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
             break;
         case KRSREPAIRER:
             signers.repairerId = db->fetchValue(0).toString();

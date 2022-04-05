@@ -50,11 +50,6 @@
         <widget class="QComboBox" name="workBox">
          <item>
           <property name="text">
-           <string>ТО</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
            <string>ТР</string>
           </property>
          </item>

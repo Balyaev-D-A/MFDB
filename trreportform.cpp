@@ -22,6 +22,8 @@ TRReportForm::TRReportForm(QWidget *parent) :
     ui->member1Edit->setAcceptFrom(ui->signersTable);
     ui->member2Edit->setAcceptFrom(ui->signersTable);
     ui->member3Edit->setAcceptFrom(ui->signersTable);
+    ui->member4Edit->setAcceptFrom(ui->signersTable);
+    ui->member5Edit->setAcceptFrom(ui->signersTable);
     ui->repairerEdit->setAcceptFrom(ui->signersTable);
     ui->chiefEdit->setAcceptFrom(ui->signersTable);
     connect(ui->unitBox, &QComboBox::currentTextChanged, this, &TRReportForm::unitChanged);
@@ -38,9 +40,19 @@ TRReportForm::TRReportForm(QWidget *parent) :
     connect(ui->member1Edit, &DragDropEdit::itemDroped, this, &TRReportForm::member1Droped);
     connect(ui->member2Edit, &DragDropEdit::itemDroped, this, &TRReportForm::member2Droped);
     connect(ui->member3Edit, &DragDropEdit::itemDroped, this, &TRReportForm::member3Droped);
+    connect(ui->member4Edit, &DragDropEdit::itemDroped, this, &TRReportForm::member4Droped);
+    connect(ui->member5Edit, &DragDropEdit::itemDroped, this, &TRReportForm::member5Droped);
     connect(ui->repairerEdit, &DragDropEdit::itemDroped, this, &TRReportForm::repairerDroped);
     connect(ui->chiefEdit, &DragDropEdit::itemDroped, this, &TRReportForm::chiefDroped);
     connect(ui->doneButton, &QPushButton::clicked, this, &TRReportForm::doneButtonClicked);
+    connect(ui->ownerClearButton, &QToolButton::clicked, this, &TRReportForm::ownerClearClicked);
+    connect(ui->member1ClearButton, &QToolButton::clicked, this, &TRReportForm::member1ClearClicked);
+    connect(ui->member2ClearButton, &QToolButton::clicked, this, &TRReportForm::member2ClearClicked);
+    connect(ui->member3ClearButton, &QToolButton::clicked, this, &TRReportForm::member3ClearClicked);
+    connect(ui->member4ClearButton, &QToolButton::clicked, this, &TRReportForm::member4ClearClicked);
+    connect(ui->member5ClearButton, &QToolButton::clicked, this, &TRReportForm::member5ClearClicked);
+    connect(ui->repairerClearButton, &QToolButton::clicked, this, &TRReportForm::repairerClearClicked);
+    connect(ui->chiefClearButton, &QToolButton::clicked, this, &TRReportForm::chiefClearClicked);
 }
 
 TRReportForm::~TRReportForm()
@@ -135,6 +147,14 @@ void TRReportForm::editReport(QString Id)
             signers.member3Id = db->fetchValue(0).toString();
             ui->member3Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
             break;
+        case TRSMEMBER4:
+            signers.member4Id = db->fetchValue(0).toString();
+            ui->member4Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
+            break;
+        case TRSMEMBER5:
+            signers.member5Id = db->fetchValue(0).toString();
+            ui->member5Edit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
+            break;
         case TRSREPAIRER:
             signers.repairerId = db->fetchValue(0).toString();
             ui->repairerEdit->setText(db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
@@ -169,7 +189,18 @@ void TRReportForm::updateTRTable()
 {
     int curRow;
     QStringList usedIds;
-    QString query = "SELECT def_id, def_devtype, def_kks, def_begdate, def_enddate FROM defects "
+    QStringList inReportIds;
+    QString query = "SELECT trw_work FROM trrworks";
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    while (db->nextRecord())
+        inReportIds.append(db->fetchValue(0).toString());
+
+    query = "SELECT def_id, def_devtype, def_kks, def_begdate, def_enddate FROM defects "
                     "WHERE def_unit = '%1' AND def_begdate <> 'NULL' AND def_enddate <> 'NULL' AND def_num <> 'NULL'";
     query = query.arg(ui->unitBox->currentData().toString());
 
@@ -189,6 +220,7 @@ void TRReportForm::updateTRTable()
     while (db->nextRecord())
     {
         if (usedIds.contains(db->fetchValue(0).toString())) continue;
+        if (inReportIds.contains(db->fetchValue(0).toString())) continue;
         curRow = ui->trTable->rowCount();
         ui->trTable->insertRow(curRow);
         for (int i=0; i<5; i++)
@@ -202,7 +234,10 @@ void TRReportForm::updateTRTable()
 void TRReportForm::updateSignersTable()
 {
     int curRow;
-    QString query = "SELECT sig_id, sig_name, sig_loc FROM signers WHERE sig_hidden = 'FALSE'";
+    QString sigId;
+    QString query;
+
+    query = "SELECT sig_id, sig_name, sig_loc FROM signers WHERE sig_hidden = 'FALSE'";
 
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -213,13 +248,23 @@ void TRReportForm::updateSignersTable()
 
     while (db->nextRecord())
     {
+        sigId = db->fetchValue(0).toString();
         curRow = ui->signersTable->rowCount();
+        if (sigId == signers.ownerId) continue;
+        if (sigId == signers.member1Id) continue;
+        if (sigId == signers.member2Id) continue;
+        if (sigId == signers.member3Id) continue;
+        if (sigId == signers.member4Id) continue;
+        if (sigId == signers.member5Id) continue;
+        if (sigId == signers.repairerId) continue;
+        if (sigId == signers.chiefId) continue;
         ui->signersTable->insertRow(curRow);
         for (int i=0; i<3; i++)
         {
             ui->signersTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
+    ui->signersTable->resizeColumnsToContents();
 }
 void TRReportForm::addButtonClicked()
 {
@@ -266,6 +311,7 @@ void TRReportForm::ownerDroped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.ownerId = ui->signersTable->item(curRow, 0)->text();
     ui->ownerEdit->setText(text);
+    updateSignersTable();
 }
 
 void TRReportForm::member1Droped()
@@ -275,6 +321,7 @@ void TRReportForm::member1Droped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.member1Id = ui->signersTable->item(curRow, 0)->text();
     ui->member1Edit->setText(text);
+    updateSignersTable();
 }
 
 void TRReportForm::member2Droped()
@@ -284,6 +331,7 @@ void TRReportForm::member2Droped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.member2Id = ui->signersTable->item(curRow, 0)->text();
     ui->member2Edit->setText(text);
+    updateSignersTable();
 }
 
 void TRReportForm::member3Droped()
@@ -293,8 +341,28 @@ void TRReportForm::member3Droped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.member3Id = ui->signersTable->item(curRow, 0)->text();
     ui->member3Edit->setText(text);
+    updateSignersTable();
 }
 
+void TRReportForm::member4Droped()
+{
+    int curRow = ui->signersTable->currentRow();
+    QString text = "%1 %2";
+    text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
+    signers.member4Id = ui->signersTable->item(curRow, 0)->text();
+    ui->member4Edit->setText(text);
+    updateSignersTable();
+}
+
+void TRReportForm::member5Droped()
+{
+    int curRow = ui->signersTable->currentRow();
+    QString text = "%1 %2";
+    text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
+    signers.member5Id = ui->signersTable->item(curRow, 0)->text();
+    ui->member5Edit->setText(text);
+    updateSignersTable();
+}
 void TRReportForm::repairerDroped()
 {
     int curRow = ui->signersTable->currentRow();
@@ -302,6 +370,7 @@ void TRReportForm::repairerDroped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.repairerId = ui->signersTable->item(curRow, 0)->text();
     ui->repairerEdit->setText(text);
+    updateSignersTable();
 }
 
 void TRReportForm::chiefDroped()
@@ -311,6 +380,63 @@ void TRReportForm::chiefDroped()
     text = text.arg(ui->signersTable->item(curRow, 1)->text()).arg(ui->signersTable->item(curRow, 2)->text());
     signers.chiefId = ui->signersTable->item(curRow, 0)->text();
     ui->chiefEdit->setText(text);
+    updateSignersTable();
+}
+
+void TRReportForm::ownerClearClicked()
+{
+    ui->ownerEdit->setText("");
+    signers.ownerId = "";
+    updateSignersTable();
+}
+
+void TRReportForm::member1ClearClicked()
+{
+    ui->member1Edit->setText("");
+    signers.member1Id = "";
+    updateSignersTable();
+}
+
+void TRReportForm::member2ClearClicked()
+{
+    ui->member2Edit->setText("");
+    signers.member2Id = "";
+    updateSignersTable();
+}
+
+void TRReportForm::member3ClearClicked()
+{
+    ui->member3Edit->setText("");
+    signers.member3Id = "";
+    updateSignersTable();
+}
+
+void TRReportForm::member4ClearClicked()
+{
+    ui->member4Edit->setText("");
+    signers.member4Id = "";
+    updateSignersTable();
+}
+
+void TRReportForm::member5ClearClicked()
+{
+    ui->member5Edit->setText("");
+    signers.member5Id = "";
+    updateSignersTable();
+}
+
+void TRReportForm::repairerClearClicked()
+{
+    ui->repairerEdit->setText("");
+    signers.repairerId = "";
+    updateSignersTable();
+}
+
+void TRReportForm::chiefClearClicked()
+{
+    ui->chiefEdit->setText("");
+    signers.chiefId = "";
+    updateSignersTable();
 }
 
 bool TRReportForm::checkFilling()
@@ -332,15 +458,15 @@ bool TRReportForm::checkFilling()
         return false;
     }
     if (ui->member1Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членнов комиссии.");
+        showErrorMessage("Не выбран один из членов комиссии.");
         return false;
     }
     if (ui->member2Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членнов комиссии.");
+        showErrorMessage("Не выбран один из членов комиссии.");
         return false;
     }
     if (ui->member3Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членнов комиссии.");
+        showErrorMessage("Не выбран один из членов комиссии.");
         return false;
     }
     if (ui->repairerEdit->text().isEmpty()) {
@@ -369,9 +495,8 @@ void TRReportForm::doneButtonClicked()
     QString query, prepQuery;
     QStringList queryList;
     if (!checkFilling()) return;
-
+    db->startTransaction();
     if (reportId == "0") {
-        db->startTransaction();
         query = "INSERT INTO trreports (trr_desc, trr_unit, trr_planbeg, trr_planend, trr_date, trr_docnum) "
                 "VALUES ('%1', '%2', '%3', '%4', '%5', '%6')";
         query = query.arg(ui->descEdit->text());
@@ -388,7 +513,7 @@ void TRReportForm::doneButtonClicked()
         }
         reportId = db->lastInsertId().toString();
     } else {
-        query = "UPDATE trreports SET trr_desc = '%1', trr_unit = '%2, trr_planbeg = '%3', trr_planend = '%4', trr_date = '%5',  trr_docnum = '%6' "
+        query = "UPDATE trreports SET trr_desc = '%1', trr_unit = '%2', trr_planbeg = '%3', trr_planend = '%4', trr_date = '%5',  trr_docnum = '%6' "
                 "WHERE trr_id = '%7'";
         query = query.arg(ui->descEdit->text());
         query = query.arg(ui->unitBox->currentData().toString());
@@ -404,7 +529,7 @@ void TRReportForm::doneButtonClicked()
             return;
         }
 
-        query = "DELETE FROM trrworks WHERE trw_work = '%1'";
+        query = "DELETE FROM trrworks WHERE trw_report = '%1'";
         query = query.arg(reportId);
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -444,6 +569,14 @@ void TRReportForm::doneButtonClicked()
     queryList.append(prepQuery);
     prepQuery = query.arg(reportId).arg(signers.member3Id).arg(TRSMEMBER3);
     queryList.append(prepQuery);
+    if (signers.member4Id != "") {
+        prepQuery = query.arg(reportId).arg(signers.member4Id).arg(TRSMEMBER4);
+        queryList.append(prepQuery);
+    }
+    if (signers.member5Id != "") {
+        prepQuery = query.arg(reportId).arg(signers.member5Id).arg(TRSMEMBER5);
+        queryList.append(prepQuery);
+    }
     prepQuery = query.arg(reportId).arg(signers.repairerId).arg(TRSREPAIRER);
     queryList.append(prepQuery);
     prepQuery = query.arg(reportId).arg(signers.chiefId).arg(TRSCHIEF);

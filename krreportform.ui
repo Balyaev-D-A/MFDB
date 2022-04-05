@@ -145,7 +145,7 @@
          <item>
           <widget class="QLabel" name="label_9">
            <property name="text">
-            <string>Документ № 33-20/</string>
+            <string>Документ №</string>
            </property>
           </widget>
          </item>
@@ -431,11 +431,11 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <layout class="QHBoxLayout" name="horizontalLayout_17">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
+          <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
+            <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
               <widget class="QLabel" name="label_11">
                <property name="text">
@@ -444,11 +444,21 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <property name="spacing">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="DragDropEdit" name="ownerEdit">
                  <property name="readOnly">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="ownerClearButton">
+                 <property name="text">
+                  <string>x</string>
                  </property>
                 </widget>
                </item>
@@ -467,6 +477,9 @@
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <property name="spacing">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="DragDropEdit" name="member1Edit">
                  <property name="readOnly">
@@ -474,10 +487,20 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QToolButton" name="member1ClearButton">
+                 <property name="text">
+                  <string>x</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <property name="spacing">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="DragDropEdit" name="member2Edit">
                  <property name="readOnly">
@@ -485,10 +508,20 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QToolButton" name="member2ClearButton">
+                 <property name="text">
+                  <string>x</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <property name="spacing">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="DragDropEdit" name="member3Edit">
                  <property name="readOnly">
@@ -496,25 +529,52 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QToolButton" name="member3ClearButton">
+                 <property name="text">
+                  <string>x</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>Подразделение АС, ответственное за ремонт </string>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <property name="spacing">
+                <number>0</number>
                </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_14">
                <item>
-                <widget class="DragDropEdit" name="repairerEdit">
+                <widget class="DragDropEdit" name="member4Edit">
                  <property name="readOnly">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="member4ClearButton">
+                 <property name="text">
+                  <string>x</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="DragDropEdit" name="member5Edit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="member5ClearButton">
+                 <property name="text">
+                  <string>x</string>
                  </property>
                 </widget>
                </item>
@@ -525,6 +585,38 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>Подразделение АС, ответственное за ремонт </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="DragDropEdit" name="repairerEdit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="repairerClearButton">
+                 <property name="text">
+                  <string>x</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
               <widget class="QLabel" name="label_10">
                <property name="text">
                 <string>Руководитель работ по ремонту оборудования:</string>
@@ -532,7 +624,10 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <layout class="QHBoxLayout" name="horizontalLayout_16">
+               <property name="spacing">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="DragDropEdit" name="chiefEdit">
                  <property name="readOnly">
@@ -540,22 +635,29 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QToolButton" name="chiefClearButton">
+                 <property name="text">
+                  <string>x</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
-             <item>
-              <spacer name="verticalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
             </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </item>
