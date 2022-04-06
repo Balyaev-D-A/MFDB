@@ -24,6 +24,10 @@ DefectForm::DefectForm(QWidget *parent) :
     connect(ui->materialTable, &DragDropTable::itemDroped, this, &DefectForm::removeMaterialClicked);
     connect(ui->okButton, &QPushButton::clicked, this, &DefectForm::okClicked);
     connect(ui->cancelButton, &QPushButton::clicked, this, &DefectForm::cancelClicked);
+    connect(ui->journalDefectEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
+    connect(ui->defectEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
+    connect(ui->repairEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
+    connect(ui->stageBox, &QComboBox::currentTextChanged, this, &DefectForm::updateActionsDesc);
 
     ui->addedMatTable->hideColumn(0);
     ui->materialTable->hideColumn(0);
@@ -110,6 +114,8 @@ void DefectForm::editDefect(QString defId)
     updateRepairs();
     ui->defectEdit->setText(defect);
     ui->repairEdit->setText(repair);
+    updateActions();
+    updateActionsDesc();
 }
 
 void DefectForm::deviceButtonClicked()
@@ -138,6 +144,8 @@ void DefectForm::deviceChoosed(SelectedDevice device)
     updateStages();
     updateDefects();
     updateRepairs();
+    updateActions();
+    updateActionsDesc();
 }
 
 void DefectForm::updateDefects()
@@ -294,6 +302,50 @@ void DefectForm::updateStages()
         if (actList[i].startsWith('@'))
                 ui->stageBox->addItem(actList[i].remove(0, 1));
     }
+}
+
+void DefectForm::updateActions()
+{
+    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'";
+
+    query = query.arg(device.type).arg("ТР");
+
+    if (!db->execQuery(query)){
+        db->showError(this);
+        return;
+    }
+
+    if (db->nextRecord())
+        actions = db->fetchValue(0).toString();
+    else
+        actions = "";
+
+
+}
+
+void DefectForm::updateActionsDesc()
+{
+    QString act;
+    QStringList actList;
+
+    actList = actions.split("\n");
+    act = "";
+    for (int i=0; i<actList.size(); i++)
+    {
+        if (actList[i].startsWith('@')){
+            if (actList[i].remove(0, 1) == ui->stageBox->currentText()) {
+                actList[i] = actList[i] + " " + ui->defectEdit->text();
+            }
+            else {
+                actList[i] = actList[i] + " Замечаний нет.";
+            }
+        }
+        act += actList[i] + "\n";
+    }
+    act.replace("$JD$", ui->journalDefectEdit->text());
+    act.replace("$REP$", ui->repairEdit->text());
+
+    ui->actionsTextEdit->document()->setPlainText(act);
 }
 
 void DefectForm::addDefectClicked()
@@ -505,12 +557,13 @@ bool DefectForm::saveDefect()
             }
         }
         query = "UPDATE defects SET def_quarter = '%1', def_devtype = '%2', def_kks = '%3', def_journaldesc = '%4', def_realdesc = '%5', "
-                "def_stage = '%6', def_repairdesc = '%7', def_unit = '%8', def_devname = '%9' WHERE def_id = '%10'";
+                "def_stage = '%6', def_repairdesc = '%7', def_unit = '%8', def_devname = '%9', def_actionsdesc = '%10' WHERE def_id = '%11'";
         query = query.arg(ui->quarterBox->currentIndex()+1);
         query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text());
         query = query.arg(ui->defectEdit->text()).arg(ui->stageBox->currentIndex()).arg(ui->repairEdit->text());
         query = query.arg(device.unitId);
         query = query.arg(device.name);
+        query = query.arg(ui->actionsTextEdit->toPlainText());
         query = query.arg(defId);
 
         if (!db->execQuery(query)) {
@@ -520,13 +573,14 @@ bool DefectForm::saveDefect()
         }
     }
     else {
-        query = "INSERT INTO defects (def_quarter, def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_unit, def_devname) "
-                "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9')";
+        query = "INSERT INTO defects (def_quarter, def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_unit, def_devname, def_actionsdesc) "
+                "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', '%10')";
         query = query.arg(ui->quarterBox->currentIndex() + 1);
         query = query.arg(device.type).arg(device.kks).arg(ui->journalDefectEdit->text()).arg(ui->defectEdit->text());
         query = query.arg(ui->stageBox->currentIndex()).arg(ui->repairEdit->text());
         query = query.arg(device.unitId);
         query = query.arg(device.name);
+        query = query.arg(ui->actionsTextEdit->toPlainText());
 
         if (!db->execQuery(query)) {
             db->showError(this);

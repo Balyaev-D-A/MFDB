@@ -450,7 +450,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         QString journalDesc;
         QString realDesc;
         QString repairDesc;
-        int stage;
+        QString actionsDesc;
     } Work;
     Work w;
     QList<Work> workList;
@@ -460,7 +460,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
     QString pageTempNoSign, pageTempSign, page;
     QFile file;
     QTextStream *ts;
-    int pageCount, stageCounter;
+    int pageCount;
     QStringList workActList;
     QString query = "SELECT unit_shortname, unit_subsys, trr_date, trr_docnum FROM trreports "
                     "LEFT JOIN units ON trr_unit = unit_id "
@@ -479,9 +479,9 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         docNum = db->fetchValue(3).toString();
     }
 
-    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_journaldesc, def_realdesc, def_repairdesc, def_stage FROM trrworks "
+    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_journaldesc, def_realdesc, def_repairdesc, def_actionsdesc FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1'";
+            "WHERE trw_report = '%1' ORDER BY def_id";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -499,7 +499,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         w.journalDesc = db->fetchValue(5).toString();
         w.realDesc = db->fetchValue(6).toString();
         w.repairDesc = db->fetchValue(7).toString();
-        w.stage = db->fetchValue(8).toInt();
+        w.actionsDesc = db->fetchValue(8).toString();
         workList.append(w);
     }
     works.chop(2);
@@ -569,40 +569,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
             page = pageTempSign;
         }
 
-        currWork = "Текущий ремонт: " + workList[i].name + " " + workList[i].type + ", " + workList[i].kks + "<br/>\n";
-
-        query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'ТР'";
-        query = query.arg(workList[i].type);
-        if (!db->execQuery(query)) {
-            db->showError(this);
-            return result;
-        }
-        if (db->nextRecord()) workActions = db->fetchValue(0).toString();
-        else workActions = "";
-
-        workActList = workActions.split("\n");
-        stageCounter = 0;
-        for (int j=0; j<workActList.size(); j++)
-        {
-            if (workActList[j].startsWith('@')) {
-                if (stageCounter == workList[i].stage)
-                    workActList[j] = workActList[j].remove(0, 1).append(" " + workList[i].realDesc);
-                else
-                    workActList[j] = workActList[j].remove(0, 1).append(" Замечаний нет.");
-                stageCounter++;
-            }
-        }
-
-        workActions ="";
-        for (int j=0; j<workActList.size(); j++)
-        {
-            workActions += workActList[j];
-            if (j != workActList.size()-1) workActions += "\n";
-        }
-
-        workActions.replace("\n", "<br/>");
-        workActions.replace("$JD$", workList[i].journalDesc);
-        workActions.replace("$REP$", workList[i].repairDesc);
+        currWork = "Текущий ремонт: " + workList[i].name + " " + workList[i].type + ", " + workList[i].kks + "\n";
 
         query = "SELECT nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
         query = query.arg(workList[i].type);
@@ -623,7 +590,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         page.replace("$ENDDATE$", workList[i].endDate);
         page.replace("$WT$", "ТР");
         page.replace("$CURRWORK$", currWork);
-        page.replace("$ACTIONS$", workActions);
+        page.replace("$ACTIONS$", workList[i].actionsDesc.replace("\n", "<br/>"));
         page.replace("$HOURS$", workHours.replace(".", ","));
 
         if (i == pageCount-1) {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>848</width>
-    <height>614</height>
+    <width>837</width>
+    <height>758</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -379,6 +379,18 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Описание устранения дефекта</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item>
+       <widget class="QPlainTextEdit" name="actionsTextEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Дополнительные материалы</string>
@@ -466,7 +478,7 @@
        <widget class="DragDropTable" name="materialTable">
         <property name="maximumSize">
          <size>
-          <width>250</width>
+          <width>350</width>
           <height>16777215</height>
          </size>
         </property>

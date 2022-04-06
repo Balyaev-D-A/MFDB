@@ -50,6 +50,7 @@ private:
     DefectList defectList;
     RepairList repairList;
     QString defId;
+    QString actions;
     bool matsChanged;
     int currentDefect;
     int currentRepair;
@@ -60,6 +61,8 @@ private:
     void updateAddedMaterials();
     void updateMaterials();
     void updateStages();
+    void updateActions();
+    void updateActionsDesc();
     bool saveDefect();
 
 private slots:
