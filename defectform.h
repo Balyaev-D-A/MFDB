@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "database.h"
 #include "deviceselectorform.h"
+#include "normativeform.h"
 
 
 const int EXTERNREVIEW = 1;
@@ -41,10 +42,12 @@ public:
     void setDatabase(Database *db);
     void newDefect();
     void editDefect(QString defId);
+    void setNormativeForm(NormativeForm *nf);
 
 private:
     Ui::DefectForm *ui;
     Database *db;
+    NormativeForm *nf;
     DeviceSelectorForm *dsf;
     SelectedDevice device;
     DefectList defectList;
@@ -83,6 +86,7 @@ private slots:
     void removeMaterialClicked();
     void okClicked();
     void cancelClicked();
+    void oesnClicked();
 
 signals:
     void defectSaved();

@@ -19,6 +19,7 @@ KRForm::KRForm(QWidget *parent) :
     connect(ui->okButton, &QToolButton::clicked, this, &KRForm::okClicked);
     connect(ui->addedMatTable, &DragDropTable::itemDroped, this, &KRForm::addMaterialClicked);
     connect(ui->materialTable, &DragDropTable::itemDroped, this, &KRForm::removeMaterialClicked);
+    connect(ui->oesnButton, &QToolButton::clicked, this, &KRForm::oesnClicked);
 }
 
 KRForm::~KRForm()
@@ -31,6 +32,11 @@ void KRForm::setDatabase(Database *db)
     this->db = db;
 }
 
+void KRForm::setNormativeForm(NormativeForm *nf)
+{
+    this->nf = nf;
+}
+
 void KRForm::newKR()
 {
     setWindowTitle("Новый капитальный ремонт");
@@ -38,6 +44,7 @@ void KRForm::newKR()
     selectedSched = "0";
     matsChanged = false;
     ui->deviceEdit->clear();
+    ui->oesnButton->setDisabled(true);
     ui->materialTable->setDisabled(true);
     ui->addedMatTable->setDisabled(true);
     ui->addMaterialButton->setDisabled(true);
@@ -61,7 +68,7 @@ void KRForm::editKR(QString KRId)
     ui->addMaterialButton->setDisabled(true);
     ui->removeMaterialButton->setDisabled(true);
     ui->okButton->setDisabled(true);
-
+    ui->oesnButton->setDisabled(true);
     query = "SELECT kr_sched, sch_name, sch_type, sch_kks FROM kaprepairs AS kr "
             "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
             "WHERE kr_id = '%1'";
@@ -75,6 +82,7 @@ void KRForm::editKR(QString KRId)
     if (db->nextRecord()) {
         selectedSched = db->fetchValue(0).toString();
         ui->deviceEdit->setText(db->fetchValue(1).toString() + " " + db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
+        ui->oesnButton->setDisabled(false);
     }
     else
         return;
@@ -256,10 +264,19 @@ void KRForm::selectorClosed(KRSelectorForm *sender)
 void KRForm::deviceSelected(const KRDevice &device)
 {
     selectedSched = device.sched;
+    selectedDevice = device.type;
     ui->deviceEdit->setText(device.device + " " + device.type + " " + device.kks);
     ui->materialTable->setDisabled(false);
     ui->addedMatTable->setDisabled(false);
     ui->addMaterialButton->setDisabled(false);
     ui->removeMaterialButton->setDisabled(false);
     ui->okButton->setDisabled(false);
+    ui->oesnButton->setDisabled(false);
+}
+
+void KRForm::oesnClicked()
+{
+    nf->show();
+    nf->setDevice(selectedDevice);
+    nf->setWorkType("КР");
 }

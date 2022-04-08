@@ -17,6 +17,8 @@ public:
     explicit NormativeForm(QWidget *parent = nullptr);
     ~NormativeForm();
     void setDatabase(Database *db);
+    void setDevice(QString device);
+    void setWorkType(QString wt);
 
 private:
     Ui::NormativeForm *ui;

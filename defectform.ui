@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>837</width>
+    <width>960</width>
     <height>758</height>
    </rect>
   </property>
@@ -79,6 +79,13 @@
           <widget class="QToolButton" name="deviceButton">
            <property name="text">
             <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="oesnButton">
+           <property name="text">
+            <string>ОЭСН</string>
            </property>
           </widget>
          </item>
@@ -393,7 +400,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Дополнительные материалы</string>
+      <string>Материалы</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
@@ -401,14 +408,23 @@
         <property name="acceptDrops">
          <bool>true</bool>
         </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
         <property name="dragDropOverwriteMode">
          <bool>false</bool>
         </property>
         <property name="dragDropMode">
          <enum>QAbstractItemView::DragDrop</enum>
         </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
         <property name="sortingEnabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
@@ -421,6 +437,11 @@
         <column>
          <property name="text">
           <string>Наименование</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>ОЭСН</string>
          </property>
         </column>
         <column>
@@ -485,11 +506,20 @@
         <property name="acceptDrops">
          <bool>true</bool>
         </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
         <property name="dragDropOverwriteMode">
          <bool>false</bool>
         </property>
         <property name="dragDropMode">
          <enum>QAbstractItemView::DragDrop</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
         </property>
         <property name="sortingEnabled">
          <bool>true</bool>

@@ -36,6 +36,16 @@ void NormativeForm::setDatabase(Database *db)
     this->db = db;
 }
 
+void NormativeForm::setDevice(QString device)
+{
+    ui->deviceBox->setCurrentText(device);
+}
+
+void NormativeForm::setWorkType(QString wt)
+{
+    ui->workBox->setCurrentText(wt);
+}
+
 void NormativeForm::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
@@ -80,6 +90,7 @@ void NormativeForm::updateNormTable()
         ui->normativeTable->setItem(ui->normativeTable->rowCount()-1, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
         ui->normativeTable->setItem(ui->normativeTable->rowCount()-1, 2, new QTableWidgetItem(db->fetchValue(2).toString()));
     }
+    ui->normativeTable->resizeColumnsToContents();
 }
 
 void NormativeForm::updateMatTable()

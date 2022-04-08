@@ -6,7 +6,7 @@
 DragDropTable::DragDropTable(QWidget *parent)
     :QTableWidget(parent)
 {
-
+    persistentRows.clear();
 }
 
 void DragDropTable::dragEnterEvent(QDragEnterEvent *event)
@@ -25,4 +25,22 @@ void DragDropTable::dropEvent(QDropEvent *event)
 void DragDropTable::setAcceptFrom(QObject *obj)
 {
     acceptFrom = obj;
+}
+
+void DragDropTable::setPersistentRow(int row)
+{
+    persistentRows.append(row);
+    for (int i=0; i<columnCount(); i++)
+        item(row, i)->setBackground(QBrush(QColor(Qt::yellow)));
+}
+
+bool DragDropTable::isPersistentRow(int row)
+{
+    return persistentRows.contains(row);
+}
+
+void DragDropTable::startDrag(Qt::DropActions actions)
+{
+    if (isPersistentRow(this->currentRow())) return;
+    QAbstractItemView::startDrag(actions);
 }

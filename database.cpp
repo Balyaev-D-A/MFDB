@@ -65,7 +65,7 @@ bool Database::deployTables()
                   "mat_measure VARCHAR(10))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS normativmat (nm_id SERIAL PRIMARY KEY, nm_dev VARCHAR(50), nm_worktype CHAR(2), "
-                  "nm_material INTEGER REFERENCES materials(mat_id), nm_count DECIMAL(5,2))")) return false;
+                  "nm_material INTEGER REFERENCES materials(mat_id), nm_count DECIMAL(6,3))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS normativwork (nw_id SERIAL PRIMARY KEY, nw_dev VARCHAR(50), nw_worktype CHAR(2), "
                   "nw_oesn VARCHAR(255), nw_work DECIMAL(5,2))")) return false;
@@ -84,13 +84,13 @@ bool Database::deployTables()
                   "drp_repairdesc TEXT)")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS defadditionalmats (dam_id SERIAL PRIMARY KEY, dam_defect INTEGER REFERENCES defects(def_id), "
-                  "dam_material INTEGER REFERENCES materials (mat_id), dam_count DECIMAL(5,2))")) return false;
+                  "dam_material INTEGER REFERENCES materials (mat_id), dam_count DECIMAL(6,3))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kaprepairs (kr_id SERIAL PRIMARY KEY, kr_sched INTEGER REFERENCES schedule(sch_id) UNIQUE, "
                   "kr_begdate CHAR(10), kr_enddate CHAR(10))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kradditionalmats (kam_id SERIAL PRIMARY KEY, kam_kr INTEGER REFERENCES kaprepairs(kr_id), "
-                  "kam_material INTEGER REFERENCES materials (mat_id), kam_count DECIMAL(5,2))")) return false;
+                  "kam_material INTEGER REFERENCES materials (mat_id), kam_count DECIMAL(6,3))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS receipts (rec_id serial primary key, rec_date CHAR(10), "
                   "rec_description VARCHAR(255))")) return false;

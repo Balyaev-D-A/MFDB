@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "database.h"
 #include "krselectorform.h"
-
+#include "normativeform.h"
 
 namespace Ui {
 class KRForm;
@@ -19,14 +19,17 @@ public:
     explicit KRForm(QWidget *parent = nullptr);
     ~KRForm();
     void setDatabase(Database *db);
+    void setNormativeForm(NormativeForm *nf);
     void newKR();
     void editKR(QString KRId);
 
 private:
     Ui::KRForm *ui;
     Database *db;
+    NormativeForm *nf;
     QString KRId;
     QString selectedSched;
+    QString selectedDevice;
     bool matsChanged;
     void updateMaterials();
     bool saveKR();
@@ -39,6 +42,7 @@ private slots:
     void okClicked();
     void selectorClosed(KRSelectorForm *sender);
     void deviceSelected(const KRDevice &device);
+    void oesnClicked();
 
 signals:
     void krSaved();

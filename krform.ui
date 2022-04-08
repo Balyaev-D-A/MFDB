@@ -37,6 +37,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="oesnButton">
+       <property name="text">
+        <string>ОЭСН</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

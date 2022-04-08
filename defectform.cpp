@@ -28,10 +28,10 @@ DefectForm::DefectForm(QWidget *parent) :
     connect(ui->defectEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
     connect(ui->repairEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
     connect(ui->stageBox, &QComboBox::currentTextChanged, this, &DefectForm::updateActionsDesc);
+    connect(ui->oesnButton, &QToolButton::clicked, this, &DefectForm::oesnClicked);
 
     ui->addedMatTable->hideColumn(0);
     ui->materialTable->hideColumn(0);
-    ui->addedMatTable->sortByColumn(1, Qt::AscendingOrder);
     ui->materialTable->sortByColumn(1, Qt::AscendingOrder);
     ui->addedMatTable->setAcceptFrom(ui->materialTable);
     ui->materialTable->setAcceptFrom(ui->addedMatTable);
@@ -58,6 +58,9 @@ void DefectForm::newDefect()
     matsChanged = false;
     ui->deviceEdit->setText("");
     ui->journalDefectEdit->setText("");
+    ui->stageBox->clear();
+    ui->actionsTextEdit->clear();
+    ui->oesnButton->setDisabled(true);
     ui->journalDefectEdit->setDisabled(true);
     ui->materialTable->setDisabled(true);
     ui->addedMatTable->setDisabled(true);
@@ -108,6 +111,7 @@ void DefectForm::editDefect(QString defId)
         if (db->nextRecord())
             device.name = db->fetchValue(0).toString();
     ui->deviceEdit->setText(device.name + " " + device.type + " " + device.kks);
+    ui->oesnButton->setDisabled(false);
     updateAddedMaterials();
     updateMaterials();
     updateDefects();
@@ -141,6 +145,7 @@ void DefectForm::deviceChoosed(SelectedDevice device)
     ui->addedMatTable->setDisabled(false);
     ui->addMaterialButton->setDisabled(false);
     ui->removeMaterialButton->setDisabled(false);
+    ui->oesnButton->setDisabled(false);
     updateStages();
     updateDefects();
     updateRepairs();
@@ -454,26 +459,56 @@ void DefectForm::deleteRepairClicked()
 
 void DefectForm::updateAddedMaterials()
 {
-    QString query = "SELECT dam_material, mat_name, dam_count FROM defadditionalmats AS dam LEFT JOIN materials AS m ON dam.dam_material = m.mat_id "
-                    "WHERE dam_defect = '%1'";
-    query = query.arg(defId);
-
-    while (ui->addedMatTable->rowCount() > 0) ui->addedMatTable->removeRow(0);
+    int foundRow;
+    QString query = "SELECT nm_material, mat_name, nm_count FROM normativmat AS nm LEFT JOIN materials AS mat ON nm.nm_material = mat.mat_id "
+            "WHERE nm_dev = '%1' AND nm_worktype = 'ТР'";
+    query = query.arg(device.type);
 
     if (!db->execQuery(query)) {
         db->showError(this);
         return;
     }
 
-    ui->addedMatTable->setSortingEnabled(false);
+    while (ui->addedMatTable->rowCount() > 0) ui->addedMatTable->removeRow(0);
+
+    for (int i=0; db->nextRecord(); i++)
+    {
+        ui->addedMatTable->insertRow(i);
+        ui->addedMatTable->setItem(i, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
+        ui->addedMatTable->setItem(i, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
+        ui->addedMatTable->setItem(i, 2, new QTableWidgetItem(db->fetchValue(2).toString()));
+        ui->addedMatTable->setItem(i, 3, new QTableWidgetItem(db->fetchValue(2).toString()));
+        ui->addedMatTable->setPersistentRow(i);
+    }
+
+
+    query = "SELECT dam_material, mat_name, dam_count FROM defadditionalmats AS dam LEFT JOIN materials AS m ON dam.dam_material = m.mat_id "
+                    "WHERE dam_defect = '%1'";
+    query = query.arg(defId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
     while (db->nextRecord())
     {
-        ui->addedMatTable->insertRow(0);
-        ui->addedMatTable->setItem(0, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
-        ui->addedMatTable->setItem(0, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
-        ui->addedMatTable->setItem(0, 2, new QTableWidgetItem(db->fetchValue(2).toString()));
+        foundRow = -1;
+        for (int i=0; i<ui->addedMatTable->rowCount(); i++)
+            if (ui->addedMatTable->item(i, 0)->text() == db->fetchValue(0).toString())
+                foundRow = i;
+
+        if (foundRow < 0) {
+            ui->addedMatTable->insertRow(ui->materialTable->rowCount());
+            ui->addedMatTable->setItem(0, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
+            ui->addedMatTable->setItem(0, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
+            ui->addedMatTable->setItem(0, 2, new QTableWidgetItem("-"));
+            ui->addedMatTable->setItem(0, 3, new QTableWidgetItem(db->fetchValue(2).toString()));
+        }
+        else {
+            ui->addedMatTable->item(0,3)->setText(db->fetchValue(2).toString());
+        }
     }
-    ui->addedMatTable->setSortingEnabled(true);
     ui->addedMatTable->resizeColumnsToContents();
 }
 
@@ -618,4 +653,16 @@ void DefectForm::okClicked()
 void DefectForm::cancelClicked()
 {
     close();
+}
+
+void DefectForm::setNormativeForm(NormativeForm *nf)
+{
+    this->nf = nf;
+}
+
+void DefectForm::oesnClicked()
+{
+    nf->show();
+    nf->setDevice(device.type);
+    nf->setWorkType("ТР");
 }

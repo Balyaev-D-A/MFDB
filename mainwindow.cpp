@@ -52,12 +52,14 @@ MainWindow::MainWindow(QWidget *parent)
     normativeForm->setDatabase(db);
     defectForm = new DefectForm(this);
     defectForm->setDatabase(db);
+    defectForm->setNormativeForm(normativeForm);
     datePicker = new QCalendarWidget(this);
     datePicker->setWindowFlags(Qt::Window | Qt::Popup);
     raspPicker = new QListWidget(this);
     raspPicker->setWindowFlags(Qt::Window | Qt::Popup);
     krform = new KRForm(this);
     krform->setDatabase(db);
+    krform->setNormativeForm(normativeForm);
     receiptsForm = new ReceiptsForm(this);
     receiptsForm->setDatabase(db);
     verifyForm = new VerifyForm(this);
@@ -120,7 +122,7 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
 
-    if (!connectDB("127.0.0.1", "radico22", "radico", "coolpass")) {
+    if (!connectDB("192.168.1.100", "radico22", "radico", "coolpass")) {
         db->showError(this);
         return;
     }
