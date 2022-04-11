@@ -131,9 +131,8 @@ void DeviceSelectorForm::okClicked()
     }
 
     dev.kks = items[0]->text(0);
-    dev.name = ui->deviceBox->currentData().toString();
     dev.type = ui->deviceBox->currentText();
-    QString query = "SELECT sch_unit FROM schedule WHERE sch_kks = '%1' AND sch_type = '%2' LIMIT 1";
+    QString query = "SELECT sch_unit, sch_name FROM schedule WHERE sch_kks = '%1' AND sch_type = '%2' LIMIT 1";
     query = query.arg(dev.kks).arg(dev.type);
 
     if (!db->execQuery(query)) {
@@ -143,6 +142,7 @@ void DeviceSelectorForm::okClicked()
 
     if (db->nextRecord()){
         dev.unitId = db->fetchValue(0).toString();
+        dev.name = db->fetchValue(1).toString();
     }
 
     emit deviceChoosed(dev);

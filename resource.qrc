@@ -11,6 +11,7 @@
         <file>icons/print.png</file>
         <file>icons/selectall.png</file>
         <file>icons/savereport.png</file>
+        <file>icons/copy.png</file>
     </qresource>
     <qresource prefix="/tr"/>
 </RCC>

@@ -1,6 +1,8 @@
 #include <QDebug>
 #include <QFile>
 #include <QXmlStreamReader>
+#include <QMessageBox>
+#include <QProgressDialog>
 
 #include "dictionaryform.h"
 #include "ui_dictionaryform.h"
@@ -25,6 +27,7 @@ DictionaryForm::DictionaryForm(QWidget *parent) :
     connect(ui->deleteBtn, &QToolButton::clicked, this, &DictionaryForm::deleteRecord);
     connect(ui->updateBtn, &QToolButton::clicked, this, &DictionaryForm::updateData);
     connect(ui->importBtn, &QToolButton::clicked, this, &DictionaryForm::importBtnClicked);
+    connect(ui->copyButton, &QToolButton::clicked, this, &DictionaryForm::copyRecord);
 }
 
 DictionaryForm::~DictionaryForm()
@@ -216,6 +219,10 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         break;
     }
 
+    if (dbTable == "schedule")
+        ui->copyButton->setVisible(true);
+    else
+        ui->copyButton->setVisible(false);
     ui->table->setColumnCount(fields.count());
     ui->table->horizontalHeader()->setFont(QFont(QFont().defaultFamily(), -1, QFont::Bold));
     ui->table->setHorizontalHeaderLabels(headers);
@@ -233,6 +240,7 @@ void DictionaryForm::updateData()
         db->showError(this);
         return;
     }
+
     for (int i = 0; db->nextRecord(); i++)
     {
         ui->table->insertRow(i);
@@ -376,5 +384,52 @@ void DictionaryForm::importBtnClicked()
 void DictionaryForm::importFormClosed()
 {
     importForm->deleteLater();
+    updateData();
+}
+
+void DictionaryForm::copyRecord()
+{
+    QVariant lId;
+    int curRow;
+    QStringList toFields;
+    QString query = "INSERT INTO %1 DEFAULT VALUES";
+    QString prepQuery, value;
+    curRow = ui->table->currentRow();
+    if (curRow < 0) return;
+
+    QMessageBox::StandardButton btn = QMessageBox::question(this, "Внимание!!!", "Вы действительно хотите скопировать запись?");
+    if (btn == QMessageBox::No)
+        return;
+
+    query = query.arg(dbTable);
+
+    db->startTransaction();
+
+    if (!db->execQuery(query)) {
+       db->showError(this);
+       db->rollbackTransaction();
+       return;
+    }
+    lId = db->lastInsertId();
+    if (!lId.isValid()){
+        db->rollbackTransaction();
+        return;
+    }
+    query = "UPDATE %1 SET %2='%3' WHERE %4 = '%5'";
+    query = query.arg(dbTable);
+    for (int i=1; i<ui->table->columnCount(); i++)
+    {
+        value = ui->table->item(curRow, i)->text();
+        if (i == 2) value += " копия";
+        if (fieldTypes[i] == "bool") value = "FALSE";
+        prepQuery = query.arg(fields[i]).arg(value).arg(fields[0]).arg(lId.toString());
+        toFields.append(value);
+        if (!db->execQuery(prepQuery)) {
+            db->showError(this);
+            db->rollbackTransaction();
+            return;
+        }
+    }
+    db->commitTransaction();
     updateData();
 }

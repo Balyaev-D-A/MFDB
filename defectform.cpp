@@ -1,11 +1,11 @@
 #include "defectform.h"
 #include "ui_defectform.h"
+#include "fieldeditor.h"
 
 DefectForm::DefectForm(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::DefectForm)
 {
-    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
     connect(ui->deviceButton, &QToolButton::clicked, this, &DefectForm::deviceButtonClicked);
     connect(ui->addDefectButton, &QToolButton::clicked, this, &DefectForm::addDefectClicked);
@@ -29,6 +29,7 @@ DefectForm::DefectForm(QWidget *parent) :
     connect(ui->repairEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
     connect(ui->stageBox, &QComboBox::currentTextChanged, this, &DefectForm::updateActionsDesc);
     connect(ui->oesnButton, &QToolButton::clicked, this, &DefectForm::oesnClicked);
+    connect(ui->addedMatTable, &DragDropTable::cellDoubleClicked, this, &DefectForm::cellDoubleClicked);
 
     ui->addedMatTable->hideColumn(0);
     ui->materialTable->hideColumn(0);
@@ -68,8 +69,8 @@ void DefectForm::newDefect()
     ui->removeMaterialButton->setDisabled(true);
     updateDefects();
     updateRepairs();
-    updateAddedMaterials();
     updateMaterials();
+    ui->addedMatTable->clearPersistentRows();
 }
 
 void DefectForm::editDefect(QString defId)
@@ -112,6 +113,7 @@ void DefectForm::editDefect(QString defId)
             device.name = db->fetchValue(0).toString();
     ui->deviceEdit->setText(device.name + " " + device.type + " " + device.kks);
     ui->oesnButton->setDisabled(false);
+    ui->addedMatTable->clearPersistentRows();
     updateAddedMaterials();
     updateMaterials();
     updateDefects();
@@ -151,6 +153,7 @@ void DefectForm::deviceChoosed(SelectedDevice device)
     updateRepairs();
     updateActions();
     updateActionsDesc();
+    updateAddedMaterials();
 }
 
 void DefectForm::updateDefects()
@@ -551,12 +554,17 @@ void DefectForm::addMaterialClicked()
     ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 1, new QTableWidgetItem(
                                    ui->materialTable->item(ui->materialTable->currentRow(), 1)->text()));
     ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 2, new QTableWidgetItem("-"));
+    ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 3, new QTableWidgetItem(""));
     ui->materialTable->removeRow(ui->materialTable->currentRow());
+    ui->addedMatTable->resizeColumnsToContents();
+    ui->materialTable->resizeColumnsToContents();
     matsChanged = true;
 }
 
 void DefectForm::removeMaterialClicked()
 {
+    if (ui->addedMatTable->currentRow() < 0) return;
+    if (ui->addedMatTable->isPersistentRow(ui->addedMatTable->currentRow())) return;
     ui->addedMatTable->removeRow(ui->addedMatTable->currentRow());
     matsChanged = true;
     updateMaterials();
@@ -566,6 +574,7 @@ bool DefectForm::saveDefect()
 {
     QString query;
     QString prepQuery;
+    float oesn, real;
     db->startTransaction();
     if (defId != "0") {
         if (matsChanged) {
@@ -581,7 +590,12 @@ bool DefectForm::saveDefect()
 
             for (int i=0; i<ui->addedMatTable->rowCount(); i++)
             {
-                prepQuery = query.arg(defId).arg(ui->addedMatTable->item(i, 0)->text()).arg(ui->addedMatTable->item(i, 2)->text());
+                if (ui->addedMatTable->isPersistentRow(i)){
+                    oesn = ui->addedMatTable->item(i, 2)->text().toFloat();
+                    real = ui->addedMatTable->item(i, 3)->text().toFloat();
+                    if (oesn == real) continue;
+                }
+                prepQuery = query.arg(defId).arg(ui->addedMatTable->item(i, 0)->text()).arg(ui->addedMatTable->item(i, 3)->text().replace(",", "."));
 
                 if (!db->execQuery(prepQuery)) {
                     db->showError(this);
@@ -628,8 +642,13 @@ bool DefectForm::saveDefect()
 
         for (int i=0; i<ui->addedMatTable->rowCount(); i++)
         {
-            prepQuery = query.arg(defId).arg(ui->addedMatTable->item(i, 0)->text()).arg(ui->addedMatTable->item(i, 2)->text());
+            if (ui->addedMatTable->isPersistentRow(i)) {
+                oesn = ui->addedMatTable->item(i, 2)->text().toFloat();
+                real = ui->addedMatTable->item(i, 3)->text().toFloat();
+                if (oesn == real) continue;
+            }
 
+            prepQuery = query.arg(defId).arg(ui->addedMatTable->item(i, 0)->text()).arg(ui->addedMatTable->item(i, 3)->text().replace(",", "."));
             if (!db->execQuery(prepQuery)) {
                 db->showError(this);
                 db->rollbackTransaction();
@@ -664,4 +683,34 @@ void DefectForm::oesnClicked()
     nf->show();
     nf->setDevice(device.type);
     nf->setWorkType("ТР");
+}
+
+void DefectForm::cellDoubleClicked(int row, int column)
+{
+    if (column != 3) return;
+
+    FieldEditor *fe = new FieldEditor(ui->addedMatTable->viewport());
+    fe->setType(EREAL);
+    fe->setCell(row, column);
+    fe->setGeometry(ui->addedMatTable->visualItemRect(ui->addedMatTable->item(row, column)));
+    fe->setText(ui->addedMatTable->item(row, column)->text());
+    connect(fe, &FieldEditor::acceptInput, this, &DefectForm::inputAccepted);
+    connect(fe, &FieldEditor::rejectInput, this, &DefectForm::inputRejected);
+    fe->show();
+    fe->selectAll();
+    fe->setFocus();
+}
+
+void DefectForm::inputAccepted(FieldEditor *editor)
+{
+    ui->addedMatTable->item(editor->getRow(), editor->getColumn())->setText(editor->text());
+    editor->hide();
+    editor->deleteLater();
+    matsChanged = true;
+}
+
+void DefectForm::inputRejected(FieldEditor *editor)
+{
+    editor->hide();
+    editor->deleteLater();
 }

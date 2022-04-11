@@ -25,7 +25,7 @@ void FieldEditor::setType(EType type)
         this->setValidator(m_intvalidator);
         break;
     case EREAL:
-        m_doublevalidator->setRange(0, 9999999, 2);
+        m_doublevalidator->setRange(0, 9999999, 3);
         this->setValidator(m_doublevalidator);
         break;
     case EDIGIT:

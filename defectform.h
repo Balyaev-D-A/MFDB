@@ -6,12 +6,7 @@
 #include "deviceselectorform.h"
 #include "normativeform.h"
 
-
-const int EXTERNREVIEW = 1;
-const int EXTERNCONN = 2;
-const int INTERNCONN = 3;
-const int ELECTRICPAR = 4;
-
+class FieldEditor;
 
 typedef struct {
     int id;
@@ -87,6 +82,9 @@ private slots:
     void okClicked();
     void cancelClicked();
     void oesnClicked();
+    void cellDoubleClicked(int row, int column);
+    void inputAccepted(FieldEditor *editor);
+    void inputRejected(FieldEditor *editor);
 
 signals:
     void defectSaved();

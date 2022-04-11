@@ -45,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->quarterBox->setCurrentIndex(quarter - 1);
 
+    ui->tasksTab->deleteLater();
+    ui->rasp_tab->deleteLater();
     db = new Database;
     dictionaryForm = new DictionaryForm(this);
     dictionaryForm->setDatabase(db);

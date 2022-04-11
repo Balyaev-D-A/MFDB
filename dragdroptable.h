@@ -12,6 +12,7 @@ public:
     void setAcceptFrom(QObject *obj);
     void setPersistentRow(int row);
     bool isPersistentRow(int row);
+    void clearPersistentRows();
 private:
     QObject *acceptFrom = nullptr;
     QList<int> persistentRows;

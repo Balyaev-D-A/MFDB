@@ -44,3 +44,8 @@ void DragDropTable::startDrag(Qt::DropActions actions)
     if (isPersistentRow(this->currentRow())) return;
     QAbstractItemView::startDrag(actions);
 }
+
+void DragDropTable::clearPersistentRows()
+{
+    persistentRows.clear();
+}

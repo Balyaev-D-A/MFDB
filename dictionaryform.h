@@ -46,6 +46,7 @@ private slots:
     void updateData();
     void importBtnClicked();
     void importFormClosed();
+    void copyRecord();
 
 private:
     Ui::DictionaryForm *ui;
