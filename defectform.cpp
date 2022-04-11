@@ -545,13 +545,12 @@ void DefectForm::updateMaterials()
 
 void DefectForm::addMaterialClicked()
 {
-    ui->addedMatTable->setSortingEnabled(false);
     ui->addedMatTable->insertRow(ui->addedMatTable->rowCount());
     ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 0, new QTableWidgetItem(
                                    ui->materialTable->item(ui->materialTable->currentRow(), 0)->text()));
     ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 1, new QTableWidgetItem(
                                    ui->materialTable->item(ui->materialTable->currentRow(), 1)->text()));
-    ui->addedMatTable->setSortingEnabled(true);
+    ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 2, new QTableWidgetItem("-"));
     ui->materialTable->removeRow(ui->materialTable->currentRow());
     matsChanged = true;
 }
