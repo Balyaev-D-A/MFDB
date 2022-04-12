@@ -1,6 +1,6 @@
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets sql printsupport webenginewidgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets sql
 
 CONFIG += c++11 axcontainer console
 
@@ -25,7 +25,6 @@ SOURCES += \
     importform.cpp \
     krform.cpp \
     krreportform.cpp \
-    krreportpreviewform.cpp \
     krreportsform.cpp \
     krselectorform.cpp \
     main.cpp \
@@ -34,7 +33,6 @@ SOURCES += \
     normativeform.cpp \
     progressform.cpp \
     raspform.cpp \
-    raspprintpreviewform.cpp \
     receiptform.cpp \
     receiptsform.cpp \
     settings.cpp \
@@ -61,7 +59,6 @@ HEADERS += \
     importform.h \
     krform.h \
     krreportform.h \
-    krreportpreviewform.h \
     krreportsform.h \
     krselectorform.h \
     mainwindow.h \
@@ -69,7 +66,6 @@ HEADERS += \
     normativeform.h \
     progressform.h \
     raspform.h \
-    raspprintpreviewform.h \
     receiptform.h \
     receiptsform.h \
     settings.h \
@@ -87,7 +83,6 @@ FORMS += \
     importform.ui \
     krform.ui \
     krreportform.ui \
-    krreportpreviewform.ui \
     krreportsform.ui \
     krselectorform.ui \
     mainwindow.ui \
@@ -95,7 +90,6 @@ FORMS += \
     normativeform.ui \
     progressform.ui \
     raspform.ui \
-    raspprintpreviewform.ui \
     receiptform.ui \
     receiptsform.ui \
     trreportform.ui \

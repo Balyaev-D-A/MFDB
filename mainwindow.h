@@ -48,6 +48,8 @@ private:
     TRReportsForm *trReportsForm;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
+    QString groupWorks(QList<QStringList> workList);
+    void saveRasp(QStringList raspList);
 private slots:
     void employeesTriggered();
     void scheduleTriggered();

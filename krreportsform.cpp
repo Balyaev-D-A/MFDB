@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileDialog>
+#include <QDebug>
 
 #include "krreportsform.h"
 #include "ui_krreportsform.h"
@@ -837,6 +838,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
                 rows = "";
             }
         } else {
+            qDebug() << "Current block size = " << currBlockSize << ". All blocks size = " << allBlocksSize;
             if (allBlocksSize + currBlockSize <= fillerNS) {
                 allBlocksSize += currBlockSize;
                 currBlockSize = 0;
