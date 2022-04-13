@@ -74,6 +74,19 @@ MainWindow::MainWindow(QWidget *parent)
     trReportsForm = new TRReportsForm(this);
     trReportsForm->setDatabase(db);
 
+    if (!connectDB("192.168.1.100", "radico22", "radico", "coolpass")) {
+        db->showError(this);
+    }
+    //ui->raspDateEdit->setDate(QDate::currentDate());
+    //ui->taskDateEdit->setDate(QDate::currentDate());
+//    db->execQuery("SELECT emp_name, emp_id FROM employees WHERE emp_metrolog = false AND emp_hidden = false ORDER BY emp_name");
+//    ui->employeeBox->addItem("Все", 0);
+//    while (db->nextRecord())
+//        ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
+//    updateRaspTable();
+    updateDefectsTable();
+    updateKRTable();
+
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
     connect(ui->aUnits, &QAction::triggered, this, &MainWindow::unitsTriggered);
@@ -124,20 +137,6 @@ MainWindow::~MainWindow()
 void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
-
-    if (!connectDB("192.168.1.100", "radico22", "radico", "coolpass")) {
-        db->showError(this);
-        return;
-    }
-    ui->raspDateEdit->setDate(QDate::currentDate());
-    ui->taskDateEdit->setDate(QDate::currentDate());
-    db->execQuery("SELECT emp_name, emp_id FROM employees WHERE emp_metrolog = false AND emp_hidden = false ORDER BY emp_name");
-    ui->employeeBox->addItem("Все", 0);
-    while (db->nextRecord())
-        ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
-    updateRaspTable();
-    updateDefectsTable();
-    updateKRTable();
 }
 
 bool MainWindow::connectDB(QString host, QString dbname, QString user, QString password)

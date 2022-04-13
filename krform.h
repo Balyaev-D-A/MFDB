@@ -5,6 +5,7 @@
 #include "database.h"
 #include "krselectorform.h"
 #include "normativeform.h"
+#include "fieldeditor.h"
 
 namespace Ui {
 class KRForm;
@@ -32,6 +33,7 @@ private:
     QString selectedDevice;
     bool matsChanged;
     void updateMaterials();
+    void updateAddedMats();
     bool saveKR();
 
 private slots:
@@ -43,6 +45,9 @@ private slots:
     void selectorClosed(KRSelectorForm *sender);
     void deviceSelected(const KRDevice &device);
     void oesnClicked();
+    void cellDoubleClicked(int row, int column);
+    void inputAccepted(FieldEditor *editor);
+    void inputRejected(FieldEditor *editor);
 
 signals:
     void krSaved();

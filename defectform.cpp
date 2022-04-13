@@ -462,7 +462,7 @@ void DefectForm::deleteRepairClicked()
 
 void DefectForm::updateAddedMaterials()
 {
-    int foundRow;
+    int foundRow, curRow;
     QString query = "SELECT nm_material, mat_name, nm_count FROM normativmat AS nm LEFT JOIN materials AS mat ON nm.nm_material = mat.mat_id "
             "WHERE nm_dev = '%1' AND nm_worktype = 'ТР'";
     query = query.arg(device.type);
@@ -502,14 +502,15 @@ void DefectForm::updateAddedMaterials()
                 foundRow = i;
 
         if (foundRow < 0) {
-            ui->addedMatTable->insertRow(ui->materialTable->rowCount());
-            ui->addedMatTable->setItem(0, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
-            ui->addedMatTable->setItem(0, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
-            ui->addedMatTable->setItem(0, 2, new QTableWidgetItem("-"));
-            ui->addedMatTable->setItem(0, 3, new QTableWidgetItem(db->fetchValue(2).toString()));
+            curRow = ui->addedMatTable->rowCount();
+            ui->addedMatTable->insertRow(curRow);
+            ui->addedMatTable->setItem(curRow, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
+            ui->addedMatTable->setItem(curRow, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
+            ui->addedMatTable->setItem(curRow, 2, new QTableWidgetItem("-"));
+            ui->addedMatTable->setItem(curRow, 3, new QTableWidgetItem(db->fetchValue(2).toString()));
         }
         else {
-            ui->addedMatTable->item(0,3)->setText(db->fetchValue(2).toString());
+            ui->addedMatTable->item(foundRow, 3)->setText(db->fetchValue(2).toString());
         }
     }
     ui->addedMatTable->resizeColumnsToContents();
