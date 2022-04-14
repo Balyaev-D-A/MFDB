@@ -48,6 +48,7 @@ private slots:
     void cellDoubleClicked(int row, int column);
     void inputAccepted(FieldEditor *editor);
     void inputRejected(FieldEditor *editor);
+    void normativeSaved(QString device, QString workType);
 
 signals:
     void krSaved();

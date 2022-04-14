@@ -218,6 +218,7 @@ bool NormativeForm::saveNormatives()
     }
 
     db->commitTransaction();
+    emit saved(ui->deviceBox->currentText(), ui->workBox->currentText());
     return true;
 }
 

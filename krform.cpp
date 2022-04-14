@@ -36,6 +36,7 @@ void KRForm::setDatabase(Database *db)
 void KRForm::setNormativeForm(NormativeForm *nf)
 {
     this->nf = nf;
+    connect(nf, &NormativeForm::saved, this, &KRForm::normativeSaved);
 }
 
 void KRForm::newKR()
@@ -359,4 +360,12 @@ void KRForm::inputRejected(FieldEditor *editor)
 {
     editor->hide();
     editor->deleteLater();
+}
+
+void KRForm::normativeSaved(QString device, QString workType)
+{
+    if ((!isVisible()) || (workType != "КР")) return;
+    if (device != selectedDevice) return;
+    updateAddedMats();
+    updateMaterials();
 }

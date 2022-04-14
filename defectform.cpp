@@ -677,6 +677,7 @@ void DefectForm::cancelClicked()
 void DefectForm::setNormativeForm(NormativeForm *nf)
 {
     this->nf = nf;
+    connect(nf, &NormativeForm::saved, this, &DefectForm::normativeSaved);
 }
 
 void DefectForm::oesnClicked()
@@ -714,4 +715,13 @@ void DefectForm::inputRejected(FieldEditor *editor)
 {
     editor->hide();
     editor->deleteLater();
+}
+
+void DefectForm::normativeSaved(QString device, QString workType)
+{
+    if ((!isVisible()) || (workType != "ТР")) return;
+    if (device != this->device.type) return;
+    updateAddedMaterials();
+    updateMaterials();
+    updateStages();
 }

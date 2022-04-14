@@ -33,9 +33,11 @@ private slots:
     void removeMatClicked();
     void okClicked();
 
-
 protected:
     void showEvent(QShowEvent *event);
+
+signals:
+    void saved(QString device, QString workType);
 };
 
 #endif // NORMATIVEFORM_H
