@@ -26,6 +26,8 @@ TRReportForm::TRReportForm(QWidget *parent) :
     ui->member5Edit->setAcceptFrom(ui->signersTable);
     ui->repairerEdit->setAcceptFrom(ui->signersTable);
     ui->chiefEdit->setAcceptFrom(ui->signersTable);
+    ui->member4Edit->setStyleSheet("background: rgb(255, 255, 0);");
+    ui->member5Edit->setStyleSheet("background: rgb(255, 255, 0);");
     connect(ui->unitBox, &QComboBox::currentTextChanged, this, &TRReportForm::unitChanged);
     connect(ui->addButton, &QToolButton::clicked, this, &TRReportForm::addButtonClicked);
     connect(ui->removeButton, &QToolButton::clicked, this, &TRReportForm::removeButtonClicked);

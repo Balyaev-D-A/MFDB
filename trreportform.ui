@@ -563,6 +563,9 @@
                </property>
                <item>
                 <widget class="DragDropEdit" name="member5Edit">
+                 <property name="autoFillBackground">
+                  <bool>false</bool>
+                 </property>
                  <property name="readOnly">
                   <bool>true</bool>
                  </property>
