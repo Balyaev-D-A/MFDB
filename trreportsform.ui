@@ -27,6 +27,9 @@
        <attribute name="horizontalHeaderVisible">
         <bool>false</bool>
        </attribute>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
        <column>
         <property name="text">
          <string>Id</string>
@@ -177,5 +180,22 @@
  <resources>
   <include location="resource.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>TRReportsForm</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>549</x>
+     <y>451</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>235</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

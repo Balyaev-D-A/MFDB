@@ -177,5 +177,22 @@
  <resources>
   <include location="resource.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>KRReportsForm</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>549</x>
+     <y>449</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>234</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
