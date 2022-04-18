@@ -256,7 +256,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
 
     worksCount = workList.size();
     if (worksCount > 5) {
-        firstWork = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        firstWork = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         firstWork = firstWork.arg(docNum).arg(worksCount);
     }
     else {
@@ -284,7 +284,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     }
 
     if (worksCount > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         works = works.arg(docNum).arg(worksCount);
     }
     else {
@@ -489,7 +489,7 @@ QStringList KRReportsForm::makeVVR(QString reportId)
     }
     works.chop(2);
     if (workList.size() > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 
@@ -688,7 +688,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
     works.chop(2);
 
     if (workList.size() > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 

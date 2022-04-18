@@ -10,6 +10,7 @@ TRReportsForm::TRReportsForm(QWidget *parent) :
     ui(new Ui::TRReportsForm)
 {
     ui->setupUi(this);
+    ui->table->hideColumn(0);
     connect(ui->addButton, &QToolButton::clicked, this, &TRReportsForm::addButtonClicked);
     connect(ui->updateButton, &QToolButton::clicked, this, &TRReportsForm::updateReports);
     connect(ui->editButton, &QToolButton::clicked, this, &TRReportsForm::editButtonClicked);
@@ -243,7 +244,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
 
     query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_num FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1'";
+            "WHERE trw_report = '%1' ORDER BY def_id";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -263,7 +264,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
 
     worksCount = workList.size();
     if (worksCount > 5) {
-        firstWork = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        firstWork = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         firstWork = firstWork.arg(docNum).arg(worksCount);
     }
     else {
@@ -291,7 +292,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     }
 
     if (worksCount > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         works = works.arg(docNum).arg(worksCount);
     }
     else {
@@ -418,7 +419,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     page.replace("$BEGDATE$", begDate);
     page.replace("$ENDDATE$", endDate);
     page.replace("$DOCNUM$", docNum);
-    page.replace("$WORKS$", firstWork + "; " + works);
+    page.replace("$WORKS$", works);
     page.replace("$OWNERLOC$", ownerLoc);
     page.replace("$OWNERNAME$", ownerName);
     page.replace("$MEMBER1LOC$", member1Loc);
@@ -505,7 +506,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
     works.chop(2);
 
     if (workList.size() > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 
@@ -673,7 +674,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
 
     query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, trw_work FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1'";
+            "WHERE trw_report = '%1' ORDER BY def_id";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -694,7 +695,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
     works.chop(2);
 
     if (workList.size() > 5) {
-        works = "Согласно перечню оборудования к акту %1 АД. Количество %2 шт.";
+        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 
@@ -1036,7 +1037,7 @@ QStringList TRReportsForm::makeADO(QString reportId)
 
     query = "SELECT def_devname, def_devtype, def_kks, def_realdesc, def_repairdesc FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1'";
+            "WHERE trw_report = '%1' ORDER BY def_id";
     query = query.arg(reportId);
 
     if (!db->execQuery(query)) {
@@ -1057,7 +1058,7 @@ QStringList TRReportsForm::makeADO(QString reportId)
     works.chop(2);
 
     if (workList.size() > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД. Количество %2 шт.";
+        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 
@@ -1226,7 +1227,7 @@ QStringList TRReportsForm::makePO(QString reportId)
 
     query = "SELECT def_kks, def_devname, def_devtype FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1'";
+            "WHERE trw_report = '%1' ORDER BY def_id";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
