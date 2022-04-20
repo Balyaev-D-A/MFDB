@@ -51,6 +51,7 @@ private:
     void updateSignersTable();
     bool checkFilling();
     void showErrorMessage(QString message);
+    QString maxDate(QString date1, QString date2);
 
 private slots:
     void updateTRTable();

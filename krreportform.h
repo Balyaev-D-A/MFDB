@@ -49,7 +49,8 @@ private:
     void fillUnitBox();
     bool checkFilling();
     void updateSignersTable();
-    void showErrorMessage(QString message);;
+    void showErrorMessage(QString message);
+    QString maxDate(QString date1, QString date2);
 private slots:
     void updateKRTable();
     void addButtonClicked();

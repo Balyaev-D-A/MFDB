@@ -441,6 +441,22 @@ void TRReportForm::chiefClearClicked()
     updateSignersTable();
 }
 
+QString TRReportForm::maxDate(QString date1, QString date2)
+{
+    QStringList dateList1, dateList2;
+
+    dateList1 = date1.split(".");
+    dateList2 = date2.split(".");
+
+    if (dateList1[2].toInt() > dateList1[2].toInt()) return date1;
+    else if (dateList2[2].toInt() > dateList1[2].toInt()) return date2;
+    else if (dateList1[1].toInt() > dateList2[1].toInt()) return date1;
+    else if (dateList2[1].toInt() > dateList1[1].toInt()) return date2;
+    else if (dateList1[0].toInt() > dateList2[0].toInt()) return date1;
+    else if (dateList2[0].toInt() > dateList1[0].toInt()) return date2;
+    return date1;
+}
+
 bool TRReportForm::checkFilling()
 {
     if (ui->descEdit->text().isEmpty()) {
@@ -477,6 +493,21 @@ bool TRReportForm::checkFilling()
     }
     if (ui->chiefEdit->text().isEmpty()) {
         showErrorMessage("Не выбран руководитель работ по ремонту оборудования.");
+    }
+    QDate signDate = QDate::fromString(ui->dateEdit->text(), "dd.MM.yyyy");
+    QString lastDate = "00.00.0000";
+    for (int i=0; i<ui->selectedTRTable->rowCount(); i++)
+    {
+        lastDate = maxDate(lastDate, ui->selectedTRTable->item(i, 4)->text());
+    }
+    QDate lDate = QDate::fromString(lastDate, "dd.MM.yyyy");
+    if (lDate.daysTo(signDate) < 0) {
+        showErrorMessage("Дата подписания не может быть раньше даты окончания работ.");
+        return false;
+    }
+    if (lDate.daysTo(signDate) > 7) {
+        QMessageBox::StandardButton btn = QMessageBox::question(this, "Внимание!!!", "Между окончанием работ и датой подписания не должно быть больше 7 дней. Вы действительно хотите оставить даты как есть?");
+        if (btn == QMessageBox::No) return false;
     }
     return true;
 }

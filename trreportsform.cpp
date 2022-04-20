@@ -264,7 +264,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
 
     worksCount = workList.size();
     if (worksCount > 5) {
-        firstWork = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
+        firstWork = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         firstWork = firstWork.arg(docNum).arg(worksCount);
     }
     else {
@@ -292,7 +292,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     }
 
     if (worksCount > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
+        works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         works = works.arg(docNum).arg(worksCount);
     }
     else {
@@ -397,6 +397,14 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     page.replace("$DOC1LABEL$", "-");
     page.replace("$DOC2LABEL$", "-");
     page.replace("$DOC3LABEL$", "-");
+    if (worksCount > 5) {
+       page.replace("$DOC4LABEL$", "-");
+       page.replace("$DOC4$", "Перечень оборудования к акту о выполненных работах по ремонту оборудования №" + docNum + " АР");
+    }
+    else {
+        page.replace("$DOC4LABEL$", "");
+        page.replace("$DOC4$", "");
+    }
     page.replace("$DOC1$", "Ведомость выполненых работ №" + docNum + " ВР;");
     page.replace("$DOC2$", "Ведомость фактических затраченных материалов №" + docNum + " ВМ;");
     page.replace("$DOC3$", "Акт о дефектах оборудования №" + docNum + " АД;");
@@ -506,7 +514,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
     works.chop(2);
 
     if (workList.size() > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
+        works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 
@@ -695,7 +703,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
     works.chop(2);
 
     if (workList.size() > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
+        works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 
@@ -1058,7 +1066,7 @@ QStringList TRReportsForm::makeADO(QString reportId)
     works.chop(2);
 
     if (workList.size() > 5) {
-        works = "Согласно перечню оборудования к акту №%1 АД (Количество %2 шт.).";
+        works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 
