@@ -1035,11 +1035,11 @@ QStringList TRReportsForm::makeADO(QString reportId)
     }
 
     if (member4Name != "") {
-        addMembers += additionalMemberRow.arg(member4Loc).arg(date).arg(member4Loc);
+        addMembers += additionalMemberRow.arg(member4Loc).arg(date).arg(member4Name);
         fillerS -= memberRowHeight;
     }
     if (member5Name != "") {
-        addMembers += additionalMemberRow.arg(member5Loc).arg(date).arg(member5Loc);
+        addMembers += additionalMemberRow.arg(member5Loc).arg(date).arg(member5Name);
         fillerS -= memberRowHeight;
     }
 
