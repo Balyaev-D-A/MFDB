@@ -228,6 +228,8 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
     ui->table->setHorizontalHeaderLabels(headers);
     if (headers[0] == "id")
         ui->table->hideColumn(0);
+    else
+        ui->table->showColumn(0);
     ui->table->verticalHeader()->hide();
     updateData();
 }
