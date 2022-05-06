@@ -67,10 +67,12 @@ void DefectForm::newDefect()
     ui->addedMatTable->setDisabled(true);
     ui->addMaterialButton->setDisabled(true);
     ui->removeMaterialButton->setDisabled(true);
+    while (ui->addedMatTable->rowCount()) ui->addedMatTable->removeRow(0);
+    ui->addedMatTable->clearPersistentRows();
     updateDefects();
     updateRepairs();
     updateMaterials();
-    ui->addedMatTable->clearPersistentRows();
+    ui->actionsTextEdit->document()->setPlainText("");
 }
 
 void DefectForm::editDefect(QString defId)

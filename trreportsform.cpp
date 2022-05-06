@@ -397,17 +397,11 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     page.replace("$DOC1LABEL$", "-");
     page.replace("$DOC2LABEL$", "-");
     page.replace("$DOC3LABEL$", "-");
-    if (worksCount > 5) {
-       page.replace("$DOC4LABEL$", "-");
-       page.replace("$DOC4$", "Перечень оборудования к акту о выполненных работах по ремонту оборудования №" + docNum + " АР");
-    }
-    else {
-        page.replace("$DOC4LABEL$", "");
-        page.replace("$DOC4$", "");
-    }
+    page.replace("$DOC4LABEL$", "");
     page.replace("$DOC1$", "Ведомость выполненых работ №" + docNum + " ВР;");
     page.replace("$DOC2$", "Ведомость фактических затраченных материалов №" + docNum + " ВМ;");
     page.replace("$DOC3$", "Акт о дефектах оборудования №" + docNum + " АД;");
+    page.replace("$DOC4$", "");
     page.replace("$EXECUTOR$", executor);
 
     result.append(page);

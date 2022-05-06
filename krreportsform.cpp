@@ -387,17 +387,11 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     page.replace("$ACCORDINGDOC$", "годовым графиком ремонта оборудования технологических систем №" + schedNum);
     page.replace("$DOC1LABEL$", "-");
     page.replace("$DOC2LABEL$", "-");
-    if (worksCount > 5) {
-        page.replace("$DOC3LABEL$", "-");
-        page.replace("$DOC3$", "Перечень оборудования к акту о выполненных работах по ремонту оборудования №" + docNum + " АР");
-    }
-    else {
-        page.replace("$DOC3LABEL$", "");
-        page.replace("$DOC3$", "");
-    }
+    page.replace("$DOC3LABEL$", "");
     page.replace("$DOC4LABEL$", "");
     page.replace("$DOC1$", "Ведомость выполненых работ №" + docNum + " ВР");
     page.replace("$DOC2$", "Ведомость фактических затраченных материалов №" + docNum + " ВМ");
+    page.replace("$DOC3$", "");
     page.replace("$DOC4$", "");
     page.replace("$EXECUTOR$", executor);
 
