@@ -144,6 +144,8 @@ void KRForm::addMaterialClicked()
                                    ui->materialTable->item(ui->materialTable->currentRow(), 0)->text()));
     ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 1, new QTableWidgetItem(
                                    ui->materialTable->item(ui->materialTable->currentRow(), 1)->text()));
+    ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 2, new QTableWidgetItem("-"));
+    ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 3, new QTableWidgetItem(""));
     ui->materialTable->removeRow(ui->materialTable->currentRow());
     ui->addedMatTable->resizeColumnsToContents();
     matsChanged = true;

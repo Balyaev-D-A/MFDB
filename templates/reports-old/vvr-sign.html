@@ -49,20 +49,23 @@
         <td class="hc">№ п/п</td>
         <td colspan="2" class="hc">Дата начала/<br/>окончания работ </td>
         <td colspan="6" class="hc">Вид ремонта. Перечень выполненных работ. Наименование сборочных единиц (узлов).</td>
-        <td colspan="4" class="hc">Обоснование  работ (регистрационное обозначение и наименование технологической документации на ТОиР)</td>
+        <td colspan="2" class="hc">Обоснование работ</td>
+        <td colspan="2" class="hc">Трудозатраты, чел.час. (фактические)</td>
     </tr>
     <tr class="vvrrow8">
         <td rowspan="4" class=" border-trl hc">$PAGE$</td>
         <td colspan="2" class="border-trl"></td>
         <td colspan="6" rowspan="2" class="border-trl hc ut">$WT$</td>
-        <td colspan="4" rowspan="6" class="hc vc">регламент РГ.0.33.01</td>
+        <td colspan="2" rowspan="6" class="hc"><div class="vert" style="overflow: visible; width: 1.78cm; font-style: italic;"> регламент&nbsp;РГ.0.33.01</td>
+        <td colspan="2" class="border-trl"></td>
     </tr>
     <tr class="vvrrow9">
         <td colspan="2" class="border-rl hc">с</td>
+        <td  colspan="2" rowspan="5" class="border-rbl hc" style="vertical-align: top;">$HOURS$</td>
     </tr>
     <tr class="vvrrow10">
         <td colspan="2" class="border-rl hc ut">$BEGDATE$</td>
-        <td colspan="6" rowspan="4" class="border-rbl vt">$CURRWORK$<br/>$ACTIONS$</td>
+        <td colspan="6" rowspan="4" class="border-rbl" style="vertical-align: top;">$CURRWORK$<br/>$ACTIONS$</td>
     </tr>
     <tr class="vvrrow11">
         <td colspan="2" class="border-rl hc">по</td>
@@ -74,6 +77,55 @@
     <tr class="expanding">
         <td class="border-rbl"></td>
         <td colspan="2" class="border-rbl"></td>
+    </tr>
+    <tr class="vvrrow13 f11">
+        <td colspan="6" class="border-tl">Подразделение-владелец:</td>
+        <td class="border-t"></td>
+        <td colspan="6" class="border-tr">Подразделение АС, ответственное за ремонт</td>
+    </tr>
+    <tr class="vvrrow14 f11">
+        <td colspan="6" class="border-l">$OWNERLOC$</td>
+        <td class="border-none"></td>
+        <td colspan="6" class="border-r">$REPAIRERLOC$</td>
+    </tr>
+    <tr class="vvrrow15 f11">
+        <td colspan="3" class="border-bl"></td>
+        <td class="border-b hc">$DATE$</td>
+        <td colspan="2" class="border-b hc">$OWNERNAME$</td>
+        <td class="border-none"></td>
+        <td colspan="2" class="border-b"></td>
+        <td colspan="2" class="border-b hc">$DATE$</td>
+        <td colspan="2" class="border-rb hc">$REPAIRERNAME$</td>
+    </tr>
+    <tr class="vvrrow16 f11">
+        <td colspan="3" class="border-tl hc vt f9">(подпись)</td>
+        <td class="border-t hc vt f9">(дата)</td>
+        <td colspan="2" class="border-t hc vt f9">(И. О. Фамилия)</td>
+        <td class="border-none"></td>
+        <td colspan="2" class="border-t hc vt f9">(подпись)</td>
+        <td colspan="2" class="border-t hc vt f9">(дата)</td>
+        <td colspan="2" class="border-tr hc vt f9">(И. О. Фамилия)</td>
+    </tr>
+    <tr class="vvrrow17 f11">
+        <td colspan="6" rowspan="4" class="border-bl"></td>
+        <td class="border-none"></td>
+        <td colspan="6" class="border-r">Руководитель работ по наряду-допуску</td>
+    </tr>
+    <tr class="vvrrow18 f11">
+        <td class="border-none"></td>
+        <td colspan="4" class="border-none hc">$CHIEFLOC$</td>
+        <td colspan="2" rowspan="2" class="border-rb hc">$CHIEFNAME$</td>
+    </tr>
+    <tr class="vvrrow19 f11">
+        <td class="border-none"></td>
+        <td colspan="2" class="border-b"></td>
+        <td colspan="2" class="border-b hc">$DATE$</td>
+    </tr>
+    <tr class="vvrrow20 f11">
+        <td class="border-b"></td>
+        <td colspan="2" class="border-tb hc vt f9">(подпись)</td>
+        <td colspan="2" class="border-tb hc vt f9">(дата)</td>
+        <td colspan="2" class="border-trb hc vt f9">(И. О. Фамилия)</td>
     </tr>
     <tr class = "tfooter">
         <td colspan="13" class="hr vb border-t ov"><div style="position: relative; bottom: 0cm; right: -0.5cm; color: transparent; text-shadow: 2px 0 rgb(180, 180, 180)">П.00.52 Д.5.2</div></td> 

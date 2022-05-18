@@ -127,7 +127,7 @@ void KRReportsForm::saveButtonClicked()
         body += vvr[i];
     for (int i=0; i<vfzm.size(); i++)
         body += vfzm[i];
-    if (vvr.size() > 5) {
+    if (vvr.size() > 4) {
         po = makePO(reportId);
         for (int i=0; i<po.size(); i++)
             body += po[i];
@@ -204,7 +204,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     int worksCount;
     int breakPos;
     bool isFit = false;
-    const int firstWorkWidth = 351;
+    const int firstWorkWidth = 414;
     QString member4Loc = "", member4Name = "", member5Loc = "", member5Name = "";
     QString additionalMemberRow = "<tr class=\"avr2row18\">\n"
             "<td class=\"border-l\"></td>\n"
@@ -254,7 +254,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     }
 
     worksCount = workList.size();
-    if (worksCount > 5) {
+    if (worksCount > 4) {
         firstWork = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         firstWork = firstWork.arg(docNum).arg(worksCount);
     }
@@ -282,7 +282,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
             otherWorks += fwWordList[i] + " ";
     }
 
-    if (worksCount > 5) {
+    if (worksCount > 4) {
         works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         works = works.arg(docNum).arg(worksCount);
     }
@@ -489,7 +489,7 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         workList.append(w);
     }
     works.chop(2);
-    if (workList.size() > 5) {
+    if (workList.size() > 4) {
         works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
@@ -688,7 +688,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
     }
     works.chop(2);
 
-    if (workList.size() > 5) {
+    if (workList.size() > 4) {
         works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
