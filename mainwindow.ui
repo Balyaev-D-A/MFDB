@@ -721,6 +721,11 @@
             </column>
             <column>
              <property name="text">
+              <string>Инв. №</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
               <string>Нач. ремонта</string>
              </property>
             </column>

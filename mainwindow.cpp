@@ -550,9 +550,9 @@ void MainWindow::datePicked(const QDate &date)
         query = "UPDATE kaprepairs SET %1 = '%2' WHERE kr_id = '%3'";
         curRow = ui->krTable->currentRow();
         curCol = ui->krTable->currentColumn();
-        if (curCol == 5)
+        if (curCol == 6)
             query = query.arg("kr_begdate");
-        else if (curCol == 6)
+        else if (curCol == 7)
             query = query.arg("kr_enddate");
         else {
             datePicker->close();
@@ -676,7 +676,7 @@ void MainWindow::updateKRTable()
 {
     int curRow;
     QString month = "";
-    QString query = "SELECT kr_id, unit_name, sch_name, sch_type, sch_kks, kr_begdate, kr_enddate FROM kaprepairs AS kr "
+    QString query = "SELECT kr_id, unit_name, sch_name, sch_type, sch_kks, sch_invno, kr_begdate, kr_enddate FROM kaprepairs AS kr "
                     "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
                     "LEFT JOIN units AS u ON sch.sch_unit = u.unit_id";
     if (ui->krMonthBox->currentIndex() != 0) {
@@ -701,7 +701,7 @@ void MainWindow::updateKRTable()
     {
         curRow = ui->krTable->rowCount();
         ui->krTable->insertRow(curRow);
-        for (int i=0; i<7; i++)
+        for (int i=0; i<8; i++)
         {
             ui->krTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
@@ -716,7 +716,7 @@ void MainWindow::krCellDoubleClicked(int row, int column)
     QPoint calOrigin;
     QDate minDate, maxDate;
 
-    if (column == 5 || column == 6) {
+    if (column == 6 || column == 7) {
         krChangingDate = true;
         int leftFrameWidth = this->geometry().left() - this->pos().x();
         int topFrameHeight = this->geometry().top() - this->pos().y();
@@ -739,16 +739,16 @@ void MainWindow::krClearCellPressed()
     if (!ui->krTable->currentItem()) return;
     curRow = ui->krTable->currentRow();
     curCol = ui->krTable->currentColumn();
-    if (curCol != 5)
-        if (curCol != 6)
+    if (curCol != 6)
+        if (curCol != 7)
             return;
     QMessageBox::StandardButton btn;
     btn = QMessageBox::question(this, "Внимание!!!", "Вы действительно хотите очистить значение?");
     if (btn == QMessageBox::No) return;
     QString query = "UPDATE kaprepairs SET %1 = NULL WHERE kr_id = '%2'";
-    if (curCol == 5)
+    if (curCol == 6)
         query = query.arg("kr_begdate");
-    else if (curCol == 6)
+    else if (curCol == 7)
         query = query.arg("kr_enddate");
     query = query.arg(ui->krTable->item(curRow, 0)->text());
     if (!db->execQuery(query)) {
