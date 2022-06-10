@@ -725,5 +725,6 @@ void DefectForm::normativeSaved(QString device, QString workType)
     if (device != this->device.type) return;
     updateAddedMaterials();
     updateMaterials();
+    updateActions();
     updateStages();
 }
