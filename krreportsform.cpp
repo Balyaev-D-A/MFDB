@@ -191,8 +191,8 @@ QString KRReportsForm::maxDate(QString date1, QString date2)
 QStringList KRReportsForm::makeAVR(QString reportId)
 {
     QStringList result;
-    QStringList workList;
-    QString page, unitShortName, subsystem, date, begDate, endDate, planBegDate, planEndDate;
+    QStringList workList, ktdList, opcardNums;
+    QString page, unitShortName, subsystem, date, begDate, endDate, planBegDate, planEndDate, ktdText;
     QString orderDate, orderNum, schedNum, docNum, workType, firstWork, otherWorks, works, accordingDoc;
     QString ownerLoc, ownerName, member1Loc, member1Name, member2Loc, member2Name, member3Loc, member3Name;
     QString repairerLoc, repairerName, chiefLoc, chiefName, executor;
@@ -234,9 +234,10 @@ QStringList KRReportsForm::makeAVR(QString reportId)
         return result;
     }
 
-    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate FROM krrworks "
+    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate, ktd_doc FROM krrworks "
             "LEFT JOIN kaprepairs ON krw_work = kr_id "
             "LEFT JOIN schedule ON kr_sched = sch_id "
+            "LEFT JOIN ktd ON sch_type = ktd_dev "
             "WHERE krw_report = '%1'";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
@@ -251,11 +252,48 @@ QStringList KRReportsForm::makeAVR(QString reportId)
         workList.append(db->fetchValue(0).toString() + " " + db->fetchValue(1).toString() + ", " + db->fetchValue(2).toString());
         begDate = minDate(begDate, db->fetchValue(3).toString());
         endDate = maxDate(endDate, db->fetchValue(4).toString());
+        if (db->fetchValue(5).toString() != "")
+            ktdList.append(db->fetchValue(5).toString());
+    }
+
+    ktdText = "";
+    if (ktdList.isEmpty()) {
+        ktdText = "Ремонтная документация";
+    }
+    else {
+        for (int i=0; i<ktdList.size(); i++)
+        {
+            if (ktdList[i].contains("Операционная карта №"))
+                opcardNums.append(ktdList[i].split("№")[1]);
+        }
+        if (opcardNums.size() > 1) {
+            ktdText.append("Операционные карты №№");
+            for (int i=0; i<opcardNums.size(); i++)
+            {
+                ktdText.append(opcardNums[i] + ", ");
+            }
+            ktdText.chop(2);
+            ktdText.append(";<br/>");
+            for (int i=0; i<ktdList.size(); i++)
+            {
+                if (ktdList[i].contains("Операционная"))
+                    continue;
+                ktdText.append(ktdList[i]+";<br/>");
+            }
+            ktdText.chop(5); // убираем последний <br/>
+        }
+        else {
+            for (int i=0; i<ktdList.size(); i++)
+            {
+                ktdText.append(ktdList[i]+";<br/>");
+            }
+            ktdText.chop(5); // убираем последний <br/>
+        }
     }
 
     worksCount = workList.size();
     if (worksCount > 4) {
-        firstWork = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
+        firstWork = "Согласно перечню оборудования к акту №%1 (Количество %2 шт.).";
         firstWork = firstWork.arg(docNum).arg(worksCount);
     }
     else {
@@ -283,7 +321,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     }
 
     if (worksCount > 4) {
-        works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
+        works = "Согласно перечню оборудования к акту №%1 (Количество %2 шт.).";
         works = works.arg(docNum).arg(worksCount);
     }
     else {
@@ -413,6 +451,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     page.replace("$ENDDATE$", endDate);
     page.replace("$DOCNUM$", docNum);
     page.replace("$WORKS$", works);
+    page.replace("$KTDTEXT$", ktdText);
     page.replace("$OWNERLOC$", ownerLoc);
     page.replace("$OWNERNAME$", ownerName);
     page.replace("$MEMBER1LOC$", member1Loc);
@@ -441,13 +480,14 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         QString kks;
         QString begDate;
         QString endDate;
+        QString ktdDoc;
     } Work;
     Work w;
     QList<Work> workList;
     QStringList result;
     QString unitShortName, subsys, date, docNum, works, currWork, begDate, endDate, workActions, workHours;
     QString ownerLoc, ownerName, repairerLoc, repairerName, chiefLoc, chiefName;
-    QString pageTempNoSign, pageTempSign, page;
+    QString pageTempNoSign, pageTempSign, page, ktdText;
     QFile file;
     QTextStream *ts;
     int pageCount;
@@ -468,9 +508,10 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         docNum = db->fetchValue(3).toString();
     }
 
-    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate FROM krrworks "
+    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate, ktd_doc FROM krrworks "
             "LEFT JOIN kaprepairs ON krw_work = kr_id "
             "LEFT JOIN schedule ON kr_sched = sch_id "
+            "LEFT JOIN ktd ON sch_type = ktd_dev "
             "WHERE krw_report = '%1'";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
@@ -486,11 +527,12 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         w.kks = db->fetchValue(2).toString();
         w.begDate = db->fetchValue(3).toString();
         w.endDate = db->fetchValue(4).toString();
+        w.ktdDoc = db->fetchValue(5).toString();
         workList.append(w);
     }
     works.chop(2);
     if (workList.size() > 4) {
-        works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
+        works = "Согласно перечню оборудования к акту №%1 (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 
@@ -554,6 +596,11 @@ QStringList KRReportsForm::makeVVR(QString reportId)
             page = pageTempSign;
         }
 
+        if (workList[i].ktdDoc == "")
+            ktdText = "регламент РГ.0.33.01";
+        else
+            ktdText = workList[i].ktdDoc;
+
         currWork = "Капитальный ремонт: " + workList[i].name + " " + workList[i].type + ", " + workList[i].kks;
 
         query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'КР'";
@@ -580,6 +627,7 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         page.replace("$PAGE$", QString("%1").arg(i+1));
         page.replace("$PAGECOUNT$", QString("%1").arg(pageCount));
         page.replace("$WORKS$", works);
+        page.replace("$KTDTEXT$", ktdText);
         page.replace("$BEGDATE$", workList[i].begDate);
         page.replace("$ENDDATE$", workList[i].endDate);
         page.replace("$WT$", "КР");
@@ -689,7 +737,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
     works.chop(2);
 
     if (workList.size() > 4) {
-        works = "Согласно перечню оборудования к акту №%1 АР (Количество %2 шт.).";
+        works = "Согласно перечню оборудования к акту №%1 (Количество %2 шт.).";
         works = works.arg(docNum).arg(workList.size());
     }
 

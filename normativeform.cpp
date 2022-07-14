@@ -155,6 +155,19 @@ void NormativeForm::updateNormatives()
 
     if (db->nextRecord()) ui->actionsTextEdit->document()->setPlainText(db->fetchValue(0).toString());
 
+    query = "SELECT ktd_doc FROM ktd WHERE ktd_dev = '%1'";
+    query = query.arg(ui->deviceBox->currentText());
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+    if (db->nextRecord()) {
+        ui->ktdEdit->setText(db->fetchValue(0).toString());
+    }
+    else {
+        ui->ktdEdit->clear();
+    }
 }
 
 bool NormativeForm::saveNormatives()
@@ -188,6 +201,14 @@ bool NormativeForm::saveNormatives()
         return false;
     }
 
+    query = "DELETE FROM ktd WHERE ktd_dev = '%1'";
+    query = query.arg(ui->deviceBox->currentText());
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        db->rollbackTransaction();
+        return false;
+    }
+
     query = "INSERT INTO normativwork (nw_dev, nw_worktype, nw_oesn, nw_work) VALUES ('%1' , '%2', '%3', '%4')";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->oesnEdit->text());
     query = query.arg(ui->workEdit->text().replace(',', '.'));
@@ -211,6 +232,16 @@ bool NormativeForm::saveNormatives()
     {
         q = query.arg(ui->normativeTable->item(i, 0)->text()).arg(ui->normativeTable->item(i,2)->text().replace(',','.'));
         if (!db->execQuery(q)) {
+            db->showError(this);
+            db->rollbackTransaction();
+            return false;
+        }
+    }
+
+    if (ui->ktdEdit->text().simplified() != "") {
+        query = "INSERT INTO ktd (ktd_dev, ktd_doc) VALUES ('%1', '%2')";
+        query = query.arg(ui->deviceBox->currentText()).arg(ui->ktdEdit->text().simplified());
+        if (!db->execQuery(query)) {
             db->showError(this);
             db->rollbackTransaction();
             return false;

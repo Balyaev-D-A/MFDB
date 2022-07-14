@@ -121,6 +121,8 @@ bool Database::deployTables()
     if (!pq->exec("CREATE TABLE IF NOT EXISTS trrworks (trw_id SERIAL PRIMARY KEY, trw_work INTEGER REFERENCES defects(def_id) ON DELETE RESTRICT, "
                   "trw_report INTEGER REFERENCES trreports(trr_id) ON DELETE CASCADE)")) return false;
 
+    if (!pq->exec("CREATE TABLE IF NOT EXISTS ktd (ktd_dev VARCHAR(50) PRIMARY KEY, ktd_doc VARCHAR(50))")) return false;
+
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
     if (!pq->exec("CREATE TABLE IF NOT EXISTS rasp (rasp_id SERIAL PRIMARY KEY, rasp_num CHAR(6), rasp_date CHAR(10), rasp_btime CHAR(5), "
                   "rasp_etime CHAR(5), rasp_issuer INTEGER REFERENCES issuers(iss_id), rasp_executor INTEGER REFERENCES employees(emp_id), "
