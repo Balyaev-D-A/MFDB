@@ -261,7 +261,8 @@ QStringList TRReportsForm::makeAVR(QString reportId)
         endDate = maxDate(endDate, db->fetchValue(4).toString());
         defNums += db->fetchValue(5).toString() + ", ";
         if (db->fetchValue(6).toString() != "")
-            ktdList.append(db->fetchValue(6).toString());
+            if (!ktdList.contains(db->fetchValue(6).toString()))
+                ktdList.append(db->fetchValue(6).toString());
     }
     defNums.chop(2);
 

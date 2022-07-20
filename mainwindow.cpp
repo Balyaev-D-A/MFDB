@@ -12,11 +12,15 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+//    Settings::ConnSettings cs;
+
     ui->setupUi(this);
 
     ui->raspTable->hideColumn(0);
     ui->defectsTable->hideColumn(0);
+    ui->defectsTable->verticalHeader()->setHidden(false);
     ui->krTable->hideColumn(0);
+    ui->krTable->verticalHeader()->setHidden(false);
 
     int month = QDate::currentDate().month();
     int quarter;
@@ -74,18 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
     trReportsForm = new TRReportsForm(this);
     trReportsForm->setDatabase(db);
 
-    if (!connectDB("192.168.1.100", "radico22", "radico", "coolpass")) {
-        db->showError(this);
-    }
-    //ui->raspDateEdit->setDate(QDate::currentDate());
-    //ui->taskDateEdit->setDate(QDate::currentDate());
-//    db->execQuery("SELECT emp_name, emp_id FROM employees WHERE emp_metrolog = false AND emp_hidden = false ORDER BY emp_name");
-//    ui->employeeBox->addItem("Все", 0);
-//    while (db->nextRecord())
-//        ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
-//    updateRaspTable();
-    updateDefectsTable();
-    updateKRTable();
+//    settings = Settings::instance();
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -126,6 +119,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->aVariables, &QAction::triggered, this, &MainWindow::variablesTriggered);
     connect(ui->aKRReports, &QAction::triggered, this, &MainWindow::krReportsTriggered);
     connect(ui->aTRReports, &QAction::triggered, this, &MainWindow::trReportsTriggered);
+    connect(ui->woreportBox, &QCheckBox::stateChanged, this, &MainWindow::updateDefectsTable);
+
+//    cs = settings->getConnSettings();
+//    if (cs.host == "") {
+//        return;
+//    }
+    if (!connectDB("192.168.1.100", "radico22", "radico", "coolpass")) {
+        db->showError(this);
+    }
+    //ui->raspDateEdit->setDate(QDate::currentDate());
+    //ui->taskDateEdit->setDate(QDate::currentDate());
+//    db->execQuery("SELECT emp_name, emp_id FROM employees WHERE emp_metrolog = false AND emp_hidden = false ORDER BY emp_name");
+//    ui->employeeBox->addItem("Все", 0);
+//    while (db->nextRecord())
+//        ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
+//    updateRaspTable();
+    updateDefectsTable();
+    updateKRTable();
 }
 
 MainWindow::~MainWindow()
@@ -413,14 +424,30 @@ void MainWindow::printRaspClicked()
 
 void MainWindow::addDefectClicked()
 {
-    defectForm->newDefect();
+    defectForm->newDefect(ui->quarterBox->currentIndex());
     defectForm->show();
 }
 
 void MainWindow::updateDefectsTable()
 {
     int rc;
-    QString query = "SELECT def_id, def_num, unit_name, def_devtype, def_kks, def_begdate, def_enddate, def_rasp FROM defects "
+    QStringList inReport;
+    QString query;
+
+    if (ui->woreportBox->isChecked()) {
+        query = "SELECT trw_work FROM trrworks";
+        if (!db->execQuery(query))
+        {
+            db->showError(this);
+            return;
+        }
+        while (db->nextRecord())
+        {
+            inReport.append(db->fetchValue(0).toString());
+        }
+    }
+
+    query = "SELECT def_id, def_num, unit_name, def_devtype, def_kks, def_begdate, def_enddate, def_rasp FROM defects "
                     "LEFT JOIN units ON def_unit = unit_id "
                     "WHERE def_quarter = '%1'";
     query = query.arg(ui->quarterBox->currentIndex() + 1);
@@ -433,6 +460,8 @@ void MainWindow::updateDefectsTable()
     ui->defectsTable->setSortingEnabled(false);
     while (db->nextRecord())
     {
+        if (ui->woreportBox->isChecked())
+            if (inReport.contains(db->fetchValue(0).toString())) continue;
         rc = ui->defectsTable->rowCount();
         ui->defectsTable->insertRow(rc);
         for (int i=0; i<8; i++)

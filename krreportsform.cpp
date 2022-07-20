@@ -253,7 +253,8 @@ QStringList KRReportsForm::makeAVR(QString reportId)
         begDate = minDate(begDate, db->fetchValue(3).toString());
         endDate = maxDate(endDate, db->fetchValue(4).toString());
         if (db->fetchValue(5).toString() != "")
-            ktdList.append(db->fetchValue(5).toString());
+            if (!ktdList.contains(db->fetchValue(5).toString()))
+                ktdList.append(db->fetchValue(5).toString());
     }
 
     ktdText = "";

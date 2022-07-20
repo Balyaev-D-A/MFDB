@@ -49,7 +49,7 @@ void DefectForm::setDatabase(Database *db)
     this->db = db;
 }
 
-void DefectForm::newDefect()
+void DefectForm::newDefect(int quarter)
 {
     setWindowTitle("Новый дефект");
     defId = "0";
@@ -57,6 +57,7 @@ void DefectForm::newDefect()
     device.name = "";
     device.type = "";
     matsChanged = false;
+    ui->quarterBox->setCurrentIndex(quarter);
     ui->deviceEdit->setText("");
     ui->journalDefectEdit->setText("");
     ui->stageBox->clear();
@@ -115,6 +116,11 @@ void DefectForm::editDefect(QString defId)
             device.name = db->fetchValue(0).toString();
     ui->deviceEdit->setText(device.name + " " + device.type + " " + device.kks);
     ui->oesnButton->setDisabled(false);
+    ui->journalDefectEdit->setDisabled(false);
+    ui->addedMatTable->setDisabled(false);
+    ui->materialTable->setDisabled(false);
+    ui->addMaterialButton->setDisabled(false);
+    ui->removeMaterialButton->setDisabled(false);
     ui->addedMatTable->clearPersistentRows();
     updateAddedMaterials();
     updateMaterials();
@@ -344,7 +350,7 @@ void DefectForm::updateActionsDesc()
     {
         if (actList[i].startsWith('@')){
             if (actList[i].remove(0, 1) == ui->stageBox->currentText()) {
-                actList[i] = actList[i] + " " + ui->defectEdit->text();
+                actList[i] = actList[i] + " " + ui->defectEdit->text().simplified();
             }
             else {
                 actList[i] = actList[i] + " Замечаний нет.";
@@ -352,8 +358,8 @@ void DefectForm::updateActionsDesc()
         }
         act += actList[i] + "\n";
     }
-    act.replace("$JD$", ui->journalDefectEdit->text());
-    act.replace("$REP$", ui->repairEdit->text());
+    act.replace("$JD$", ui->journalDefectEdit->text().simplified());
+    act.replace("$REP$", ui->repairEdit->text().simplified());
 
     ui->actionsTextEdit->document()->setPlainText(act);
 }
@@ -377,6 +383,7 @@ void DefectForm::addDefectClicked()
 
 void DefectForm::saveDefectClicked()
 {
+    ui->defectEdit->setText(ui->defectEdit->text().simplified());
     QString query = "UPDATE defrealdescs SET drd_stage = '%1', drd_desc = '%2' WHERE drd_id = '%3'";
     query = query.arg(ui->stageBox->currentIndex());
     query = query.arg(ui->defectEdit->text());
@@ -436,6 +443,7 @@ void DefectForm::addRepairClicked()
 
 void DefectForm::saveRepairClicked()
 {
+    ui->repairEdit->setText(ui->repairEdit->text().simplified());
     QString query = "UPDATE defrepairdescs SET drp_repairdesc = '%1' WHERE drp_id = '%2'";
     query = query.arg(ui->repairEdit->text());
     query = query.arg(repairList[currentRepair].id);

@@ -395,7 +395,7 @@ void DictionaryForm::copyRecord()
     int curRow;
     QStringList toFields;
     QString query = "INSERT INTO %1 DEFAULT VALUES";
-    QString prepQuery, value;
+    QString prepQuery, value, toFind;
     curRow = ui->table->currentRow();
     if (curRow < 0) return;
 
@@ -422,7 +422,10 @@ void DictionaryForm::copyRecord()
     for (int i=1; i<ui->table->columnCount(); i++)
     {
         value = ui->table->item(curRow, i)->text();
-        if (i == 2) value += " копия";
+        if (i == 2) {
+                value += " копия";
+                toFind = value;
+        }
         if (fieldTypes[i] == "bool") value = "FALSE";
         prepQuery = query.arg(fields[i]).arg(value).arg(fields[0]).arg(lId.toString());
         toFields.append(value);
@@ -434,4 +437,9 @@ void DictionaryForm::copyRecord()
     }
     db->commitTransaction();
     updateData();
+    QList <QTableWidgetItem*> found = ui->table->findItems(toFind, Qt::MatchCaseSensitive);
+    if (found.size() > 0){
+        ui->table->selectRow(found[0]->row());
+        ui->table->scrollToItem(found[0]);
+    }
 }

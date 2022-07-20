@@ -108,29 +108,30 @@ void DeviceSelectorForm::updateDeviceTree()
 
 void DeviceSelectorForm::okClicked()
 {
-    QList<QTreeWidgetItem *> items = ui->deviceTree->selectedItems();
+    QTreeWidgetItem* item = ui->deviceTree->currentItem();
     bool isTopLevelItem = false;
     SelectedDevice dev;
 
-    if (items.isEmpty()) {
+    if (!item) {
         QMessageBox::critical(this, "Ошибка!", "Устройство не выбрано. Выберите устройство.");
         return;
     }
 
     for (int i=0; i<ui->deviceTree->topLevelItemCount(); i++)
     {
-        if (ui->deviceTree->topLevelItem(i) == items[0]) {
+        if (ui->deviceTree->topLevelItem(i) == item) {
             isTopLevelItem = true;
             break;
         }
     }
 
     if (isTopLevelItem) {
-        QMessageBox::critical(this, "Ошибка!", "Выбран каталог устройств. Выберите отдельное устройство.");
+//        QMessageBox::critical(this, "Ошибка!", "Выбран каталог устройств. Выберите отдельное устройство.");
+        ui->deviceTree->expandItem(item);
         return;
     }
 
-    dev.kks = items[0]->text(0);
+    dev.kks = item->text(0);
     dev.type = ui->deviceBox->currentText();
     QString query = "SELECT sch_unit, sch_name FROM schedule WHERE sch_kks = '%1' AND sch_type = '%2' LIMIT 1";
     query = query.arg(dev.kks).arg(dev.type);
@@ -157,4 +158,10 @@ void DeviceSelectorForm::dtItemDoubleClicked(QTreeWidgetItem *item, int column)
 void DeviceSelectorForm::cancelClicked()
 {
     close();
+}
+
+void DeviceSelectorForm::keyPressEvent(QKeyEvent *event)
+{
+    if ((event->key() == Qt::Key_Enter) | (event->key() == Qt::Key_Return)) okClicked();
+    QWidget::keyPressEvent(event);
 }

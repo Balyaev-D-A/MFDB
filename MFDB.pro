@@ -36,6 +36,7 @@ SOURCES += \
     receiptform.cpp \
     receiptsform.cpp \
     settings.cpp \
+    settingsform.cpp \
     trreportform.cpp \
     trreportsform.cpp \
     verifyform.cpp \
@@ -69,6 +70,7 @@ HEADERS += \
     receiptform.h \
     receiptsform.h \
     settings.h \
+    settingsform.h \
     trreportform.h \
     trreportsform.h \
     verifyform.h \
@@ -92,6 +94,7 @@ FORMS += \
     raspform.ui \
     receiptform.ui \
     receiptsform.ui \
+    settingsform.ui \
     trreportform.ui \
     trreportsform.ui \
     verifyform.ui \

@@ -2,6 +2,7 @@
 #define DEVICESELECTORFORM_H
 
 #include <QWidget>
+#include <QKeyEvent>
 #include "database.h"
 
 typedef struct {
@@ -40,6 +41,7 @@ private slots:
 protected:
     void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 signals:
     void closed(DeviceSelectorForm *sender);
     void deviceChoosed(SelectedDevice device);

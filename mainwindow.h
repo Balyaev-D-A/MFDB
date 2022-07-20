@@ -15,6 +15,7 @@
 #include "movesform.h"
 #include "krreportsform.h"
 #include "trreportsform.h"
+//#include "settings.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -46,6 +47,7 @@ private:
     MovesForm *movesForm;
     KRReportsForm *krReportsForm;
     TRReportsForm *trReportsForm;
+//    Settings *settings;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
     QString groupWorks(QList<QStringList> workList);

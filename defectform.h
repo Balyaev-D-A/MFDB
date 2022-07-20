@@ -35,7 +35,7 @@ public:
     explicit DefectForm(QWidget *parent = nullptr);
     ~DefectForm();
     void setDatabase(Database *db);
-    void newDefect();
+    void newDefect(int quarter);
     void editDefect(QString defId);
     void setNormativeForm(NormativeForm *nf);
 

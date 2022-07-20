@@ -408,6 +408,13 @@
            </layout>
           </item>
           <item>
+           <widget class="QCheckBox" name="woreportBox">
+            <property name="text">
+             <string>Не включённые в отчеты</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_3">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
