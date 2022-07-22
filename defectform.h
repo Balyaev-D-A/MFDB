@@ -2,6 +2,7 @@
 #define DEFECTFORM_H
 
 #include <QWidget>
+#include <QKeyEvent>
 #include "database.h"
 #include "deviceselectorform.h"
 #include "normativeform.h"
@@ -86,6 +87,9 @@ private slots:
     void inputAccepted(FieldEditor *editor);
     void inputRejected(FieldEditor *editor);
     void normativeSaved(QString device, QString workType);
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
 
 signals:
     void defectSaved();

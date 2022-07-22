@@ -268,7 +268,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
                 opcardNums.append(ktdList[i].split("№")[1]);
         }
         if (opcardNums.size() > 1) {
-            ktdText.append("Операционные карты №№");
+            ktdText.append("Операционные карты<br/>№№");
             for (int i=0; i<opcardNums.size(); i++)
             {
                 ktdText.append(opcardNums[i] + ", ");

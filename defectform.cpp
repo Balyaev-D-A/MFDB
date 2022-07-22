@@ -736,3 +736,13 @@ void DefectForm::normativeSaved(QString device, QString workType)
     updateActions();
     updateStages();
 }
+
+void DefectForm::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_F4)
+        deviceButtonClicked();
+    if (event->key() == Qt::Key_F5)
+        if (ui->oesnButton->isEnabled())
+            oesnClicked();
+    QWidget::keyPressEvent(event);
+}
