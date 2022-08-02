@@ -204,7 +204,7 @@ bool Database::firstRecord()
 
 QVariant Database::getVariable(QString varName)
 {
-    QVariant result = NULL;
+    QVariant result;
     QString query = "SELECT var_value FROM variables WHERE var_name = '%1'";
     query = query.arg(varName);
     if (!execQuery(query))
