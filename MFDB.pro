@@ -29,6 +29,7 @@ SOURCES += \
     krselectorform.cpp \
     main.cpp \
     mainwindow.cpp \
+    materialsreportform.cpp \
     movesform.cpp \
     normativeform.cpp \
     progressform.cpp \
@@ -63,6 +64,7 @@ HEADERS += \
     krreportsform.h \
     krselectorform.h \
     mainwindow.h \
+    materialsreportform.h \
     movesform.h \
     normativeform.h \
     progressform.h \
@@ -88,6 +90,7 @@ FORMS += \
     krreportsform.ui \
     krselectorform.ui \
     mainwindow.ui \
+    materialsreportform.ui \
     movesform.ui \
     normativeform.ui \
     progressform.ui \
