@@ -2,6 +2,8 @@
 #define MATERIALSREPORTFORM_H
 
 #include <QWidget>
+#include <QShowEvent>
+#include <QCloseEvent>
 #include "database.h"
 
 namespace Ui {
@@ -22,6 +24,16 @@ private:
     Database *db;
     void updateTRMaterials();
     void updateKRMaterials();
+    void updateMaterialBox();
+private slots:
+    void updateMaterials();
+
+protected:
+    void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
+
+signals:
+    void closed();
 
 };
 

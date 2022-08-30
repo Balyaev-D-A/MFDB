@@ -15,6 +15,7 @@
 #include "movesform.h"
 #include "krreportsform.h"
 #include "trreportsform.h"
+#include "materialsreportform.h"
 //#include "settings.h"
 
 QT_BEGIN_NAMESPACE
@@ -47,6 +48,7 @@ private:
     MovesForm *movesForm;
     KRReportsForm *krReportsForm;
     TRReportsForm *trReportsForm;
+    MaterialsReportForm *mrForm;
 //    Settings *settings;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
@@ -92,6 +94,7 @@ private slots:
     void variablesTriggered();
     void krReportsTriggered();
     void trReportsTriggered();
+    void matReportTriggered();
 
 protected:
     void showEvent(QShowEvent *event);

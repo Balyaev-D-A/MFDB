@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>684</width>
+    <height>397</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Отчет по материалам</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -20,7 +20,25 @@
       <widget class="QComboBox" name="materialBox"/>
      </item>
      <item>
-      <widget class="QComboBox" name="workBox"/>
+      <widget class="QComboBox" name="workBox">
+       <item>
+        <property name="text">
+         <string>ТР</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>КР</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="onlyDoneBox">
+       <property name="text">
+        <string>Только выполненные</string>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer">
@@ -38,7 +56,29 @@
     </layout>
    </item>
    <item>
-    <widget class="QTableWidget" name="materialTable"/>
+    <widget class="QTableWidget" name="materialTable">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <column>
+      <property name="text">
+       <string>Количество</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Работа</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Дата</string>
+      </property>
+     </column>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -890,11 +890,9 @@
    </widget>
    <widget class="QMenu" name="menu_6">
     <property name="title">
-     <string>Материалы КР</string>
+     <string>Материалы</string>
     </property>
-    <addaction name="receiptsAction"/>
-    <addaction name="verifyAction"/>
-    <addaction name="movesAction"/>
+    <addaction name="aMatReport"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -1001,6 +999,11 @@
   <action name="aTRReports">
    <property name="text">
     <string>Отчеты по ТР...</string>
+   </property>
+  </action>
+  <action name="aMatReport">
+   <property name="text">
+    <string>Отчет по материалам</string>
    </property>
   </action>
  </widget>

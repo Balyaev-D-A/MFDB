@@ -77,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent)
     krReportsForm->setDatabase(db);
     trReportsForm = new TRReportsForm(this);
     trReportsForm->setDatabase(db);
+    mrForm = new MaterialsReportForm(this);
+    mrForm->setDatabase(db);
 
 //    settings = Settings::instance();
 
@@ -120,6 +122,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->aKRReports, &QAction::triggered, this, &MainWindow::krReportsTriggered);
     connect(ui->aTRReports, &QAction::triggered, this, &MainWindow::trReportsTriggered);
     connect(ui->woreportBox, &QCheckBox::stateChanged, this, &MainWindow::updateDefectsTable);
+    connect(ui->aMatReport, &QAction::triggered, this, &MainWindow::matReportTriggered);
 
 //    cs = settings->getConnSettings();
 //    if (cs.host == "") {
@@ -1007,4 +1010,9 @@ void MainWindow::saveRasp(QStringList raspList)
     }
 
     html.replace("%BODY%", body);
+}
+
+void MainWindow::matReportTriggered()
+{
+    mrForm->show();
 }
