@@ -84,13 +84,13 @@ bool Database::deployTables()
                   "drp_repairdesc TEXT)")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS defadditionalmats (dam_id SERIAL PRIMARY KEY, dam_defect INTEGER REFERENCES defects(def_id), "
-                  "dam_material INTEGER REFERENCES materials (mat_id), dam_count DECIMAL(6,3))")) return false;
+                  "dam_material INTEGER REFERENCES materials (mat_id), dam_count DECIMAL(6,3), dam_oesn DECIMAL(6,3))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kaprepairs (kr_id SERIAL PRIMARY KEY, kr_sched INTEGER REFERENCES schedule(sch_id) UNIQUE, "
                   "kr_begdate CHAR(10), kr_enddate CHAR(10))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kradditionalmats (kam_id SERIAL PRIMARY KEY, kam_kr INTEGER REFERENCES kaprepairs(kr_id), "
-                  "kam_material INTEGER REFERENCES materials (mat_id), kam_count DECIMAL(6,3))")) return false;
+                  "kam_material INTEGER REFERENCES materials (mat_id), kam_count DECIMAL(6,3), kam_oesn DECIMAL(6,3))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS receipts (rec_id serial primary key, rec_date CHAR(10), "
                   "rec_description VARCHAR(255))")) return false;

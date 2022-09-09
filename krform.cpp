@@ -21,6 +21,7 @@ KRForm::KRForm(QWidget *parent) :
     connect(ui->materialTable, &DragDropTable::itemDroped, this, &KRForm::removeMaterialClicked);
     connect(ui->oesnButton, &QToolButton::clicked, this, &KRForm::oesnClicked);
     connect(ui->addedMatTable, &DragDropTable::cellDoubleClicked, this, &KRForm::cellDoubleClicked);
+    connect(ui->fillButton, &QToolButton::clicked, this, &KRForm::fillButtonClicked);
 }
 
 KRForm::~KRForm()
@@ -52,6 +53,7 @@ void KRForm::newKR()
     ui->addMaterialButton->setDisabled(true);
     ui->removeMaterialButton->setDisabled(true);
     ui->okButton->setDisabled(true);
+    ui->fillButton->setDisabled(true);
     while (ui->addedMatTable->rowCount()) ui->addedMatTable->removeRow(0);
     updateMaterials();
 }
@@ -64,12 +66,13 @@ void KRForm::editKR(QString KRId)
 
     this->KRId = KRId;
     matsChanged = false;
-    ui->materialTable->setDisabled(true);
-    ui->addedMatTable->setDisabled(true);
-    ui->addMaterialButton->setDisabled(true);
-    ui->removeMaterialButton->setDisabled(true);
-    ui->okButton->setDisabled(true);
-    ui->oesnButton->setDisabled(true);
+    ui->materialTable->setDisabled(false);
+    ui->addedMatTable->setDisabled(false);
+    ui->addMaterialButton->setDisabled(false);
+    ui->removeMaterialButton->setDisabled(false);
+    ui->okButton->setDisabled(false);
+    ui->oesnButton->setDisabled(false);
+    ui->fillButton->setDisabled(false);
     query = "SELECT kr_sched, sch_name, sch_type, sch_kks FROM kaprepairs AS kr "
             "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
             "WHERE kr_id = '%1'";
@@ -90,11 +93,6 @@ void KRForm::editKR(QString KRId)
         return;
     updateAddedMats();
     updateMaterials();
-    ui->materialTable->setDisabled(false);
-    ui->addedMatTable->setDisabled(false);
-    ui->addMaterialButton->setDisabled(false);
-    ui->removeMaterialButton->setDisabled(false);
-    ui->okButton->setDisabled(false);
 }
 
 void KRForm::selectDeviceClicked()
@@ -176,16 +174,13 @@ bool KRForm::saveKR()
                 return false;
             }
 
-            query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_count) VALUES ('%1', '%2', '%3')";
+            query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_oesn, kam_count) VALUES ('%1', '%2', '%3', '%4')";
 
             for (int i=0; i<ui->addedMatTable->rowCount(); i++)
             {
-                if (ui->addedMatTable->isPersistentRow(i)){
-                    oesn = ui->addedMatTable->item(i, 2)->text().toFloat();
-                    real = ui->addedMatTable->item(i, 3)->text().toFloat();
-                    if (oesn == real) continue;
-                }
-                prepQuery = query.arg(KRId).arg(ui->addedMatTable->item(i, 0)->text()).arg(ui->addedMatTable->item(i, 3)->text());
+                prepQuery = query.arg(KRId).arg(ui->addedMatTable->item(i, 0)->text());
+                prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 2)->text().replace(",", ".").replace("-", "0"));
+                prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 3)->text().replace(",", ".").replace("-", "0"));
 
                 if (!db->execQuery(prepQuery)) {
                     db->showError(this);
@@ -216,16 +211,14 @@ bool KRForm::saveKR()
 
         KRId = db->lastInsertId().toString();
 
-        query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_count) VALUES ('%1', '%2', '%3')";
+        query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_oesn, kam_count) VALUES ('%1', '%2', '%3', '%4')";
 
         for (int i=0; i<ui->addedMatTable->rowCount(); i++)
         {
-            if (ui->addedMatTable->isPersistentRow(i)){
-                oesn = ui->addedMatTable->item(i, 2)->text().toFloat();
-                real = ui->addedMatTable->item(i, 3)->text().toFloat();
-                if (oesn == real) continue;
-            }
-            prepQuery = query.arg(KRId).arg(ui->addedMatTable->item(i, 0)->text()).arg(ui->addedMatTable->item(i, 3)->text());
+
+            prepQuery = query.arg(KRId).arg(ui->addedMatTable->item(i, 0)->text());
+            prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 2)->text().replace(",", ".").replace("-", "0"));
+            prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 3)->text().replace(",", ".").replace("-", "0"));
 
             if (!db->execQuery(prepQuery)) {
                 db->showError(this);
@@ -267,6 +260,7 @@ void KRForm::deviceSelected(const KRDevice &device)
     ui->removeMaterialButton->setDisabled(false);
     ui->okButton->setDisabled(false);
     ui->oesnButton->setDisabled(false);
+    ui->fillButton->setDisabled(false);
     updateAddedMats();
     updateMaterials();
 }
@@ -280,30 +274,11 @@ void KRForm::oesnClicked()
 
 void KRForm::updateAddedMats()
 {
-    int foundRow, curRow;
-    QString query = "SELECT nm_material, mat_name, nm_count FROM normativmat AS nm LEFT JOIN materials AS mat ON nm.nm_material = mat.mat_id "
-            "WHERE nm_dev = '%1' AND nm_worktype = 'КР'";
-    query = query.arg(selectedDevice);
-
-    if (!db->execQuery(query)) {
-        db->showError(this);
-        return;
-    }
-
+    int curRow;
+    QString query;
     while (ui->addedMatTable->rowCount() > 0) ui->addedMatTable->removeRow(0);
-    ui->addedMatTable->clearPersistentRows();
 
-    for (int i=0; db->nextRecord(); i++)
-    {
-        ui->addedMatTable->insertRow(i);
-        ui->addedMatTable->setItem(i, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
-        ui->addedMatTable->setItem(i, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
-        ui->addedMatTable->setItem(i, 2, new QTableWidgetItem(db->fetchValue(2).toString()));
-        ui->addedMatTable->setItem(i, 3, new QTableWidgetItem(db->fetchValue(2).toString()));
-        ui->addedMatTable->setPersistentRow(i);
-    }
-
-    query = "SELECT kam_material, mat_name, kam_count FROM kradditionalmats AS k "
+    query = "SELECT kam_material, mat_name, kam_oesn, kam_count FROM kradditionalmats AS k "
             "LEFT JOIN materials AS m ON k.kam_material = m.mat_id "
             "WHERE kam_kr = '%1'";
     query = query.arg(KRId);
@@ -314,24 +289,16 @@ void KRForm::updateAddedMats()
     }
     while (db->nextRecord())
     {
-        foundRow = -1;
-        for (int i=0; i<ui->addedMatTable->rowCount(); i++)
-            if (ui->addedMatTable->item(i, 0)->text() == db->fetchValue(0).toString())
-                foundRow = i;
-
-        if (foundRow < 0) {
-            curRow = ui->addedMatTable->rowCount();
-            ui->addedMatTable->insertRow(curRow);
-            ui->addedMatTable->setItem(curRow, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
-            ui->addedMatTable->setItem(curRow, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
-            ui->addedMatTable->setItem(curRow, 2, new QTableWidgetItem("-"));
-            ui->addedMatTable->setItem(curRow, 3, new QTableWidgetItem(db->fetchValue(2).toString()));
-        }
-        else {
-            ui->addedMatTable->item(foundRow ,3)->setText(db->fetchValue(2).toString());
-        }
+        curRow = ui->addedMatTable->rowCount();
+        ui->addedMatTable->insertRow(curRow);
+        ui->addedMatTable->setItem(curRow, 0, new QTableWidgetItem(db->fetchValue(0).toString()));
+        ui->addedMatTable->setItem(curRow, 1, new QTableWidgetItem(db->fetchValue(1).toString()));
+        if (db->fetchValue(2).toFloat() == 0) ui->addedMatTable->setItem(curRow, 2, new QTableWidgetItem("-"));
+        else ui->addedMatTable->setItem(curRow, 2, new QTableWidgetItem(db->fetchValue(2).toString()));
+        ui->addedMatTable->setItem(curRow, 3, new QTableWidgetItem(db->fetchValue(3).toString()));
     }
     ui->addedMatTable->resizeColumnsToContents();
+    updateMaterials();
 }
 
 void KRForm::cellDoubleClicked(int row, int column)
@@ -369,5 +336,50 @@ void KRForm::normativeSaved(QString device, QString workType)
     if ((!isVisible()) || (workType != "КР")) return;
     if (device != selectedDevice) return;
     updateAddedMats();
+    updateMaterials();
+}
+
+void KRForm::fillButtonClicked()
+{
+    QList<QStringList> oesnMatsList;
+    QStringList mat;
+    QStringList addedMats;
+    QString query = "SELECT nm_material, mat_name, nm_count FROM normativmat AS nm LEFT JOIN materials AS mat ON nm.nm_material = mat.mat_id "
+            "WHERE nm_dev = '%1' AND nm_worktype = 'КР'";
+    query = query.arg(selectedDevice);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    while (db->nextRecord()) {
+        mat.clear();
+        for (int i=0; i<3; i++)
+        {
+          mat.append(db->fetchValue(i).toString());
+        }
+        oesnMatsList.append(mat);
+    }
+
+    for (int i=0; i<ui->addedMatTable->rowCount(); i++)
+    {
+        addedMats.append(ui->addedMatTable->item(i,0)->text());
+    }
+
+    for (int i=oesnMatsList.count()-1; i>=0; i--)
+    {
+        if (addedMats.contains(oesnMatsList[i][0])) continue;
+        ui->addedMatTable->insertRow(0);
+        for (int j=0; j<4; j++)
+        {
+            if (j == 3) {
+                ui->addedMatTable->setItem(0, 3, new QTableWidgetItem(oesnMatsList[i][2]));
+                continue;
+            }
+            ui->addedMatTable->setItem(0, j, new QTableWidgetItem(oesnMatsList[i][j]));
+        }
+    }
+    ui->addedMatTable->resizeColumnsToContents();
     updateMaterials();
 }

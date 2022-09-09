@@ -801,31 +801,9 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
         workRows += header2Temp;
         workRows.replace("$OESN$", oesn);
         currBlockSize += head2Height;
-        query = "SELECT nm_material, mat_name, mat_doc, mat_measure, nm_count FROM normativmat "
-                "LEFT JOIN materials ON nm_material = mat_id "
-                "WHERE nm_dev = '%1' AND nm_worktype = 'ТР'";
-        query = query.arg(workList[i].type);
-        if (!db->execQuery(query)) {
-            db->showError(this);
-            return result;
-        }
-        matTable.clear();
-        while (db->nextRecord())
-        {
-            matRow.clear();
-            matRow.append(db->fetchValue(0).toString());
-            matName = db->fetchValue(1).toString();
-            matDoc = db->fetchValue(2).toString();
-            matName = matName.simplified();
-            if (!matName.endsWith(".")) matName += ".";
-            matRow.append(matName + " " + matDoc);
-            matRow.append(db->fetchValue(3).toString());
-            matRow.append(db->fetchValue(4).toString());
-            matRow.append(db->fetchValue(4).toString());
-            matTable.append(matRow);
-        }
 
-        query = "SELECT dam_material, mat_name, mat_doc, mat_measure, dam_count FROM defadditionalmats "
+        matTable.clear();
+        query = "SELECT dam_material, mat_name, mat_doc, mat_measure, dam_oesn, dam_count FROM defadditionalmats "
                 "LEFT JOIN materials ON dam_material = mat_id "
                 "WHERE dam_defect = '%1'";
         query = query.arg(workList[i].krId);
@@ -837,31 +815,19 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
 
         while (db->nextRecord())
         {
-            foundRow = -1;
-            for (int j=0; j<matTable.size(); j++)
-            {
-                if (matTable[j][0] == db->fetchValue(0).toString()) foundRow = j;
-            }
-
-            if (foundRow < 0) {
-                matRow.clear();
-                matRow.append(db->fetchValue(0).toString());
-                matName = db->fetchValue(1).toString();
-                matDoc = db->fetchValue(2).toString();
-                matName = matName.simplified();
-                if (!matName.endsWith(".")) matName += ".";
-                matRow.append(matName + " " + matDoc);
-                matRow.append(db->fetchValue(3).toString());
-                matRow.append("-");
-                matRow.append(db->fetchValue(4).toString());
-                matTable.append(matRow);
-            } else {
-                if (db->fetchValue(4).toFloat() == 0.00) {
-                    matTable.removeAt(foundRow);
-                } else {
-                    matTable[foundRow][4] = db->fetchValue(4).toString();
-                }
-            }
+            //if (db->fetchValue(5).toFloat() == 0) continue;
+            matRow.clear();
+            matRow.append(db->fetchValue(0).toString());
+            matName = db->fetchValue(1).toString();
+            matDoc = db->fetchValue(2).toString();
+            matName = matName.simplified();
+            if (!matName.endsWith(".")) matName += ".";
+            matRow.append(matName + " " + matDoc);
+            matRow.append(db->fetchValue(3).toString());
+            if (db->fetchValue(4).toFloat() == 0) matRow.append("-");
+            else matRow.append(db->fetchValue(4).toString());
+            matRow.append(db->fetchValue(5).toString());
+            matTable.append(matRow);
         }
 
         for (int j=0; j<matTable.size(); j++)
