@@ -25,9 +25,9 @@ DefectForm::DefectForm(QWidget *parent) :
     connect(ui->okButton, &QPushButton::clicked, this, &DefectForm::okClicked);
     connect(ui->cancelButton, &QPushButton::clicked, this, &DefectForm::cancelClicked);
     connect(ui->journalDefectEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
-    connect(ui->defectEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
-    connect(ui->repairEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
-    connect(ui->stageBox, &QComboBox::currentTextChanged, this, &DefectForm::updateActionsDesc);
+    connect(ui->defectEdit, &QLineEdit::textChanged, this, &DefectForm::defectTextChanged);
+    connect(ui->repairEdit, &QLineEdit::textChanged, this, &DefectForm::repairTextChanged);
+    connect(ui->stageBox, &QComboBox::currentTextChanged, this, &DefectForm::defectTextChanged);
     connect(ui->oesnButton, &QToolButton::clicked, this, &DefectForm::oesnClicked);
     connect(ui->addedMatTable, &DragDropTable::cellDoubleClicked, this, &DefectForm::cellDoubleClicked);
     connect(ui->fillButton, &QToolButton::clicked, this, &DefectForm::fillButtonClicked);
@@ -81,7 +81,7 @@ void DefectForm::newDefect(int quarter)
 
 void DefectForm::editDefect(QString defId)
 {
-    QString query, defect, repair;
+    QString query, defect, repair, actiondesc;
     int stage;
 
     setWindowTitle("Редактировать дефект");
@@ -90,7 +90,7 @@ void DefectForm::editDefect(QString defId)
 
     this->defId = defId;
 
-    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_quarter, def_unit FROM defects WHERE def_id = '%1'";
+    query = "SELECT def_devtype, def_kks, def_journaldesc, def_realdesc, def_stage, def_repairdesc, def_quarter, def_unit, def_actionsdesc FROM defects WHERE def_id = '%1'";
     query = query.arg(defId);
 
     if (!db->execQuery(query)) {
@@ -106,6 +106,7 @@ void DefectForm::editDefect(QString defId)
         defect = db->fetchValue(3).toString();
         stage = db->fetchValue(4).toInt();
         repair = db->fetchValue(5).toString();
+        actiondesc = db->fetchValue(8).toString();
         ui->quarterBox->setCurrentIndex(db->fetchValue(6).toInt() - 1);
         updateStages();
         ui->stageBox->setCurrentIndex(stage);
@@ -134,7 +135,7 @@ void DefectForm::editDefect(QString defId)
     ui->defectEdit->setText(defect);
     ui->repairEdit->setText(repair);
     updateActions();
-    updateActionsDesc();
+    ui->actionsTextEdit->document()->setPlainText(actiondesc);
 }
 
 void DefectForm::deviceButtonClicked()
@@ -197,7 +198,7 @@ void DefectForm::updateDefects()
 void DefectForm::updateDefectText()
 {
     if (defectList.isEmpty()) {
-        ui->defectLabel->setText("Дефект 0 из 0");
+        ui->defectLabel->setText("Дефект по факту 0 из 0");
         ui->defectEdit->setText("");
         ui->defectEdit->setDisabled(true);
         if (device.name == "")
@@ -226,7 +227,7 @@ void DefectForm::updateDefectText()
     else
         ui->prevDefectButton->setDisabled(false);
 
-    ui->defectLabel->setText(QString("Дефект %1 из %2").arg(currentDefect + 1).arg(defectList.size()));
+    ui->defectLabel->setText(QString("Дефект по факту %1 из %2").arg(currentDefect + 1).arg(defectList.size()));
     ui->defectEdit->setText(defectList[currentDefect].description);
     ui->stageBox->setCurrentIndex(defectList[currentDefect].stage);
 
@@ -402,6 +403,7 @@ void DefectForm::saveDefectClicked()
     }
     defectList[currentDefect].stage = ui->stageBox->currentIndex();
     defectList[currentDefect].description = ui->defectEdit->text();
+    ui->saveDefectButton->setEnabled(false);
 }
 
 void DefectForm::deleteDefectClicked()
@@ -460,6 +462,7 @@ void DefectForm::saveRepairClicked()
         return;
     }
     repairList[currentRepair].description = ui->repairEdit->text();
+    ui->saveRepairButton->setEnabled(false);
 }
 
 void DefectForm::deleteRepairClicked()
@@ -646,6 +649,8 @@ bool DefectForm::saveDefect()
 
 void DefectForm::okClicked()
 {
+    if (ui->saveDefectButton->isEnabled()) saveDefectClicked();
+    if (ui->saveRepairButton->isEnabled()) saveRepairClicked();
     if (saveDefect()) {
         close();
     }
@@ -762,4 +767,16 @@ void DefectForm::fillButtonClicked()
     }
     ui->addedMatTable->resizeColumnsToContents();
     updateMaterials();
+}
+
+void DefectForm::defectTextChanged()
+{
+    if (!ui->saveDefectButton->isEnabled()) ui->saveDefectButton->setEnabled(true);
+    updateActionsDesc();
+}
+
+void DefectForm::repairTextChanged()
+{
+    if (!ui->saveRepairButton->isEnabled()) ui->saveRepairButton->setEnabled(true);
+    updateActionsDesc();
 }

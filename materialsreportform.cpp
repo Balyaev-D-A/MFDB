@@ -59,17 +59,6 @@ void MaterialsReportForm::updateTRMaterials()
     for (int i=0; i<defectsTab.count(); i++)
     {
        amount = 0;
-       query = "SELECT nm_count FROM normativmat WHERE nm_material = '%1' AND nm_dev = '%2' AND nm_worktype = '%3'";
-       query = query.arg(ui->materialBox->currentData().toString()).arg(defectsTab[i][1]).arg("ТР");
-
-       if (!db->execQuery(query)) {
-           db->showError(this);
-           return;
-       }
-
-       if (db->nextRecord()) {
-           amount = db->fetchValue(0).toFloat();
-       }
 
        query = "SELECT dam_count FROM defadditionalmats WHERE dam_material = '%1' AND dam_defect = '%2'";
        query = query.arg(ui->materialBox->currentData().toString()).arg(defectsTab[i][0]);
@@ -128,7 +117,7 @@ void MaterialsReportForm::updateKRMaterials()
     while (db->nextRecord())
     {
         krStr.clear();
-        for (int i=0; i<3; i++)
+        for (int i=0; i<4; i++)
         {
             krStr.append(db->fetchValue(i).toString());
         }
@@ -140,17 +129,6 @@ void MaterialsReportForm::updateKRMaterials()
     for (int i=0; i<krTab.count(); i++)
     {
        amount = 0;
-       query = "SELECT nm_count FROM normativmat WHERE nm_material = '%1' AND nm_dev = '%2' AND nm_worktype = '%3'";
-       query = query.arg(ui->materialBox->currentData().toString()).arg(krTab[i][1]).arg("КР");
-
-       if (!db->execQuery(query)) {
-           db->showError(this);
-           return;
-       }
-
-       if (db->nextRecord()) {
-           amount = db->fetchValue(0).toFloat();
-       }
 
        query = "SELECT kam_count FROM kradditionalmats WHERE kam_material = '%1' AND kam_kr = '%2'";
        query = query.arg(ui->materialBox->currentData().toString()).arg(krTab[i][0]);

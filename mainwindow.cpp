@@ -467,7 +467,10 @@ void MainWindow::updateDefectsTable()
             if (inReport.contains(db->fetchValue(0).toString())) continue;
         rc = ui->defectsTable->rowCount();
         ui->defectsTable->insertRow(rc);
-        for (int i=0; i<8; i++)
+        QTableWidgetItem *it = new QTableWidgetItem();
+        it->setData(Qt::EditRole, db->fetchValue(0).toInt());
+        ui->defectsTable->setItem(rc, 0, it);
+        for (int i=1; i<8; i++)
         {
                 ui->defectsTable->setItem(rc, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
@@ -733,7 +736,10 @@ void MainWindow::updateKRTable()
     {
         curRow = ui->krTable->rowCount();
         ui->krTable->insertRow(curRow);
-        for (int i=0; i<8; i++)
+        QTableWidgetItem *it = new QTableWidgetItem();
+        it->setData(Qt::EditRole, db->fetchValue(0).toInt());
+        ui->krTable->setItem(curRow, 0, it);
+        for (int i=1; i<8; i++)
         {
             ui->krTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }

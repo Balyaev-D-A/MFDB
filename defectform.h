@@ -88,6 +88,8 @@ private slots:
     void inputRejected(FieldEditor *editor);
     void normativeSaved(QString device, QString workType);
     void fillButtonClicked();
+    void defectTextChanged();
+    void repairTextChanged();
 
 protected:
     void keyPressEvent(QKeyEvent *event);

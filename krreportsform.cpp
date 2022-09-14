@@ -790,9 +790,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
         } else {
             oesn = "";
         }
-        workRows += header2Temp;
-        workRows.replace("$OESN$", oesn);
-        currBlockSize += head2Height;
+
         query = "SELECT nm_material, mat_name, mat_doc, mat_measure, nm_count FROM normativmat "
                 "LEFT JOIN materials ON nm_material = mat_id "
                 "WHERE nm_dev = '%1' AND nm_worktype = 'КР'";
@@ -800,6 +798,11 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
         if (!db->execQuery(query)) {
             db->showError(this);
             return result;
+        }
+        if (db->affectedRows() > 0){
+            workRows += header2Temp;
+            workRows.replace("$OESN$", oesn);
+            currBlockSize += head2Height;
         }
         matTable.clear();
         while (db->nextRecord())

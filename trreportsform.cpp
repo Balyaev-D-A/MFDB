@@ -798,9 +798,6 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
         } else {
             oesn = "";
         }
-        workRows += header2Temp;
-        workRows.replace("$OESN$", oesn);
-        currBlockSize += head2Height;
 
         matTable.clear();
         query = "SELECT dam_material, mat_name, mat_doc, mat_measure, dam_oesn, dam_count FROM defadditionalmats "
@@ -811,6 +808,12 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
         if (!db->execQuery(query)) {
             db->showError(this);
             return result;
+        }
+
+        if (db->affectedRows() > 0) {
+            workRows += header2Temp;
+            workRows.replace("$OESN$", oesn);
+            currBlockSize += head2Height;
         }
 
         while (db->nextRecord())
