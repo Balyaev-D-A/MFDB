@@ -300,6 +300,9 @@ void DictionaryForm::addRecord()
 
 void DictionaryForm::deleteRecord()
 {
+    QMessageBox::StandardButton btn = QMessageBox::question(this, "Внимание!!!", "Вы действительно хотите удалить запись?");
+    if (btn == QMessageBox::No)
+        return;
     int cr = ui->table->currentRow();
     if (cr<0) return;
     QString crId = ui->table->item(cr,0)->text();
@@ -393,6 +396,8 @@ void DictionaryForm::copyRecord()
 {
     QVariant lId;
     int curRow;
+    int curSortCol;
+    Qt::SortOrder curSortOrder;
     QStringList toFields;
     QString query = "INSERT INTO %1 DEFAULT VALUES";
     QString prepQuery, value, toFind;
@@ -436,10 +441,13 @@ void DictionaryForm::copyRecord()
         }
     }
     db->commitTransaction();
+    curSortCol = ui->table->horizontalHeader()->sortIndicatorSection();
+    curSortOrder = ui->table->horizontalHeader()->sortIndicatorOrder();
     updateData();
+    ui->table->sortByColumn(curSortCol, curSortOrder);
     QList <QTableWidgetItem*> found = ui->table->findItems(toFind, Qt::MatchCaseSensitive);
     if (found.size() > 0){
         ui->table->selectRow(found[0]->row());
-        ui->table->scrollToItem(found[0]);
+        ui->table->scrollToItem(found[0], QAbstractItemView::PositionAtCenter);
     }
 }

@@ -7,6 +7,7 @@ KRReportForm::KRReportForm(QWidget *parent) :
     QWidget(parent, Qt::Window),
     ui(new Ui::KRReportForm)
 {
+    QDate currDate = QDate::currentDate();
     ui->setupUi(this);
     ui->tabWidget->tabBar()->hide();
     ui->tabWidget->setCurrentIndex(0);
@@ -14,8 +15,8 @@ KRReportForm::KRReportForm(QWidget *parent) :
     ui->selectedKRTable->setAcceptFrom(ui->krTable);
     ui->krTable->hideColumn(0);
     ui->selectedKRTable->hideColumn(0);
-    ui->begDateEdit->setDate(QDate::currentDate());
-    ui->endDateEdit->setDate(QDate::currentDate());
+    ui->begDateEdit->setDate(QDate(currDate.year(), currDate.month(), 1));
+    ui->endDateEdit->setDate(QDate(currDate.year(), currDate.month(), currDate.daysInMonth()));
     ui->dateEdit->setDate(QDate::currentDate());
     ui->signersTable->hideColumn(0);
     ui->ownerEdit->setAcceptFrom(ui->signersTable);
@@ -26,6 +27,8 @@ KRReportForm::KRReportForm(QWidget *parent) :
     ui->member5Edit->setAcceptFrom(ui->signersTable);
     ui->repairerEdit->setAcceptFrom(ui->signersTable);
     ui->chiefEdit->setAcceptFrom(ui->signersTable);
+    ui->member2Edit->setStyleSheet("background: rgb(255, 255, 0);");
+    ui->member3Edit->setStyleSheet("background: rgb(255, 255, 0);");
     ui->member4Edit->setStyleSheet("background: rgb(255, 255, 0);");
     ui->member5Edit->setStyleSheet("background: rgb(255, 255, 0);");
     connect(ui->unitBox, &QComboBox::currentTextChanged, this, &KRReportForm::unitChanged);
@@ -73,6 +76,8 @@ void KRReportForm::showEvent(QShowEvent *event)
     fillUnitBox();
     updateKRTable();
     updateSignersTable();
+    if (ui->docNumEdit->text() == "")
+        ui->docNumEdit->setText(db->getVariable("НомерДокКР").toString());
 }
 
 void KRReportForm::updateKRTable()
@@ -170,11 +175,17 @@ void KRReportForm::unitChanged()
 
 void KRReportForm::addAllButtonClicked()
 {
+    int curRow;
     for (int i=0; i<ui->krTable->rowCount(); i++)
     {
-        ui->krTable->selectRow(i);
-        addButtonClicked();
+        curRow = ui->selectedKRTable->rowCount();
+        ui->selectedKRTable->insertRow(curRow);
+        for (int col=0; col<4; col++)
+        {
+            ui->selectedKRTable->setItem(curRow, col, new QTableWidgetItem(ui->krTable->item(i, col)->text()));
+        }
     }
+    updateKRTable();
 }
 
 void KRReportForm::removeAllButtonClicked()
@@ -236,14 +247,7 @@ bool KRReportForm::checkFilling()
         showErrorMessage("Не выбран один из членов комиссии.");
         return false;
     }
-    if (ui->member2Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членов комиссии.");
-        return false;
-    }
-    if (ui->member3Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членов комиссии.");
-        return false;
-    }
+
     if (ui->repairerEdit->text().isEmpty()) {
         showErrorMessage("Не выбран представитель цеха ответственного за ремонт.");
         return false;
@@ -524,10 +528,14 @@ void KRReportForm::doneButtonClicked()
     queryList.append(prepQuery);
     prepQuery = query.arg(reportId).arg(signers.member1Id).arg(KRSMEMBER1);
     queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.member2Id).arg(KRSMEMBER2);
-    queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.member3Id).arg(KRSMEMBER3);
-    queryList.append(prepQuery);
+    if (signers.member2Id != "") {
+        prepQuery = query.arg(reportId).arg(signers.member2Id).arg(KRSMEMBER2);
+        queryList.append(prepQuery);
+    }
+    if (signers.member3Id != "") {
+        prepQuery = query.arg(reportId).arg(signers.member3Id).arg(KRSMEMBER3);
+        queryList.append(prepQuery);
+    }
     if (signers.member4Id != "") {
         prepQuery = query.arg(reportId).arg(signers.member4Id).arg(KRSMEMBER4);
         queryList.append(prepQuery);

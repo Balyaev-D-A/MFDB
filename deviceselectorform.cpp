@@ -1,6 +1,8 @@
 #include "deviceselectorform.h"
 #include "ui_deviceselectorform.h"
+#include "stringlistvalidator.h"
 #include <QMessageBox>
+#include <QCompleter>
 
 DeviceSelectorForm::DeviceSelectorForm(QWidget *parent) :
     QWidget(parent),
@@ -40,7 +42,8 @@ void DeviceSelectorForm::closeEvent(QCloseEvent *event)
 
 void DeviceSelectorForm::fillDeviceBox()
 {
-    QString query = "SELECT DISTINCT ON (sch_type) sch_type, sch_name FROM schedule WHERE sch_executor = 'ИТЦРК' ORDER BY sch_type ASC";
+    QStringList validList;
+    QString query = "SELECT DISTINCT ON (sch_type) sch_type FROM schedule WHERE sch_executor = 'ИТЦРК' ORDER BY sch_type ASC";
 
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -49,9 +52,16 @@ void DeviceSelectorForm::fillDeviceBox()
     ui->deviceBox->blockSignals(true);
     while (db->nextRecord())
     {
-        ui->deviceBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1).toString());
+        ui->deviceBox->addItem(db->fetchValue(0).toString());
+        validList.append(db->fetchValue(0).toString());
     }
     ui->deviceBox->blockSignals(false);
+    ui->deviceBox->completer()->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->deviceBox->completer()->setCompletionMode(QCompleter::PopupCompletion);
+    StringListValidator *validator = new StringListValidator(ui->deviceBox);
+    validator->setList(validList);
+    ui->deviceBox->setValidator(validator);
+    ui->deviceBox->setCurrentIndex(-1);
 }
 
 void DeviceSelectorForm::updateDeviceTree()
@@ -78,7 +88,6 @@ void DeviceSelectorForm::updateDeviceTree()
     }
 
     ui->deviceTree->clear();
-    ui->deviceTree->setHeaderLabel(ui->deviceBox->currentData().toString());
 
     while (db->nextRecord())
     {
@@ -101,6 +110,21 @@ void DeviceSelectorForm::updateDeviceTree()
         kksItem->setText(0, db->fetchValue(1).toString());
         if (usedKKS.contains(db->fetchValue(1).toString())) kksItem->setBackground(0, QBrush(Qt::red));
         unitItem->addChild(kksItem);
+    }
+
+    query = "SELECT sch_name FROM schedule WHERE sch_type = '%1' LIMIT 1";
+    query = query.arg(ui->deviceBox->currentText().simplified());
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    if (db->nextRecord()) {
+        ui->deviceTree->setHeaderLabel(db->fetchValue(0).toString());
+    }
+    else {
+        ui->deviceTree->setHeaderLabel("");
     }
 
     ui->deviceTree->sortItems(0, Qt::AscendingOrder);

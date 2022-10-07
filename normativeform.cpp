@@ -1,6 +1,8 @@
 #include <QDebug>
+#include <QCompleter>
 #include "normativeform.h"
 #include "ui_normativeform.h"
+#include "stringlistvalidator.h"
 
 NormativeForm::NormativeForm(QWidget *parent) :
     QWidget(parent),
@@ -48,6 +50,7 @@ void NormativeForm::setWorkType(QString wt)
 
 void NormativeForm::showEvent(QShowEvent *event)
 {
+    QStringList validList;
     QWidget::showEvent(event);
 
     ui->deviceBox->blockSignals(true);
@@ -63,9 +66,17 @@ void NormativeForm::showEvent(QShowEvent *event)
     while (db->nextRecord())
     {
         ui->deviceBox->addItem(db->fetchValue(0).toString());
+        validList.append(db->fetchValue(0).toString());
     }
 
     ui->deviceBox->blockSignals(false);
+
+    ui->deviceBox->completer()->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->deviceBox->completer()->setCompletionMode(QCompleter::PopupCompletion);
+    StringListValidator* validator = new StringListValidator(ui->deviceBox);
+    validator->setList(validList);
+    ui->deviceBox->setValidator(validator);
+    ui->deviceBox->setCurrentIndex(-1);
     updateNormatives();
 }
 
@@ -129,9 +140,10 @@ void NormativeForm::updateNormatives()
 {
     ui->workEdit->clear();
     ui->oesnEdit->clear();
+    ui->ktdEdit->clear();
     ui->actionsTextEdit->document()->clear();
 
-    QString query = "SELECT nw_oesn, nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'";
+    QString query = "SELECT nw_oesn, nw_ktd, nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -139,7 +151,8 @@ void NormativeForm::updateNormatives()
     }
     if (db->nextRecord()){
         ui->oesnEdit->setText(db->fetchValue(0).toString());
-        ui->workEdit->setText(db->fetchValue(1).toString());
+        ui->ktdEdit->setText(db->fetchValue(1).toString());
+        ui->workEdit->setText(db->fetchValue(2).toString());
     }
 
     updateNormTable();
@@ -154,20 +167,6 @@ void NormativeForm::updateNormatives()
     }
 
     if (db->nextRecord()) ui->actionsTextEdit->document()->setPlainText(db->fetchValue(0).toString());
-
-    query = "SELECT ktd_doc FROM ktd WHERE ktd_dev = '%1'";
-    query = query.arg(ui->deviceBox->currentText());
-
-    if (!db->execQuery(query)) {
-        db->showError(this);
-        return;
-    }
-    if (db->nextRecord()) {
-        ui->ktdEdit->setText(db->fetchValue(0).toString());
-    }
-    else {
-        ui->ktdEdit->clear();
-    }
 }
 
 bool NormativeForm::saveNormatives()
@@ -201,16 +200,9 @@ bool NormativeForm::saveNormatives()
         return false;
     }
 
-    query = "DELETE FROM ktd WHERE ktd_dev = '%1'";
-    query = query.arg(ui->deviceBox->currentText());
-    if (!db->execQuery(query)) {
-        db->showError(this);
-        db->rollbackTransaction();
-        return false;
-    }
-
-    query = "INSERT INTO normativwork (nw_dev, nw_worktype, nw_oesn, nw_work) VALUES ('%1' , '%2', '%3', '%4')";
+    query = "INSERT INTO normativwork (nw_dev, nw_worktype, nw_oesn, nw_ktd, nw_work) VALUES ('%1' , '%2', '%3', '%4', '%5')";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->oesnEdit->text());
+    query = query.arg(ui->ktdEdit->text().simplified());
     query = query.arg(ui->workEdit->text().replace(',', '.'));
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -232,16 +224,6 @@ bool NormativeForm::saveNormatives()
     {
         q = query.arg(ui->normativeTable->item(i, 0)->text()).arg(ui->normativeTable->item(i,2)->text().replace(',','.'));
         if (!db->execQuery(q)) {
-            db->showError(this);
-            db->rollbackTransaction();
-            return false;
-        }
-    }
-
-    if (ui->ktdEdit->text().simplified() != "") {
-        query = "INSERT INTO ktd (ktd_dev, ktd_doc) VALUES ('%1', '%2')";
-        query = query.arg(ui->deviceBox->currentText()).arg(ui->ktdEdit->text().simplified());
-        if (!db->execQuery(query)) {
             db->showError(this);
             db->rollbackTransaction();
             return false;

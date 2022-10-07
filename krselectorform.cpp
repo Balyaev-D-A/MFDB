@@ -26,7 +26,8 @@ KRSelectorForm::~KRSelectorForm()
 void KRSelectorForm::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    updateTable();
+    ui->monthBox->setCurrentIndex(QDate::currentDate().month());
+    //updateTable();
 }
 
 void KRSelectorForm::setDatabase(Database *db)

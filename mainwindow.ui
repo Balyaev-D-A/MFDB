@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tasksTab">
        <property name="enabled">
@@ -183,7 +183,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QTableWidget" name="raspTable">
+           <widget class="SearchTable" name="raspTable">
             <property name="editTriggers">
              <set>QAbstractItemView::NoEditTriggers</set>
             </property>
@@ -1008,6 +1008,11 @@
   </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>SearchTable</class>
+   <extends>QTableWidget</extends>
+   <header>searchtable.h</header>
+  </customwidget>
   <customwidget>
    <class>DefectsTable</class>
    <extends>QTableWidget</extends>

@@ -2,14 +2,14 @@
 #include <QKeyEvent>
 
 DefectsTable::DefectsTable(QWidget *parent)
-    :QTableWidget(parent)
+    :SearchTable(parent)
 {
 
 }
 
 void DefectsTable::keyPressEvent(QKeyEvent *event)
 {
-    QTableWidget::keyPressEvent(event);
+    SearchTable::keyPressEvent(event);
     if (event->key()  == Qt::Key_Backspace || event->key() == Qt::Key_Delete) {
         emit clearCellPressed();
     }

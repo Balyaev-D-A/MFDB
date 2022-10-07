@@ -7,6 +7,7 @@ TRReportForm::TRReportForm(QWidget *parent) :
     QWidget(parent, Qt::Window),
     ui(new Ui::TRReportForm)
 {
+    QDate currDate = QDate::currentDate();
     ui->setupUi(this);
     ui->tabWidget->tabBar()->hide();
     ui->tabWidget->setCurrentIndex(0);
@@ -14,8 +15,8 @@ TRReportForm::TRReportForm(QWidget *parent) :
     ui->selectedTRTable->setAcceptFrom(ui->trTable);
     ui->trTable->hideColumn(0);
     ui->selectedTRTable->hideColumn(0);
-    ui->begDateEdit->setDate(QDate::currentDate());
-    ui->endDateEdit->setDate(QDate::currentDate());
+    ui->begDateEdit->setDate(QDate(currDate.year(), currDate.month(), 1));
+    ui->endDateEdit->setDate(QDate(currDate.year(), currDate.month(), currDate.daysInMonth()));
     ui->dateEdit->setDate(QDate::currentDate());
     ui->signersTable->hideColumn(0);
     ui->ownerEdit->setAcceptFrom(ui->signersTable);
@@ -26,6 +27,8 @@ TRReportForm::TRReportForm(QWidget *parent) :
     ui->member5Edit->setAcceptFrom(ui->signersTable);
     ui->repairerEdit->setAcceptFrom(ui->signersTable);
     ui->chiefEdit->setAcceptFrom(ui->signersTable);
+    ui->member2Edit->setStyleSheet("background: rgb(255, 255, 0);");
+    ui->member3Edit->setStyleSheet("background: rgb(255, 255, 0);");
     ui->member4Edit->setStyleSheet("background: rgb(255, 255, 0);");
     ui->member5Edit->setStyleSheet("background: rgb(255, 255, 0);");
     connect(ui->unitBox, &QComboBox::currentTextChanged, this, &TRReportForm::unitChanged);
@@ -73,6 +76,8 @@ void TRReportForm::showEvent(QShowEvent *event)
     fillUnitBox();
     updateTRTable();
     updateSignersTable();
+    if (ui->docNumEdit->text() == "")
+        ui->docNumEdit->setText(db->getVariable("НомерДокТР").toString());
 }
 
 void TRReportForm::editReport(QString Id)
@@ -479,14 +484,6 @@ bool TRReportForm::checkFilling()
         showErrorMessage("Не выбран один из членов комиссии.");
         return false;
     }
-    if (ui->member2Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членов комиссии.");
-        return false;
-    }
-    if (ui->member3Edit->text().isEmpty()) {
-        showErrorMessage("Не выбран один из членов комиссии.");
-        return false;
-    }
     if (ui->repairerEdit->text().isEmpty()) {
         showErrorMessage("Не выбран представитель цеха ответственного за ремонт.");
         return false;
@@ -598,10 +595,14 @@ void TRReportForm::doneButtonClicked()
     queryList.append(prepQuery);
     prepQuery = query.arg(reportId).arg(signers.member1Id).arg(TRSMEMBER1);
     queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.member2Id).arg(TRSMEMBER2);
-    queryList.append(prepQuery);
-    prepQuery = query.arg(reportId).arg(signers.member3Id).arg(TRSMEMBER3);
-    queryList.append(prepQuery);
+    if (signers.member2Id != "") {
+        prepQuery = query.arg(reportId).arg(signers.member2Id).arg(TRSMEMBER2);
+        queryList.append(prepQuery);
+    }
+    if (signers.member3Id != "") {
+        prepQuery = query.arg(reportId).arg(signers.member3Id).arg(TRSMEMBER3);
+        queryList.append(prepQuery);
+    }
     if (signers.member4Id != "") {
         prepQuery = query.arg(reportId).arg(signers.member4Id).arg(TRSMEMBER4);
         queryList.append(prepQuery);
@@ -630,7 +631,17 @@ void TRReportForm::doneButtonClicked()
 
 void TRReportForm::addAllButtonClicked()
 {
-    return;
+    int curRow;
+    for (int i=0; i<ui->trTable->rowCount(); i++)
+    {
+        curRow = ui->selectedTRTable->rowCount();
+        ui->selectedTRTable->insertRow(curRow);
+        for (int col=0; col<4; col++)
+        {
+            ui->selectedTRTable->setItem(curRow, col, new QTableWidgetItem(ui->trTable->item(i, col)->text()));
+        }
+    }
+    updateTRTable();
 }
 
 void TRReportForm::removeAllButtonClicked()

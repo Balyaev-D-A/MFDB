@@ -2,7 +2,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileDialog>
-
+#include <QDate>
 #include "krreportsform.h"
 #include "ui_krreportsform.h"
 
@@ -34,7 +34,7 @@ void KRReportsForm::setDatabase(Database *db)
 void KRReportsForm::updateReports()
 {
     int curRow;
-    QString query = "SELECT krr_id, unit_name, krr_desc FROM krreports "
+    QString query = "SELECT krr_id, krr_date, unit_name, krr_desc FROM krreports "
                     "LEFT JOIN units ON krr_unit = unit_id";
 
     while (ui->table->rowCount()) ui->table->removeRow(0);
@@ -49,12 +49,19 @@ void KRReportsForm::updateReports()
     {
         curRow = ui->table->rowCount();
         ui->table->insertRow(curRow);
-        for (int i=0; i<3; i++)
+        for (int i=0; i<4; i++)
         {
+            if (i == 1) {
+                QTableWidgetItem *it = new QTableWidgetItem();
+                it->setData(Qt::EditRole, QDate::fromString(db->fetchValue(i).toString(), "dd.MM.yyyy"));
+                ui->table->setItem(curRow, i, it);
+                continue;
+            }
             ui->table->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
     ui->table->setSortingEnabled(true);
+    ui->table->sortByColumn(1, Qt::AscendingOrder);
     ui->table->resizeColumnsToContents();
 }
 
@@ -146,7 +153,7 @@ void KRReportsForm::saveButtonClicked()
 
     page.replace("$BODY$", body);
 
-    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", QApplication::applicationDirPath(), "HTML файлы (*.htm *.html)");
+    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения","", "HTML файлы (*.htm *.html)");
     file.setFileName(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
@@ -194,7 +201,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     QStringList workList, ktdList, opcardNums;
     QString page, unitShortName, subsystem, date, begDate, endDate, planBegDate, planEndDate, ktdText;
     QString orderDate, orderNum, schedNum, docNum, workType, firstWork, otherWorks, works, accordingDoc;
-    QString ownerLoc, ownerName, member1Loc, member1Name, member2Loc, member2Name, member3Loc, member3Name;
+    QString ownerLoc, ownerName, member1Loc, member1Name;
     QString repairerLoc, repairerName, chiefLoc, chiefName, executor;
     QFile file;
     QTextStream *ts;
@@ -205,6 +212,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     int breakPos;
     bool isFit = false;
     const int firstWorkWidth = 414;
+    QString member2Loc = "", member2Name = "", member3Loc = "", member3Name = "";
     QString member4Loc = "", member4Name = "", member5Loc = "", member5Name = "";
     QString additionalMemberRow = "<tr class=\"avr2row18\">\n"
             "<td class=\"border-l\"></td>\n"
@@ -385,6 +393,16 @@ QStringList KRReportsForm::makeAVR(QString reportId)
         }
     }
 
+    if (member2Name != "") {
+        prepAddMemberRow = additionalMemberRow.arg(member2Loc).arg(date).arg(member2Name);
+        addMembers += prepAddMemberRow;
+    }
+
+    if (member3Name != "") {
+        prepAddMemberRow = additionalMemberRow.arg(member3Loc).arg(date).arg(member3Name);
+        addMembers += prepAddMemberRow;
+    }
+
     if (member4Name != "") {
         prepAddMemberRow = additionalMemberRow.arg(member4Loc).arg(date).arg(member4Name);
         addMembers += prepAddMemberRow;
@@ -456,11 +474,7 @@ QStringList KRReportsForm::makeAVR(QString reportId)
     page.replace("$OWNERLOC$", ownerLoc);
     page.replace("$OWNERNAME$", ownerName);
     page.replace("$MEMBER1LOC$", member1Loc);
-    page.replace("$MEMBER2LOC$", member2Loc);
-    page.replace("$MEMBER3LOC$", member3Loc);
     page.replace("$MEMBER1NAME$", member1Name);
-    page.replace("$MEMBER2NAME$", member2Name);
-    page.replace("$MEMBER3NAME$", member3Name);
     page.replace("$AMEMBERS$", addMembers);
     page.replace("$REPAIRERLOC$", repairerLoc);
     page.replace("$REPAIRERNAME$", repairerName);
@@ -509,7 +523,7 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         docNum = db->fetchValue(3).toString();
     }
 
-    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate, ktd_doc FROM krrworks "
+    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate FROM krrworks "
             "LEFT JOIN kaprepairs ON krw_work = kr_id "
             "LEFT JOIN schedule ON kr_sched = sch_id "
             "LEFT JOIN ktd ON sch_type = ktd_dev "
@@ -528,7 +542,6 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         w.kks = db->fetchValue(2).toString();
         w.begDate = db->fetchValue(3).toString();
         w.endDate = db->fetchValue(4).toString();
-        w.ktdDoc = db->fetchValue(5).toString();
         workList.append(w);
     }
     works.chop(2);
@@ -597,11 +610,6 @@ QStringList KRReportsForm::makeVVR(QString reportId)
             page = pageTempSign;
         }
 
-        if (workList[i].ktdDoc == "")
-            ktdText = "регламент РГ.0.33.01";
-        else
-            ktdText = workList[i].ktdDoc;
-
         currWork = "Капитальный ремонт: " + workList[i].name + " " + workList[i].type + ", " + workList[i].kks;
 
         query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'КР'";
@@ -613,14 +621,23 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         if (db->nextRecord()) workActions = db->fetchValue(0).toString();
         else workActions = "";
         workActions.replace("\n", "<br/>");
-        query = "SELECT nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР'";
+        query = "SELECT nw_work, nw_ktd FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР'";
         query = query.arg(workList[i].type);
         if (!db->execQuery(query)) {
             db->showError(this);
             return result;
         }
-        if (db->nextRecord()) workHours = db->fetchValue(0).toString();
-        else workHours = "";
+        if (db->nextRecord()) {
+            workHours = db->fetchValue(0).toString();
+            ktdText = db->fetchValue(1).toString();
+        }
+        else {
+            workHours = "";
+            ktdText = "регламент РГ.0.33.01";
+        }
+
+        if (ktdText.simplified() == "")
+            ktdText = "регламент РГ.0.33.01";
 
         page.replace("$USN$", unitShortName);
         page.replace("$DOCNUM$", docNum);
@@ -672,7 +689,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
     QList<QStringList> matTable;
     QStringList matRow;
     QStringList pages;
-    int pageCount, currBlockSize, allBlocksSize, foundRow, strCount;
+    int pageCount, currBlockSize, allBlocksSize, strCount;
     QFile file;
     QTextStream *ts;
     QStringList result;
@@ -776,9 +793,6 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
         endDate = maxDate(endDate, workList[i].endDate);
 
         workRows = "";
-        workRows += header1Temp;
-        currBlockSize += head1Height;
-        workRows.replace("$WORK$", workList[i].name + " " + workList[i].type + ", " + workList[i].kks);
         QString query = "SELECT nw_oesn FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР'";
         query = query.arg(workList[i].type);
         if (!db->execQuery(query)) {
@@ -791,36 +805,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
             oesn = "";
         }
 
-        query = "SELECT nm_material, mat_name, mat_doc, mat_measure, nm_count FROM normativmat "
-                "LEFT JOIN materials ON nm_material = mat_id "
-                "WHERE nm_dev = '%1' AND nm_worktype = 'КР'";
-        query = query.arg(workList[i].type);
-        if (!db->execQuery(query)) {
-            db->showError(this);
-            return result;
-        }
-        if (db->affectedRows() > 0){
-            workRows += header2Temp;
-            workRows.replace("$OESN$", oesn);
-            currBlockSize += head2Height;
-        }
-        matTable.clear();
-        while (db->nextRecord())
-        {
-            matRow.clear();
-            matRow.append(db->fetchValue(0).toString());
-            matName = db->fetchValue(1).toString();
-            matDoc = db->fetchValue(2).toString();
-            matName = matName.simplified();
-            if (!matName.endsWith(".")) matName += ".";
-            matRow.append(matName + " " + matDoc);
-            matRow.append(db->fetchValue(3).toString());
-            matRow.append(db->fetchValue(4).toString());
-            matRow.append(db->fetchValue(4).toString());
-            matTable.append(matRow);
-        }
-
-        query = "SELECT kam_material, mat_name, mat_doc, mat_measure, kam_count FROM kradditionalmats "
+        query = "SELECT kam_material, mat_name, mat_doc, mat_measure, kam_oesn, kam_count FROM kradditionalmats "
                 "LEFT JOIN materials ON kam_material = mat_id "
                 "WHERE kam_kr = '%1'";
         query = query.arg(workList[i].krId);
@@ -830,33 +815,30 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
             return result;
         }
 
+        if (db->affectedRows() > 0){
+            workRows += header1Temp;
+            currBlockSize += head1Height;
+            workRows.replace("$WORK$", workList[i].name + " " + workList[i].type + ", " + workList[i].kks);
+            workRows += header2Temp;
+            workRows.replace("$OESN$", oesn);
+            currBlockSize += head2Height;
+        }
+        matTable.clear();
         while (db->nextRecord())
         {
-            foundRow = -1;
-            for (int j=0; j<matTable.size(); j++)
-            {
-                if (matTable[j][0] == db->fetchValue(0).toString()) foundRow = i;
-            }
-
-            if (foundRow < 0) {
-                matRow.clear();
-                matRow.append(db->fetchValue(0).toString());
-                matName = db->fetchValue(1).toString();
-                matDoc = db->fetchValue(2).toString();
-                matName = matName.simplified();
-                if (!matName.endsWith(".")) matName += ".";
-                matRow.append(matName + " " + matDoc);
-                matRow.append(db->fetchValue(3).toString());
-                matRow.append("-");
-                matRow.append(db->fetchValue(4).toString());
-                matTable.append(matRow);
-            } else {
-                if (db->fetchValue(4).toFloat() == 0.00) {
-                    matTable.removeAt(foundRow);
-                } else {
-                    matTable[foundRow][4] = db->fetchValue(4).toString();
-                }
-            }
+            if (db->fetchValue(5).toFloat() == 0.00) continue;
+            matRow.clear();
+            matRow.append(db->fetchValue(0).toString());
+            matName = db->fetchValue(1).toString();
+            matDoc = db->fetchValue(2).toString();
+            matName = matName.simplified();
+            if (!matName.endsWith(".")) matName += ".";
+            matRow.append(matName + " " + matDoc);
+            matRow.append(db->fetchValue(3).toString());
+            if (db->fetchValue(4).toFloat() == 0.00) matRow.append("-");
+            else matRow.append(db->fetchValue(4).toString());
+            matRow.append(db->fetchValue(5).toString());
+            matTable.append(matRow);
         }
 
         for (int j=0; j<matTable.size(); j++)

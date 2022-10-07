@@ -3,8 +3,9 @@
 
 #include <QWidget>
 #include <QTableWidget>
+#include "searchtable.h"
 
-class DefectsTable : public QTableWidget
+class DefectsTable : public SearchTable
 {
     Q_OBJECT
 public:

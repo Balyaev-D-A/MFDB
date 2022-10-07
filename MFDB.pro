@@ -36,8 +36,11 @@ SOURCES += \
     raspform.cpp \
     receiptform.cpp \
     receiptsform.cpp \
+    searchtable.cpp \
     settings.cpp \
     settingsform.cpp \
+    stringlistvalidator.cpp \
+    tablesearchwidget.cpp \
     trreportform.cpp \
     trreportsform.cpp \
     verifyform.cpp \
@@ -71,8 +74,11 @@ HEADERS += \
     raspform.h \
     receiptform.h \
     receiptsform.h \
+    searchtable.h \
     settings.h \
     settingsform.h \
+    stringlistvalidator.h \
+    tablesearchwidget.h \
     trreportform.h \
     trreportsform.h \
     verifyform.h \
@@ -98,6 +104,7 @@ FORMS += \
     receiptform.ui \
     receiptsform.ui \
     settingsform.ui \
+    tablesearchwidget.ui \
     trreportform.ui \
     trreportsform.ui \
     verifyform.ui \

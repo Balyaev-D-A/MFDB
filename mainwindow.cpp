@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     ui->quarterBox->setCurrentIndex(quarter - 1);
+    ui->krMonthBox->setCurrentIndex(QDate::currentDate().month());
 
     ui->tasksTab->deleteLater();
     ui->rasp_tab->deleteLater();
@@ -137,7 +138,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->employeeBox->addItem("Все", 0);
 //    while (db->nextRecord())
 //        ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
-//    updateRaspTable();
+    updateRaspTable();
     updateDefectsTable();
     updateKRTable();
 }

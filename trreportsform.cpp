@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QFileDialog>
+#include <QDate>
 #include "trreportsform.h"
 #include "ui_trreportsform.h"
 
@@ -31,7 +32,7 @@ void TRReportsForm::setDatabase(Database *db)
 void TRReportsForm::updateReports()
 {
     int curRow;
-    QString query = "SELECT trr_id, unit_name, trr_desc FROM trreports "
+    QString query = "SELECT trr_id, trr_date, unit_name, trr_desc FROM trreports "
                     "LEFT JOIN units ON trr_unit = unit_id";
 
     while (ui->table->rowCount()) ui->table->removeRow(0);
@@ -46,12 +47,19 @@ void TRReportsForm::updateReports()
     {
         curRow = ui->table->rowCount();
         ui->table->insertRow(curRow);
-        for (int i=0; i<3; i++)
+        for (int i=0; i<4; i++)
         {
+            if (i == 1) {
+                QTableWidgetItem *it = new QTableWidgetItem();
+                it->setData(Qt::EditRole, QDate::fromString(db->fetchValue(i).toString(), "dd.MM.yyyy"));
+                ui->table->setItem(curRow, i, it);
+                continue;
+            }
             ui->table->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
     ui->table->setSortingEnabled(true);
+    ui->table->sortByColumn(1, Qt::AscendingOrder);
     ui->table->resizeColumnsToContents();
 }
 
@@ -148,7 +156,7 @@ void TRReportsForm::saveButtonClicked()
 
     page.replace("$BODY$", body);
 
-    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", QApplication::applicationDirPath(), "HTML файлы (*.htm *.html)");
+    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", "", "HTML файлы (*.htm *.html)");
     file.setFileName(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
@@ -394,6 +402,16 @@ QStringList TRReportsForm::makeAVR(QString reportId)
         }
     }
 
+    if (member2Name != "") {
+        prepAddMemberRow = additionalMemberRow.arg(member2Loc).arg(date).arg(member2Name);
+        addMembers += prepAddMemberRow;
+    }
+
+    if (member3Name != "") {
+        prepAddMemberRow = additionalMemberRow.arg(member3Loc).arg(date).arg(member3Name);
+        addMembers += prepAddMemberRow;
+    }
+
     if (member4Name != "") {
         prepAddMemberRow = additionalMemberRow.arg(member4Loc).arg(date).arg(member4Name);
         addMembers += prepAddMemberRow;
@@ -465,11 +483,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     page.replace("$OWNERLOC$", ownerLoc);
     page.replace("$OWNERNAME$", ownerName);
     page.replace("$MEMBER1LOC$", member1Loc);
-    page.replace("$MEMBER2LOC$", member2Loc);
-    page.replace("$MEMBER3LOC$", member3Loc);
     page.replace("$MEMBER1NAME$", member1Name);
-    page.replace("$MEMBER2NAME$", member2Name);
-    page.replace("$MEMBER3NAME$", member3Name);
     page.replace("$AMEMBERS$", addMembers);
     page.replace("$REPAIRERLOC$", repairerLoc);
     page.replace("$REPAIRERNAME$", repairerName);
@@ -523,7 +537,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         docNum = db->fetchValue(3).toString();
     }
 
-    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_journaldesc, def_realdesc, def_repairdesc, def_actionsdesc, ktd_doc FROM trrworks "
+    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_journaldesc, def_realdesc, def_repairdesc, def_actionsdesc FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
             "LEFT JOIN ktd ON def_devtype = ktd_dev "
             "WHERE trw_report = '%1' ORDER BY def_id";
@@ -545,7 +559,6 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         w.realDesc = db->fetchValue(6).toString();
         w.repairDesc = db->fetchValue(7).toString();
         w.actionsDesc = db->fetchValue(8).toString();
-        w.ktdDoc = db->fetchValue(9).toString();
         workList.append(w);
     }
     works.chop(2);
@@ -615,21 +628,25 @@ QStringList TRReportsForm::makeVVR(QString reportId)
             page = pageTempSign;
         }
 
-        if (workList[i].ktdDoc == "")
-            ktdText = "регламент РГ.0.33.01";
-        else
-            ktdText = workList[i].ktdDoc;
-
         currWork = "Текущий ремонт: " + workList[i].name + " " + workList[i].type + ", " + workList[i].kks + "\n";
 
-        query = "SELECT nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
+        query = "SELECT nw_work, nw_ktd FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
         query = query.arg(workList[i].type);
         if (!db->execQuery(query)) {
             db->showError(this);
             return result;
         }
-        if (db->nextRecord()) workHours = db->fetchValue(0).toString();
-        else workHours = "";
+        if (db->nextRecord()) {
+            workHours = db->fetchValue(0).toString();
+            ktdText = db->fetchValue(1).toString();
+        }
+        else {
+            workHours = "";
+            ktdText = "регламент РГ.0.33.01";
+        }
+
+        if (ktdText.simplified() == "")
+            ktdText = "регламент РГ.0.33.01";
 
         page.replace("$USN$", unitShortName);
         page.replace("$DOCNUM$", docNum);
@@ -681,7 +698,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
     QList<QStringList> matTable;
     QStringList matRow;
     QStringList pages;
-    int pageCount, currBlockSize, allBlocksSize, foundRow, strCount;
+    int pageCount, currBlockSize, allBlocksSize, strCount;
     QFile file;
     QTextStream *ts;
     QStringList result;
@@ -784,9 +801,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
         endDate = maxDate(endDate, workList[i].endDate);
 
         workRows = "";
-        workRows += header1Temp;
-        currBlockSize += head1Height;
-        workRows.replace("$WORK$", workList[i].name + " " + workList[i].type + ", " + workList[i].kks);
+
         QString query = "SELECT nw_oesn FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
         query = query.arg(workList[i].type);
         if (!db->execQuery(query)) {
@@ -811,6 +826,9 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
         }
 
         if (db->affectedRows() > 0) {
+            workRows += header1Temp;
+            currBlockSize += head1Height;
+            workRows.replace("$WORK$", workList[i].name + " " + workList[i].type + ", " + workList[i].kks);
             workRows += header2Temp;
             workRows.replace("$OESN$", oesn);
             currBlockSize += head2Height;
@@ -818,7 +836,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
 
         while (db->nextRecord())
         {
-            //if (db->fetchValue(5).toFloat() == 0) continue;
+            if (db->fetchValue(5).toFloat() == 0) continue;
             matRow.clear();
             matRow.append(db->fetchValue(0).toString());
             matName = db->fetchValue(1).toString();
@@ -1046,6 +1064,14 @@ QStringList TRReportsForm::makeADO(QString reportId)
         }
     }
 
+    if (member2Name != "") {
+        addMembers += additionalMemberRow.arg(member2Loc).arg(date).arg(member2Name);
+        fillerS -= memberRowHeight;
+    }
+    if (member3Name != "") {
+        addMembers += additionalMemberRow.arg(member3Loc).arg(date).arg(member3Name);
+        fillerS -= memberRowHeight;
+    }
     if (member4Name != "") {
         addMembers += additionalMemberRow.arg(member4Loc).arg(date).arg(member4Name);
         fillerS -= memberRowHeight;
@@ -1186,11 +1212,7 @@ QStringList TRReportsForm::makeADO(QString reportId)
             page.replace("$OWNERLOC$", ownerLoc);
             page.replace("$OWNERNAME$", ownerName);
             page.replace("$MEMBER1LOC$", member1Loc);
-            page.replace("$MEMBER2LOC$", member2Loc);
-            page.replace("$MEMBER3LOC$", member3Loc);
             page.replace("$MEMBER1NAME$", member1Name);
-            page.replace("$MEMBER2NAME$", member2Name);
-            page.replace("$MEMBER3NAME$", member3Name);
             page.replace("$AMEMBERS$", addMembers);
             page.replace("$REPAIRERLOC$", repairerLoc);
             page.replace("$REPAIRERNAME$", repairerName);

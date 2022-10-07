@@ -68,7 +68,7 @@ bool Database::deployTables()
                   "nm_material INTEGER REFERENCES materials(mat_id), nm_count DECIMAL(6,3))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS normativwork (nw_id SERIAL PRIMARY KEY, nw_dev VARCHAR(50), nw_worktype CHAR(2), "
-                  "nw_oesn VARCHAR(255), nw_work DECIMAL(5,2))")) return false;
+                  "nw_oesn VARCHAR(255), nw_ktd VARCHAR(255), nw_work DECIMAL(5,2))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS normativactions (na_id SERIAL PRIMARY KEY, na_dev VARCHAR(50), na_worktype CHAR(2), "
                   "na_actions TEXT)")) return false;
