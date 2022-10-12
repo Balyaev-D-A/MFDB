@@ -5,11 +5,12 @@
 
 
 RaspForm::RaspForm(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::RaspForm)
 {
-    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
+    ui->zoneGroup->setId(ui->ZKDRadio, 0);
+    ui->zoneGroup->setId(ui->ZSDRadio, 1);
     wEditor = new FieldEditor(ui->workTable->viewport());
     wEditor->hide();
     cwEditor = new FieldEditor(ui->currWorkTable->viewport());
@@ -59,11 +60,12 @@ void RaspForm::setDatabase(Database *db)
     this->db = db;
 }
 
-void RaspForm::newRasp()
+void RaspForm::newRasp(QDate date)
 {
     ui->unitBox->blockSignals(true);
     ui->monthBox->blockSignals(true);
-    ui->dateEdit->setDate(QDate::currentDate());
+    ui->dateEdit->setDate(date);
+    ui->ZKDRadio->setChecked(true);
 
     db->execQuery("select iss_id, iss_name, iss_default from issuers");
     while (db->nextRecord())
@@ -352,7 +354,7 @@ void RaspForm::unitChanged(const QString &text)
 
 void RaspForm::wCellDblClicked(int row, int column)
 {
-    if (column != 4) return;
+    if (column != 4) addWorkClicked();
     wEditor->setCell(row, column);
     wEditor->setGeometry(ui->workTable->visualItemRect(ui->workTable->item(row, column)));
     wEditor->setText(ui->workTable->item(row, column)->text());
@@ -444,6 +446,9 @@ void RaspForm::cwInputRejected()
 
 void RaspForm::saveButtonClicked()
 {
+    QString unit;
+    QString query;
+
     if (ui->currWorkTable->rowCount() == 0) {
         QMessageBox::critical(this, "Невозможно сохранить распоряжение!", "Список работ по распоряжению пуст. Добавьте работы по распоряжению.");
         return;
@@ -454,15 +459,24 @@ void RaspForm::saveButtonClicked()
         return;
     }
 
-    QString query;
+    query = "SELECT unit_shortname FROM units WHERE unit_id = '%1'";
+    query = query.arg(ui->unitBox->currentData().toString());
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    if (db->nextRecord())
+        unit = db->fetchValue(0).toString();
 
     QStringList s = ui->numEdit->text().split("/");
     QString num = s[0].simplified() + "/" + s[1].simplified();
 
     if (currentRasp < 0) {
-        query = "insert into rasp (rasp_num, rasp_date, rasp_issuer, rasp_completed, rasp_executor) "
+        query = "insert into rasp (rasp_num, rasp_date, rasp_issuer, rasp_completed, rasp_executor, rasp_zkd, rasp_unit) "
                 "values ('%1', '%2', '%3', '%4', "
-                "(select emp_id from employees where emp_name = '%5' limit 1))";
+                "(select emp_id from employees where emp_name = '%5' limit 1), '%6', '%7')";
 
         query = query.arg(num);
         query = query.arg(ui->dateEdit->text());
@@ -472,6 +486,14 @@ void RaspForm::saveButtonClicked()
         else
             query = query.arg("false");
         query = query.arg(ui->teamTree->topLevelItem(0)->text(0));
+        if (ui->zoneGroup->checkedId()==0)
+            query = query.arg("true");
+        else
+            query = query.arg("false");
+        if (ui->unitEdit->text().simplified().isEmpty())
+            query = query.arg(unit);
+        else
+            query = query.arg(ui->unitEdit->text().simplified());
 
         db->startTransaction();
         if (!db->execQuery(query)) {
@@ -513,9 +535,10 @@ void RaspForm::saveButtonClicked()
     else {
         db->startTransaction();
         query = "update rasp set rasp_num = '%1', rasp_date = '%2', "
-                "rasp_issuer = %3, rasp_completed = %4, "
-                "rasp_executor = (select emp_id from employees where emp_name = '%5' limit 1)";
-
+                "rasp_issuer = '%3', rasp_completed = '%4', "
+                "rasp_executor = (select emp_id from employees where emp_name = '%5' limit 1), "
+                "rasp_zkd = '%6', rasp_unit = '%7' "
+                "where rasp_id = '%8'";
         query = query.arg(num);
         query = query.arg(ui->dateEdit->text());
         query = query.arg(ui->issuerBox->currentData().toInt());
@@ -524,11 +547,22 @@ void RaspForm::saveButtonClicked()
         else
             query = query.arg("false");
         query = query.arg(ui->teamTree->topLevelItem(0)->text(0));
+        if (ui->zoneGroup->checkedId()==0)
+            query = query.arg("true");
+        else
+            query = query.arg("false");
+        if (ui->unitEdit->text().simplified().isEmpty())
+            query = query.arg(unit);
+        else
+            query = query.arg(ui->unitEdit->text().simplified());
+        query = query.arg(currentRasp);
+
         if (!db->execQuery(query)) {
             db->rollbackTransaction();
             db->showError(this);
             return;
         }
+
         if (teamChanged) {
             query = "delete from rmembers where rm_rasp = " + QString("%1").arg(currentRasp);
             if (!db->execQuery(query)) {
@@ -688,7 +722,7 @@ bool RaspForm::editRasp(QString raspId)
     updateWorkTable();
     updateMembers();
 
-    query = "select rasp_num, rasp_date, rasp_issuer, rasp_executor, rasp_completed from rasp "
+    query = "select rasp_num, rasp_date, rasp_issuer, rasp_executor, rasp_completed, rasp_zkd, rasp_unit from rasp "
                     "where rasp_id = " + raspId;
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -702,12 +736,18 @@ bool RaspForm::editRasp(QString raspId)
         QVariant issuer = db->fetchValue(2);
         bool completed = db->fetchValue(4).toBool();
         executorId = db->fetchValue(3).toInt();
+        if (db->fetchValue(5).toBool())
+            ui->ZKDRadio->setChecked(true);
+        else
+            ui->ZSDRadio->setChecked(true);
+        ui->unitEdit->setText(db->fetchValue(6).toString());
         ui->numEdit->setText(num);
         QStringList d = date.split(".");
         ui->dateEdit->setDate(QDate(d[2].toInt(), d[1].toInt(), d[0].toInt()));
         ui->monthBox->setCurrentIndex(d[1].toInt());
         ui->issuerBox->setCurrentIndex(ui->issuerBox->findData(issuer));
         ui->completedCheckBox->setChecked(completed);
+
     }
 
     for (int i=0; i<ui->teamList->count(); i++)

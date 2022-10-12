@@ -4,7 +4,7 @@
 
 
 DragDropTable::DragDropTable(QWidget *parent)
-    :QTableWidget(parent)
+    :SearchTable(parent)
 {
     persistentRows.clear();
 }

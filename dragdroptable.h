@@ -1,10 +1,10 @@
 #ifndef DRAGDROPTABLE_H
 #define DRAGDROPTABLE_H
 
-#include <QTableWidget>
+#include "searchtable.h"
 #include <QMouseEvent>
 
-class DragDropTable : public QTableWidget
+class DragDropTable : public SearchTable
 {
     Q_OBJECT
 public:

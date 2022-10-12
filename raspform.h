@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QDate>
 #include "database.h"
 #include "fieldeditor.h"
 #include "worktypewidget.h"
@@ -26,7 +27,7 @@ public:
     ~RaspForm();
     void setDatabase(Database *db);
     bool editRasp(QString raspId);
-    void newRasp();
+    void newRasp(QDate date = QDate::currentDate());
 
 
 

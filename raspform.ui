@@ -16,336 +16,374 @@
   <property name="windowTitle">
    <string>Распряжение</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_17">
+  <layout class="QVBoxLayout" name="verticalLayout_16">
    <item>
-    <widget class="QSplitter" name="splitter_2">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <widget class="QSplitter" name="splitter">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayout_16">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_7">
-            <item>
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>Номер</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="numEdit">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="inputMask">
-               <string>000/00</string>
-              </property>
-              <property name="text">
-               <string>000/00</string>
-              </property>
-              <property name="cursorPosition">
-               <number>6</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_8">
-            <item>
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Дата</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDateEdit" name="dateEdit"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Распоряжение выдал</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="issuerBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="editable">
-               <bool>false</bool>
-              </property>
-              <property name="currentText">
-               <string/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_15">
-            <item>
-             <widget class="DragDropTable" name="currWorkTable">
-              <property name="acceptDrops">
-               <bool>true</bool>
-              </property>
-              <property name="editTriggers">
-               <set>QAbstractItemView::NoEditTriggers</set>
-              </property>
-              <property name="dragEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="dragDropOverwriteMode">
-               <bool>false</bool>
-              </property>
-              <property name="dragDropMode">
-               <enum>QAbstractItemView::DragDrop</enum>
-              </property>
-              <property name="defaultDropAction">
-               <enum>Qt::IgnoreAction</enum>
-              </property>
-              <property name="selectionMode">
-               <enum>QAbstractItemView::SingleSelection</enum>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="sortingEnabled">
-               <bool>true</bool>
-              </property>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>Id</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Обозначение</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Тип</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Вид работ</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Помещение</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Трудозатраты</string>
-               </property>
-              </column>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="labelRaspTotal">
-              <property name="text">
-               <string>Итоговые трудозатраты: 0 часов.</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QToolButton" name="addWorkButton">
-              <property name="text">
-               <string>&lt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="removeWorkButton">
-              <property name="text">
-               <string>&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <widget class="DragDropTree" name="teamTree">
-          <property name="acceptDrops">
-           <bool>true</bool>
-          </property>
-          <property name="dragDropMode">
-           <enum>QAbstractItemView::DragDrop</enum>
-          </property>
-          <property name="defaultDropAction">
-           <enum>Qt::IgnoreAction</enum>
-          </property>
-          <column>
-           <property name="text">
-            <string>Состав бригады</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Номер</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="numEdit">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="inputMask">
+              <string>000/00</string>
+             </property>
+             <property name="text">
+              <string>000/00</string>
+             </property>
+             <property name="cursorPosition">
+              <number>6</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Дата</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateEdit" name="dateEdit"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Распоряжение выдал</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="issuerBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="editable">
+              <bool>false</bool>
+             </property>
+             <property name="currentText">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>Зона</string>
            </property>
-          </column>
-         </widget>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <property name="topMargin">
+             <number>1</number>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
+            <property name="bottomMargin">
+             <number>1</number>
             </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QToolButton" name="addMemberButton">
+            <item>
+             <widget class="QRadioButton" name="ZKDRadio">
+              <property name="text">
+               <string>ЗКД</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">zoneGroup</string>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="ZSDRadio">
+              <property name="text">
+               <string>ЗСД</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">zoneGroup</string>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Блок</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="unitEdit"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_15">
+           <item>
+            <widget class="DragDropTable" name="currWorkTable">
+             <property name="acceptDrops">
+              <bool>true</bool>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="dragEnabled">
+              <bool>true</bool>
+             </property>
+             <property name="dragDropOverwriteMode">
+              <bool>false</bool>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragDrop</enum>
+             </property>
+             <property name="defaultDropAction">
+              <enum>Qt::IgnoreAction</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <property name="sortingEnabled">
+              <bool>true</bool>
+             </property>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Id</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Обозначение</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Тип</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Вид работ</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Помещение</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Трудозатраты</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="addWorkButton">
+             <property name="text">
+              <string>&lt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="removeWorkButton">
+             <property name="text">
+              <string>&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelRaspTotal">
+         <property name="text">
+          <string>Итоговые трудозатраты: 0 часов.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="DragDropTree" name="teamTree">
+           <property name="acceptDrops">
+            <bool>true</bool>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::DragDrop</enum>
+           </property>
+           <property name="defaultDropAction">
+            <enum>Qt::IgnoreAction</enum>
+           </property>
+           <column>
             <property name="text">
-             <string>&lt;</string>
+             <string>Состав бригады</string>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="removeMemberButton">
-            <property name="text">
-             <string>&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="DragDropList" name="teamList">
-          <property name="acceptDrops">
-           <bool>true</bool>
-          </property>
-          <property name="dragEnabled">
-           <bool>true</bool>
-          </property>
-          <property name="dragDropMode">
-           <enum>QAbstractItemView::DragDrop</enum>
-          </property>
-          <property name="defaultDropAction">
-           <enum>Qt::IgnoreAction</enum>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>16</width>
-            <height>16</height>
-           </size>
-          </property>
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
+           </column>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="addMemberButton">
+             <property name="text">
+              <string>&lt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="removeMemberButton">
+             <property name="text">
+              <string>&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="DragDropList" name="teamList">
+           <property name="acceptDrops">
+            <bool>true</bool>
+           </property>
+           <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::DragDrop</enum>
+           </property>
+           <property name="defaultDropAction">
+            <enum>Qt::IgnoreAction</enum>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+           <property name="sortingEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QVBoxLayout" name="verticalLayout_11">
        <property name="sizeConstraint">
         <enum>QLayout::SetMaximumSize</enum>
@@ -646,8 +684,8 @@
         </widget>
        </item>
       </layout>
-     </widget>
-    </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -708,4 +746,7 @@
  </customwidgets>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="zoneGroup"/>
+ </buttongroups>
 </ui>

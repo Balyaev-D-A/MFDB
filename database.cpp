@@ -126,7 +126,7 @@ bool Database::deployTables()
 //////////////////////////////////////////////////////// Работы /////////////////////////////////////////////////////////
     if (!pq->exec("CREATE TABLE IF NOT EXISTS rasp (rasp_id SERIAL PRIMARY KEY, rasp_num CHAR(6), rasp_date CHAR(10), rasp_btime CHAR(5), "
                   "rasp_etime CHAR(5), rasp_issuer INTEGER REFERENCES issuers(iss_id), rasp_executor INTEGER REFERENCES employees(emp_id), "
-                  "rasp_completed BOOL DEFAULT 'FALSE')")) return false;
+                  "rasp_zkd BOOL, rasp_unit CHAR(20), rasp_completed BOOL DEFAULT 'FALSE')")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS rmembers (rm_id SERIAL PRIMARY KEY, rm_rasp INTEGER REFERENCES rasp(rasp_id) ON DELETE CASCADE, "
                   "rm_emp INTEGER REFERENCES employees(emp_id))")) return false;

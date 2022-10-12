@@ -3,6 +3,7 @@
 #include <QDate>
 #include <QFile>
 #include <QTextStream>
+#include <QFileDialog>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->krMonthBox->setCurrentIndex(QDate::currentDate().month());
 
     ui->tasksTab->deleteLater();
-    ui->rasp_tab->deleteLater();
+    //ui->rasp_tab->deleteLater();
     db = new Database;
     dictionaryForm = new DictionaryForm(this);
     dictionaryForm->setDatabase(db);
@@ -132,7 +133,7 @@ MainWindow::MainWindow(QWidget *parent)
     if (!connectDB("192.168.1.100", "radico22", "radico", "coolpass")) {
         db->showError(this);
     }
-    //ui->raspDateEdit->setDate(QDate::currentDate());
+    ui->raspDateEdit->setDate(QDate::currentDate());
     //ui->taskDateEdit->setDate(QDate::currentDate());
 //    db->execQuery("SELECT emp_name, emp_id FROM employees WHERE emp_metrolog = false AND emp_hidden = false ORDER BY emp_name");
 //    ui->employeeBox->addItem("Все", 0);
@@ -210,7 +211,7 @@ void MainWindow::addRaspClicked()
     RaspForm *rf = new RaspForm();
     rf->setDatabase(db);
     connect(rf, &RaspForm::closed, this, &MainWindow::raspFormClosed);
-    rf->newRasp();
+    rf->newRasp(ui->raspDateEdit->date());
     rf->show();
 }
 
@@ -423,7 +424,7 @@ void MainWindow::printRaspClicked()
         }
     }
 
-    return;
+    saveRasp(raspList);
 }
 
 void MainWindow::addDefectClicked()
@@ -880,6 +881,7 @@ QString MainWindow::groupWorks(QList<QStringList> workList)
     typedef QMap<QString, LOC_MAP> WORK_MAP;
     WORK_MAP workMap;
     QString result;
+    QString place;
 
     for (int i=0; i<workList.size(); i++)
     {
@@ -889,14 +891,15 @@ QString MainWindow::groupWorks(QList<QStringList> workList)
     WORK_MAP::const_iterator i = workMap.constBegin();
     while (i != workMap.constEnd())
     {
+        result += i.key() + ": ";
         LOC_MAP::const_iterator j = i.value().constBegin();
         while (j != i.value().constEnd())
         {
-            result += j.key() + ": ";
+            place = j.key();
             TYPE_MAP::const_iterator k = j.value().constBegin();
             while (k != j.value().constEnd())
             {
-                result += "<b>"+k.key()+"</b> ";
+                result += "<b>"+k.key()+"</b>, ";
                 foreach (QString kks, k.value())
                 {
                     result += kks + ", ";
@@ -904,10 +907,12 @@ QString MainWindow::groupWorks(QList<QStringList> workList)
                 result.chop(2);
                 if (++k != j.value().constEnd()) result += ", ";
             }
-            if (++j != i.value().constEnd()) result += "; ";
+
+            /*if (++j != i.value().constEnd()) */result += ", " + place + "; ";
+            j++;
         }
-        result += " - " + i.key();
-        if (++i != workMap.constEnd()) result += "; ";
+
+        if (++i != workMap.constEnd()) result += " <br/> ";
     }
     return result;
 }
@@ -916,29 +921,42 @@ void MainWindow::saveRasp(QStringList raspList)
 {
     QString html;
     QString body = "";
-    QString tabTemplate;
+    QString tabTemplateZKD, tabTemplateZSD;
     QString table;
     QString query;
     QString executor;
-    QString member;
-    QString members;
+    QString member, memberLoc;
     QString issuer;
     QString date;
     QString group;
+    QString unit;
+    int memberNum;
+    bool zkd;
     QList<QStringList> workList;
     QStringList work;
     QString workString;
     QFile file;
     QTextStream *ts;
 
-    file.setFileName(QApplication::applicationDirPath() + "/templates/rasp/table.html");
+    file.setFileName(QApplication::applicationDirPath() + "/templates/rasp/table-zkd.html");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
                               QApplication::applicationDirPath() + "/templates/rasp/table.html\n" + file.errorString());
         return;
     }
     ts = new QTextStream(&file);
-    tabTemplate = ts->readAll();
+    tabTemplateZKD = ts->readAll();
+    delete ts;
+    file.close();
+
+    file.setFileName(QApplication::applicationDirPath() + "/templates/rasp/table-zsd.html");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
+                              QApplication::applicationDirPath() + "/templates/rasp/table.html\n" + file.errorString());
+        return;
+    }
+    ts = new QTextStream(&file);
+    tabTemplateZSD = ts->readAll();
     delete ts;
     file.close();
 
@@ -955,7 +973,7 @@ void MainWindow::saveRasp(QStringList raspList)
 
     foreach (QString rasp, raspList)
     {
-        query = "select rasp_date, emp_name, emp_position, emp_group, iss_name, iss_loc from rasp "
+        query = "select rasp_date, emp_name, emp_position, emp_group, iss_name, iss_loc, rasp_zkd, rasp_unit from rasp "
                 "left join employees on rasp_executor = emp_id "
                 "left join issuers on rasp_issuer = iss_id where rasp_id = '" + rasp + "'";
 
@@ -971,9 +989,16 @@ void MainWindow::saveRasp(QStringList raspList)
         executor = db->fetchValue(2).toString() + " " + db->fetchValue(1).toString() + " " + group;
         date = db->fetchValue(0).toString();
         issuer = db->fetchValue(4).toString() + " " + db->fetchValue(5).toString();
+        zkd = db->fetchValue(6).toBool();
+        unit = db->fetchValue(7).toString();
 
-        table = tabTemplate;
-        table.replace("%EXECUTOR%", executor).replace("%DATE%", date).replace("%ISSUER%", issuer);
+        if (zkd) {
+            table = tabTemplateZKD;
+        }
+        else {
+            table = tabTemplateZSD;
+        }
+        table.replace("$EXECUTOR$", executor).replace("$DATE$", date).replace("$ISSUER$", issuer).replace("$BL$", unit);
 
         query = "select emp_name, emp_position, emp_group from rmembers left join employees on rm_emp = emp_id where rm_rasp = '" +
                 rasp + "'";
@@ -982,17 +1007,23 @@ void MainWindow::saveRasp(QStringList raspList)
             deleteLater();
             return;
         }
-        members = "";
-        table.replace("%N%", QString("%1").arg(db->affectedRows()));
+        memberNum = 1;
         while (db->nextRecord())
         {
             group = db->fetchValue(2).toString();
             group.replace("1", "I гр.").replace("2", "II гр.").replace("3", "III гр.").replace("4", "IV гр.").replace("5", "V гр.");
-            member = db->fetchValue(1).toString() + " " + db->fetchValue(0).toString() + " " + group + ", ";
-            members += member;
+            memberLoc = db->fetchValue(1).toString() + ", " + group;
+            member = db->fetchValue(0).toString();
+            table.replace("$MEMBER" + QString("%1").arg(memberNum) + "NAME$", member);
+            table.replace("$MEMBER" + QString("%1").arg(memberNum) + "LOC$", memberLoc);
+            memberNum++;
         }
-        members.chop(2); //Убираем лишние ", " в конце.
-        table.replace("%MEMBERS%", members);
+
+        for (int i=memberNum; i<6; i++)
+        {
+            table.replace("$MEMBER" + QString("%1").arg(i) + "NAME$", "");
+            table.replace("$MEMBER" + QString("%1").arg(i) + "LOC$", "");
+        }
 
         query = "select loc_location, sch_type, sch_kks, re_worktype from requipment "
                 "left join schedule on re_equip = sch_id "
@@ -1011,12 +1042,21 @@ void MainWindow::saveRasp(QStringList raspList)
         }
 
         workString = groupWorks(workList);
-        table.replace("%WORKS%", workString);
+        table.replace("$WORKS$", workString);
 
         body += table;
     }
 
-    html.replace("%BODY%", body);
+    html.replace("$BODY$", body);
+
+    QString fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения","", "HTML файлы (*.htm *.html)");
+    file.setFileName(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
+        return;
+    }
+    file.write(html.toUtf8());
+    file.close();
 }
 
 void MainWindow::matReportTriggered()
