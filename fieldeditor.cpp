@@ -51,7 +51,11 @@ void FieldEditor::keyPressEvent(QKeyEvent *e)
     case Qt::Key_Return:
         emit acceptInput(this);
         break;
+    case Qt::Key_Period:
+        insert(",");
+        return;
     }
+
     QLineEdit::keyPressEvent(e);
 }
 

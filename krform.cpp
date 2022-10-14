@@ -22,6 +22,7 @@ KRForm::KRForm(QWidget *parent) :
     connect(ui->oesnButton, &QToolButton::clicked, this, &KRForm::oesnClicked);
     connect(ui->addedMatTable, &DragDropTable::cellDoubleClicked, this, &KRForm::cellDoubleClicked);
     connect(ui->fillButton, &QToolButton::clicked, this, &KRForm::fillButtonClicked);
+    ui->materialTable->sortByColumn(1, Qt::AscendingOrder);
 }
 
 KRForm::~KRForm()
@@ -137,6 +138,7 @@ void KRForm::updateMaterials()
 
 void KRForm::addMaterialClicked()
 {
+    if (ui->materialTable->currentRow() < 0) return;
     ui->addedMatTable->insertRow(ui->addedMatTable->rowCount());
     ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 0, new QTableWidgetItem(
                                    ui->materialTable->item(ui->materialTable->currentRow(), 0)->text()));
@@ -319,7 +321,7 @@ void KRForm::cellDoubleClicked(int row, int column)
 
 void KRForm::inputAccepted(FieldEditor *editor)
 {
-    ui->addedMatTable->item(editor->getRow(), editor->getColumn())->setText(editor->text());
+    ui->addedMatTable->item(editor->getRow(), editor->getColumn())->setText(editor->text().simplified());
     editor->hide();
     editor->deleteLater();
     matsChanged = true;

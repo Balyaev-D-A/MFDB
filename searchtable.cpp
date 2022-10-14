@@ -32,14 +32,14 @@ void SearchTable::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape) {
         search->hide();
     }
-    QWidget::keyPressEvent(event);
+    QTableWidget::keyPressEvent(event);
 }
 
 void SearchTable::showEvent(QShowEvent* event)
 {
     search->reset();
     search->hide();
-    QWidget::showEvent(event);
+    QTableWidget::showEvent(event);
 }
 
 void SearchTable::resizeEvent(QResizeEvent* event)
