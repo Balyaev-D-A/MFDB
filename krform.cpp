@@ -55,6 +55,7 @@ void KRForm::newKR()
     ui->removeMaterialButton->setDisabled(true);
     ui->okButton->setDisabled(true);
     ui->fillButton->setDisabled(true);
+    ui->actionsEdit->setDisabled(true);
     while (ui->addedMatTable->rowCount()) ui->addedMatTable->removeRow(0);
     updateMaterials();
 }
@@ -74,7 +75,8 @@ void KRForm::editKR(QString KRId)
     ui->okButton->setDisabled(false);
     ui->oesnButton->setDisabled(false);
     ui->fillButton->setDisabled(false);
-    query = "SELECT kr_sched, sch_name, sch_type, sch_kks FROM kaprepairs AS kr "
+    ui->actionsEdit->setDisabled(false);
+    query = "SELECT kr_sched, sch_name, sch_type, sch_kks, kr_actions FROM kaprepairs AS kr "
             "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
             "WHERE kr_id = '%1'";
     query = query.arg(KRId);
@@ -88,6 +90,7 @@ void KRForm::editKR(QString KRId)
         selectedSched = db->fetchValue(0).toString();
         selectedDevice = db->fetchValue(2).toString();
         ui->deviceEdit->setText(db->fetchValue(1).toString() + " " + db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
+        loadActions();
         ui->oesnButton->setDisabled(false);
     }
     else
@@ -192,8 +195,8 @@ bool KRForm::saveKR()
             }
         }
 
-        query = "UPDATE kaprepairs SET kr_sched = '%1' WHERE kr_id = '%2'";
-        query = query.arg(selectedSched).arg(KRId);
+        query = "UPDATE kaprepairs SET kr_sched = '%1', kr_actions = '%2' WHERE kr_id = '%3'";
+        query = query.arg(selectedSched).arg(ui->actionsEdit->document()->toPlainText()).arg(KRId);
 
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -202,8 +205,8 @@ bool KRForm::saveKR()
         }
     }
     else {
-        query = "INSERT INTO kaprepairs (kr_sched) VALUES ('%1')";
-        query = query.arg(selectedSched);
+        query = "INSERT INTO kaprepairs (kr_sched, kr_actions) VALUES ('%1', '%2')";
+        query = query.arg(selectedSched).arg(ui->actionsEdit->document()->toPlainText());
 
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -263,8 +266,10 @@ void KRForm::deviceSelected(const KRDevice &device)
     ui->okButton->setDisabled(false);
     ui->oesnButton->setDisabled(false);
     ui->fillButton->setDisabled(false);
+    ui->actionsEdit->setDisabled(false);
     updateAddedMats();
     updateMaterials();
+    loadActionsFromOESN();
 }
 
 void KRForm::oesnClicked()
@@ -384,4 +389,40 @@ void KRForm::fillButtonClicked()
     }
     ui->addedMatTable->resizeColumnsToContents();
     updateMaterials();
+}
+
+void KRForm::loadActionsFromOESN()
+{
+    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'КР'";
+    query = query.arg(selectedDevice);
+
+    if (!db->execQuery(query))
+    {
+        db->showError(this);
+        return;
+    }
+
+    if (db->nextRecord())
+        ui->actionsEdit->document()->setPlainText(db->fetchValue(0).toString());
+    else
+        ui->actionsEdit->document()->setPlainText("");
+
+}
+
+void KRForm::loadActions()
+{
+    QString query = "SELECT kr_actions FROM kaprepairs WHERE kr_id ='%1'";
+    QString actions = "";
+    query = query.arg(KRId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+
+    if (db->nextRecord())
+        actions = db->fetchValue(0).toString();
+
+    if (actions.simplified().isEmpty())
+        loadActionsFromOESN();
 }

@@ -68,7 +68,7 @@ bool Database::deployTables()
                   "nm_material INTEGER REFERENCES materials(mat_id), nm_count DECIMAL(6,3))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS normativwork (nw_id SERIAL PRIMARY KEY, nw_dev VARCHAR(50), nw_worktype CHAR(2), "
-                  "nw_oesn VARCHAR(255), nw_ktd VARCHAR(255), nw_work DECIMAL(5,2))")) return false;
+                  "nw_oesn VARCHAR(255), nw_ktd VARCHAR(255), nw_ktdshort VARCHAR(100), nw_work DECIMAL(5,2))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS normativactions (na_id SERIAL PRIMARY KEY, na_dev VARCHAR(50), na_worktype CHAR(2), "
                   "na_actions TEXT)")) return false;
@@ -87,7 +87,7 @@ bool Database::deployTables()
                   "dam_material INTEGER REFERENCES materials (mat_id), dam_count DECIMAL(6,3), dam_oesn DECIMAL(6,3))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kaprepairs (kr_id SERIAL PRIMARY KEY, kr_sched INTEGER REFERENCES schedule(sch_id) UNIQUE, "
-                  "kr_begdate CHAR(10), kr_enddate CHAR(10))")) return false;
+                  "kr_actions TEXT, kr_begdate CHAR(10), kr_enddate CHAR(10))")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS kradditionalmats (kam_id SERIAL PRIMARY KEY, kam_kr INTEGER REFERENCES kaprepairs(kr_id), "
                   "kam_material INTEGER REFERENCES materials (mat_id), kam_count DECIMAL(6,3), kam_oesn DECIMAL(6,3))")) return false;
@@ -110,7 +110,7 @@ bool Database::deployTables()
                   "krs_signer INTEGER REFERENCES signers(sig_id) ON DELETE RESTRICT, krs_role INTEGER)")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS krrworks (krw_id SERIAL PRIMARY KEY, krw_work INTEGER REFERENCES kaprepairs(kr_id) ON DELETE RESTRICT, "
-                  "krw_report INTEGER REFERENCES krreports(krr_id) ON DELETE CASCADE)")) return false;
+                  "krw_report INTEGER REFERENCES krreports(krr_id) ON DELETE CASCADE, krw_order INTEGER DEFAULT 0)")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS trreports (trr_id SERIAL PRIMARY KEY, trr_desc VARCHAR(200), trr_unit INTEGER REFERENCES units(unit_id), "
                   "trr_planbeg CHAR(10), trr_planend CHAR(10), trr_date CHAR(10), trr_docnum VARCHAR(10))")) return false;

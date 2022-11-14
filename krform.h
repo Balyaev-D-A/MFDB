@@ -34,6 +34,8 @@ private:
     bool matsChanged;
     void updateMaterials();
     void updateAddedMats();
+    void loadActionsFromOESN();
+    void loadActions();
     bool saveKR();
 
 private slots:

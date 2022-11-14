@@ -13,6 +13,8 @@ TRReportForm::TRReportForm(QWidget *parent) :
     ui->tabWidget->setCurrentIndex(0);
     ui->trTable->setAcceptFrom(ui->selectedTRTable);
     ui->selectedTRTable->setAcceptFrom(ui->trTable);
+    ui->selectedTRTable->setMovableRows(true);
+    ui->selectedTRTable->setSortingEnabled(false);
     ui->trTable->hideColumn(0);
     ui->selectedTRTable->hideColumn(0);
     ui->begDateEdit->setDate(QDate(currDate.year(), currDate.month(), 1));
@@ -106,7 +108,7 @@ void TRReportForm::editReport(QString Id)
 
     query = "SELECT trw_work, def_devtype, def_kks, def_begdate, def_enddate FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1'";
+            "WHERE trw_report = '%1' ORDER BY trw_order";
     query = query.arg(reportId);
 
     if (!db->execQuery(query)) {
@@ -114,7 +116,7 @@ void TRReportForm::editReport(QString Id)
         return;
     }
 
-    ui->selectedTRTable->setSortingEnabled(false);
+
     while (db->nextRecord())
     {
         curRow = ui->selectedTRTable->rowCount();
@@ -124,7 +126,7 @@ void TRReportForm::editReport(QString Id)
             ui->selectedTRTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
-    ui->selectedTRTable->setSortingEnabled(true);
+    ui->selectedTRTable->resizeColumnsToContents();
 
     query = "SELECT trs_signer, trs_role, sig_name, sig_loc FROM trsigners "
             "LEFT JOIN signers ON trs_signer = sig_id "
@@ -197,7 +199,7 @@ void TRReportForm::updateTRTable()
     int curRow;
     QStringList usedIds;
     QStringList inReportIds;
-    QString query = "SELECT trw_work FROM trrworks";
+    QString query = "SELECT trw_work, trw_report FROM trrworks";
 
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -205,8 +207,11 @@ void TRReportForm::updateTRTable()
     }
 
     while (db->nextRecord())
+    {
+        if (reportId != "0")
+            if (db->fetchValue(1).toString() == reportId) continue;
         inReportIds.append(db->fetchValue(0).toString());
-
+    }
     query = "SELECT def_id, def_devtype, def_kks, def_begdate, def_enddate FROM defects "
                     "WHERE def_unit = '%1' AND def_begdate <> 'NULL' AND def_enddate <> 'NULL' AND def_num <> 'NULL'";
     query = query.arg(ui->unitBox->currentData().toString());
@@ -286,6 +291,7 @@ void TRReportForm::addButtonClicked()
                                          ui->trTable->item(curKRRow, i)->text()));
     }
     ui->trTable->removeRow(curKRRow);
+    ui->selectedTRTable->resizeColumnsToContents();
 }
 
 void TRReportForm::removeButtonClicked()
@@ -576,11 +582,11 @@ void TRReportForm::doneButtonClicked()
         }
     }
 
-    query = "INSERT INTO trrworks (trw_work, trw_report) VALUES ('%1', '%2')";
+    query = "INSERT INTO trrworks (trw_work, trw_report, trw_order) VALUES ('%1', '%2', '%3')";
 
     for (int i=0; i<ui->selectedTRTable->rowCount(); i++)
     {
-        prepQuery = query.arg(ui->selectedTRTable->item(i, 0)->text()).arg(reportId);
+        prepQuery = query.arg(ui->selectedTRTable->item(i, 0)->text()).arg(reportId).arg(i);
         if (!db->execQuery(prepQuery)) {
             db->showError(this);
             db->rollbackTransaction();
@@ -636,11 +642,12 @@ void TRReportForm::addAllButtonClicked()
     {
         curRow = ui->selectedTRTable->rowCount();
         ui->selectedTRTable->insertRow(curRow);
-        for (int col=0; col<4; col++)
+        for (int col=0; col<ui->selectedTRTable->columnCount(); col++)
         {
             ui->selectedTRTable->setItem(curRow, col, new QTableWidgetItem(ui->trTable->item(i, col)->text()));
         }
     }
+    ui->selectedTRTable->resizeColumnsToContents();
     updateTRTable();
 }
 

@@ -141,9 +141,10 @@ void NormativeForm::updateNormatives()
     ui->workEdit->clear();
     ui->oesnEdit->clear();
     ui->ktdEdit->clear();
+    ui->ktdShortEdit->clear();
     ui->actionsTextEdit->document()->clear();
 
-    QString query = "SELECT nw_oesn, nw_ktd, nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'";
+    QString query = "SELECT nw_oesn, nw_ktd, nw_ktdshort, nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -152,7 +153,8 @@ void NormativeForm::updateNormatives()
     if (db->nextRecord()){
         ui->oesnEdit->setText(db->fetchValue(0).toString());
         ui->ktdEdit->setText(db->fetchValue(1).toString());
-        ui->workEdit->setText(db->fetchValue(2).toString());
+        ui->ktdShortEdit->setText(db->fetchValue(2).toString());
+        ui->workEdit->setText(db->fetchValue(3).toString());
     }
 
     updateNormTable();
@@ -200,9 +202,10 @@ bool NormativeForm::saveNormatives()
         return false;
     }
 
-    query = "INSERT INTO normativwork (nw_dev, nw_worktype, nw_oesn, nw_ktd, nw_work) VALUES ('%1' , '%2', '%3', '%4', '%5')";
+    query = "INSERT INTO normativwork (nw_dev, nw_worktype, nw_oesn, nw_ktd, nw_ktdshort, nw_work) VALUES ('%1' , '%2', '%3', '%4', '%5', '%6')";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->oesnEdit->text());
     query = query.arg(ui->ktdEdit->text().simplified());
+    query = query.arg(ui->ktdShortEdit->text().simplified());
     query = query.arg(ui->workEdit->text().replace(',', '.'));
     if (!db->execQuery(query)) {
         db->showError(this);

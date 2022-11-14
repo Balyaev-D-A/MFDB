@@ -13,8 +13,10 @@ public:
     void setPersistentRow(int row);
     bool isPersistentRow(int row);
     void clearPersistentRows();
+    void setMovableRows(bool movable);
 private:
     QObject *acceptFrom = nullptr;
+    bool movableRows = false;
     QList<int> persistentRows;
 
 protected:

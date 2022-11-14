@@ -207,11 +207,11 @@ int TRReportsForm::maxInt(int first, int second)
 QStringList TRReportsForm::makeAVR(QString reportId)
 {
     QStringList result;
-    QStringList workList, ktdList, opcardNums;
+    QStringList workList, ktdList, opcardNums, devTypeList;
     QString page, unitShortName, subsystem, date, begDate, endDate, planBegDate, planEndDate;
     QString orderDate, orderNum, schedNum, docNum, workType, firstWork, otherWorks, works, accordingDoc;
     QString ownerLoc, ownerName, member1Loc, member1Name, member2Loc, member2Name, member3Loc, member3Name;
-    QString repairerLoc, repairerName, chiefLoc, chiefName, executor, defNums, ktdText;
+    QString repairerLoc, repairerName, chiefLoc, chiefName, executor, defNums, ktdText, prepQuery, reglament;
     QFile file;
     QTextStream *ts;
     QFontMetrics *fm = new QFontMetrics(QFont("Times New Roman", 12));
@@ -253,7 +253,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_num, ktd_doc FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
             "LEFT JOIN ktd ON def_devtype = ktd_dev "
-            "WHERE trw_report = '%1' ORDER BY def_id";
+            "WHERE trw_report = '%1' ORDER BY trw_order";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -268,45 +268,59 @@ QStringList TRReportsForm::makeAVR(QString reportId)
         begDate = minDate(begDate, db->fetchValue(3).toString());
         endDate = maxDate(endDate, db->fetchValue(4).toString());
         defNums += db->fetchValue(5).toString() + ", ";
-        if (db->fetchValue(6).toString() != "")
-            if (!ktdList.contains(db->fetchValue(6).toString()))
-                ktdList.append(db->fetchValue(6).toString());
+        if (!devTypeList.contains(db->fetchValue(1).toString()))
+            devTypeList.append(db->fetchValue(1).toString());
     }
     defNums.chop(2);
 
-    ktdText = "";
-    if (ktdList.isEmpty()) {
-        ktdText = "Ремонтная документация";
+    reglament = db->getVariable("РегламентСокр").toString();
+
+    prepQuery = "SELECT nw_ktdshort FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
+
+    for (int i=0; i<devTypeList.count(); i++)
+    {
+        query = prepQuery.arg(devTypeList[i]);
+        if (!db->execQuery(query)) {
+            db->showError(this);
+            return result;
+        }
+        if (db->nextRecord()) {
+            if (db->fetchValue(0).toString().simplified().isEmpty()) {
+                ktdList.append(reglament);
+            }
+            else {
+                ktdList.append(db->fetchValue(0).toString());
+            }
+        }
+    }
+
+    for (int i=0; i<ktdList.size(); i++)
+    {
+        if (ktdList[i].contains("Операционная карта №"))
+            opcardNums.append(ktdList[i].split("№")[1]);
+    }
+    if (opcardNums.size() > 1) {
+        ktdText.append("Операционные карты<br/>№№");
+        for (int i=0; i<opcardNums.size(); i++)
+        {
+           ktdText.append(opcardNums[i] + ", ");
+        }
+        ktdText.chop(2);
+        ktdText.append(";<br/>");
+        for (int i=0; i<ktdList.size(); i++)
+        {
+            if (ktdList[i].contains("Операционная"))
+                continue;
+            ktdText.append(ktdList[i]+";<br/>");
+        }
+        ktdText.chop(5); // убираем последний <br/>
     }
     else {
         for (int i=0; i<ktdList.size(); i++)
         {
-            if (ktdList[i].contains("Операционная карта №"))
-                opcardNums.append(ktdList[i].split("№")[1]);
+            ktdText.append(ktdList[i]+";<br/>");
         }
-        if (opcardNums.size() > 1) {
-            ktdText.append("Операционные карты<br/>№№");
-            for (int i=0; i<opcardNums.size(); i++)
-            {
-                ktdText.append(opcardNums[i] + ", ");
-            }
-            ktdText.chop(2);
-            ktdText.append(";<br/>");
-            for (int i=0; i<ktdList.size(); i++)
-            {
-                if (ktdList[i].contains("Операционная"))
-                    continue;
-                ktdText.append(ktdList[i]+";<br/>");
-            }
-            ktdText.chop(5); // убираем последний <br/>
-        }
-        else {
-            for (int i=0; i<ktdList.size(); i++)
-            {
-                ktdText.append(ktdList[i]+";<br/>");
-            }
-            ktdText.chop(5); // убираем последний <br/>
-        }
+    ktdText.chop(5); // убираем последний <br/>
     }
 
     worksCount = workList.size();
@@ -460,6 +474,7 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     page.replace("$DOC3$", "Акт о дефектах оборудования №" + docNum + " АД;");
     page.replace("$DOC4$", "");
     page.replace("$EXECUTOR$", executor);
+    page.replace("$KTDTEXT$", ktdText);
 
     result.append(page);
 
@@ -479,7 +494,6 @@ QStringList TRReportsForm::makeAVR(QString reportId)
     page.replace("$ENDDATE$", endDate);
     page.replace("$DOCNUM$", docNum);
     page.replace("$WORKS$", works);
-    page.replace("$KTDTEXT$", ktdText);
     page.replace("$OWNERLOC$", ownerLoc);
     page.replace("$OWNERNAME$", ownerName);
     page.replace("$MEMBER1LOC$", member1Loc);
@@ -515,7 +529,7 @@ QStringList TRReportsForm::makeVVR(QString reportId)
     QStringList result;
     QString unitShortName, subsys, date, docNum, works, currWork, begDate, endDate, workActions, workHours;
     QString ownerLoc, ownerName, repairerLoc, repairerName, chiefLoc, chiefName;
-    QString pageTempNoSign, pageTempSign, page, ktdText;
+    QString pageTempNoSign, pageTempSign, page, ktdText, reglament;
     QFile file;
     QTextStream *ts;
     int pageCount;
@@ -537,10 +551,12 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         docNum = db->fetchValue(3).toString();
     }
 
+    reglament = db->getVariable("РегламентПолн").toString();
+
     query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_journaldesc, def_realdesc, def_repairdesc, def_actionsdesc FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
             "LEFT JOIN ktd ON def_devtype = ktd_dev "
-            "WHERE trw_report = '%1' ORDER BY def_id";
+            "WHERE trw_report = '%1' ORDER BY trw_order";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -642,11 +658,11 @@ QStringList TRReportsForm::makeVVR(QString reportId)
         }
         else {
             workHours = "";
-            ktdText = "регламент РГ.0.33.01";
+            ktdText = reglament;
         }
 
         if (ktdText.simplified() == "")
-            ktdText = "регламент РГ.0.33.01";
+            ktdText = reglament;
 
         page.replace("$USN$", unitShortName);
         page.replace("$DOCNUM$", docNum);
@@ -742,7 +758,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
 
     query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, trw_work FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1' ORDER BY def_id";
+            "WHERE trw_report = '%1' ORDER BY trw_order";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -1083,7 +1099,7 @@ QStringList TRReportsForm::makeADO(QString reportId)
 
     query = "SELECT def_devname, def_devtype, def_kks, def_realdesc, def_repairdesc FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1' ORDER BY def_id";
+            "WHERE trw_report = '%1' ORDER BY trw_order";
     query = query.arg(reportId);
 
     if (!db->execQuery(query)) {
@@ -1269,7 +1285,7 @@ QStringList TRReportsForm::makePO(QString reportId)
 
     query = "SELECT def_kks, def_devname, def_devtype FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
-            "WHERE trw_report = '%1' ORDER BY def_id";
+            "WHERE trw_report = '%1' ORDER BY trw_order";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);

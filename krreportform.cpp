@@ -13,8 +13,10 @@ KRReportForm::KRReportForm(QWidget *parent) :
     ui->tabWidget->setCurrentIndex(0);
     ui->krTable->setAcceptFrom(ui->selectedKRTable);
     ui->selectedKRTable->setAcceptFrom(ui->krTable);
+    ui->selectedKRTable->setMovableRows(true);
     ui->krTable->hideColumn(0);
     ui->selectedKRTable->hideColumn(0);
+    ui->selectedKRTable->setSortingEnabled(false);
     ui->begDateEdit->setDate(QDate(currDate.year(), currDate.month(), 1));
     ui->endDateEdit->setDate(QDate(currDate.year(), currDate.month(), currDate.daysInMonth()));
     ui->dateEdit->setDate(QDate::currentDate());
@@ -85,7 +87,7 @@ void KRReportForm::updateKRTable()
     int curRow;
     QStringList usedIds;
     QStringList inReportIds;
-    QString query = "SELECT krw_work FROM krrworks";
+    QString query = "SELECT krw_work, krw_report FROM krrworks";
 
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -93,8 +95,11 @@ void KRReportForm::updateKRTable()
     }
 
     while (db->nextRecord())
+    {
+        if (reportId != "0")
+            if (db->fetchValue(1).toString() == reportId) continue;
         inReportIds.append(db->fetchValue(0).toString());
-
+    }
     query = "SELECT kr_id, sch_type, sch_kks, kr_begdate, kr_enddate FROM kaprepairs AS kr "
                     "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
                     "WHERE sch_unit = '%1' AND kr_begdate <> 'NULL' AND kr_enddate <> 'NULL'";
@@ -158,6 +163,7 @@ void KRReportForm::addButtonClicked()
                                          ui->krTable->item(curKRRow, i)->text()));
     }
     ui->krTable->removeRow(curKRRow);
+    ui->selectedKRTable->resizeColumnsToContents();
 }
 
 void KRReportForm::removeButtonClicked()
@@ -180,11 +186,12 @@ void KRReportForm::addAllButtonClicked()
     {
         curRow = ui->selectedKRTable->rowCount();
         ui->selectedKRTable->insertRow(curRow);
-        for (int col=0; col<4; col++)
+        for (int col=0; col<ui->selectedKRTable->columnCount(); col++)
         {
             ui->selectedKRTable->setItem(curRow, col, new QTableWidgetItem(ui->krTable->item(i, col)->text()));
         }
     }
+    ui->selectedKRTable->resizeColumnsToContents();
     updateKRTable();
 }
 
@@ -509,11 +516,11 @@ void KRReportForm::doneButtonClicked()
         }
     }
 
-    query = "INSERT INTO krrworks (krw_work, krw_report) VALUES ('%1', '%2')";
+    query = "INSERT INTO krrworks (krw_work, krw_report, krw_order) VALUES ('%1', '%2', '%3')";
 
     for (int i=0; i<ui->selectedKRTable->rowCount(); i++)
     {
-        prepQuery = query.arg(ui->selectedKRTable->item(i, 0)->text()).arg(reportId);
+        prepQuery = query.arg(ui->selectedKRTable->item(i, 0)->text()).arg(reportId).arg(i);
         if (!db->execQuery(prepQuery)) {
             db->showError(this);
             db->rollbackTransaction();
@@ -589,7 +596,7 @@ void KRReportForm::editReport(QString Id)
     query = "SELECT krw_work, sch_type, sch_kks, kr_begdate, kr_enddate FROM krrworks AS kw "
             "LEFT JOIN kaprepairs AS kr ON kr_id = krw_work "
             "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
-            "WHERE krw_report = '%1'";
+            "WHERE krw_report = '%1' ORDER BY krw_order";
     query = query.arg(reportId);
 
     if (!db->execQuery(query)) {
@@ -597,7 +604,7 @@ void KRReportForm::editReport(QString Id)
         return;
     }
 
-    ui->selectedKRTable->setSortingEnabled(false);
+
     while (db->nextRecord())
     {
         curRow = ui->selectedKRTable->rowCount();
@@ -607,7 +614,7 @@ void KRReportForm::editReport(QString Id)
             ui->selectedKRTable->setItem(curRow, i, new QTableWidgetItem(db->fetchValue(i).toString()));
         }
     }
-    ui->selectedKRTable->setSortingEnabled(true);
+    ui->selectedKRTable->resizeColumnsToContents();
 
     query = "SELECT krs_signer, krs_role, sig_name, sig_loc FROM krsigners "
             "LEFT JOIN signers ON krs_signer = sig_id "
