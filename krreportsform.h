@@ -21,6 +21,7 @@ public:
 private:
     Ui::KRReportsForm *ui;
     Database *db;
+    QString lastSavedDir = "";
     QStringList makeAVR(QString reportId);
     QStringList makeVVR(QString reportId);
     QStringList makeVFZM(QString reportId);

@@ -153,8 +153,9 @@ void KRReportsForm::saveButtonClicked()
 
     page.replace("$BODY$", body);
 
-    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения","", "HTML файлы (*.htm *.html)");
+    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", lastSavedDir + "КР " + ui->table->item(ui->table->currentRow(), 2)->text() + ".htm", "HTML файлы (*.htm *.html)");
     file.setFileName(fileName);
+    lastSavedDir = QFileInfo(fileName).absolutePath() + "/";
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
         return;
@@ -276,10 +277,12 @@ QStringList KRReportsForm::makeAVR(QString reportId)
         }
         if (db->nextRecord()) {
             if (db->fetchValue(0).toString().simplified().isEmpty()) {
-                ktdList.append(reglament);
+                if (!ktdList.contains(reglament))
+                    ktdList.append(reglament);
             }
             else {
-                ktdList.append(db->fetchValue(0).toString());
+                if (!ktdList.contains(db->fetchValue(0).toString()))
+                    ktdList.append(db->fetchValue(0).toString());
             }
         }
     }
@@ -823,7 +826,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
 
         query = "SELECT kam_material, mat_name, mat_doc, mat_measure, kam_oesn, kam_count FROM kradditionalmats "
                 "LEFT JOIN materials ON kam_material = mat_id "
-                "WHERE kam_kr = '%1'";
+                "WHERE kam_kr = '%1' ORDER BY kam_order";
         query = query.arg(workList[i].krId);
 
         if (!db->execQuery(query)) {

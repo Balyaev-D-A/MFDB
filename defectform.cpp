@@ -31,12 +31,14 @@ DefectForm::DefectForm(QWidget *parent) :
     connect(ui->oesnButton, &QToolButton::clicked, this, &DefectForm::oesnClicked);
     connect(ui->addedMatTable, &DragDropTable::cellDoubleClicked, this, &DefectForm::cellDoubleClicked);
     connect(ui->fillButton, &QToolButton::clicked, this, &DefectForm::fillButtonClicked);
+    connect(ui->addedMatTable, &DragDropTable::rowMoved, this, &DefectForm::addedMatsRowMoved);
 
     ui->addedMatTable->hideColumn(0);
     ui->materialTable->hideColumn(0);
     ui->materialTable->sortByColumn(1, Qt::AscendingOrder);
     ui->addedMatTable->setAcceptFrom(ui->materialTable);
     ui->materialTable->setAcceptFrom(ui->addedMatTable);
+    ui->addedMatTable->setMovableRows(true);
 
 }
 
@@ -488,7 +490,7 @@ void DefectForm::updateAddedMaterials()
     while (ui->addedMatTable->rowCount() > 0) ui->addedMatTable->removeRow(0);
 
     query = "SELECT dam_material, mat_name, dam_oesn, dam_count FROM defadditionalmats AS dam LEFT JOIN materials AS m ON dam.dam_material = m.mat_id "
-                    "WHERE dam_defect = '%1'";
+                    "WHERE dam_defect = '%1' ORDER BY dam_order";
     query = query.arg(defId);
 
     if (!db->execQuery(query)) {
@@ -579,13 +581,14 @@ bool DefectForm::saveDefect()
                 return false;
             }
 
-            query = "INSERT INTO defadditionalmats (dam_defect, dam_material, dam_oesn, dam_count) VALUES ('%1', '%2', '%3', '%4')";
+            query = "INSERT INTO defadditionalmats (dam_defect, dam_material, dam_oesn, dam_count, dam_order) VALUES ('%1', '%2', '%3', '%4', '%5')";
 
             for (int i=0; i<ui->addedMatTable->rowCount(); i++)
             {
                 prepQuery = query.arg(defId).arg(ui->addedMatTable->item(i, 0)->text());
                 prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 2)->text().replace(",", ".").replace("-", "0"));
                 prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 3)->text().replace(",", ".").replace("-", "0"));
+                prepQuery = prepQuery.arg(i);
 
                 if (!db->execQuery(prepQuery)) {
                     db->showError(this);
@@ -779,4 +782,9 @@ void DefectForm::repairTextChanged()
 {
     if (!ui->saveRepairButton->isEnabled()) ui->saveRepairButton->setEnabled(true);
     updateActionsDesc();
+}
+
+void DefectForm::addedMatsRowMoved()
+{
+    matsChanged = true;
 }

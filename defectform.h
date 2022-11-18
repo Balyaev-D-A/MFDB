@@ -90,6 +90,7 @@ private slots:
     void fillButtonClicked();
     void defectTextChanged();
     void repairTextChanged();
+    void addedMatsRowMoved();
 
 protected:
     void keyPressEvent(QKeyEvent *event);

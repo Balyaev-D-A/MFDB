@@ -41,6 +41,7 @@ void DragDropTable::dropEvent(QDropEvent *event)
         removeRow(moveFrom);
         selectRow(moveTo);
         setCurrentItem(item(moveTo,0));
+        emit rowMoved();
     }
 }
 

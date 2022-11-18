@@ -26,6 +26,7 @@ protected:
 
 signals:
     void itemDroped();
+    void rowMoved();
 };
 
 #endif // DRAGDROPTABLE_H

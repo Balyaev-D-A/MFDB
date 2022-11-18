@@ -156,8 +156,9 @@ void TRReportsForm::saveButtonClicked()
 
     page.replace("$BODY$", body);
 
-    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", "", "HTML файлы (*.htm *.html)");
+    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", lastSavedDir + "ТР " + ui->table->item(ui->table->currentRow(), 2)->text() + ".htm", "HTML файлы (*.htm *.html)");
     file.setFileName(fileName);
+    lastSavedDir = QFileInfo(fileName).absolutePath() + "/";
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
         return;
@@ -286,10 +287,12 @@ QStringList TRReportsForm::makeAVR(QString reportId)
         }
         if (db->nextRecord()) {
             if (db->fetchValue(0).toString().simplified().isEmpty()) {
-                ktdList.append(reglament);
+                if (!ktdList.contains(reglament))
+                    ktdList.append(reglament);
             }
             else {
-                ktdList.append(db->fetchValue(0).toString());
+                if (!ktdList.contains(db->fetchValue(0).toString()))
+                    ktdList.append(db->fetchValue(0).toString());
             }
         }
     }
@@ -833,7 +836,7 @@ QStringList TRReportsForm::makeVFZM(QString reportId)
         matTable.clear();
         query = "SELECT dam_material, mat_name, mat_doc, mat_measure, dam_oesn, dam_count FROM defadditionalmats "
                 "LEFT JOIN materials ON dam_material = mat_id "
-                "WHERE dam_defect = '%1'";
+                "WHERE dam_defect = '%1' ORDER BY dam_order";
         query = query.arg(workList[i].krId);
 
         if (!db->execQuery(query)) {

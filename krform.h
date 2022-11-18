@@ -35,7 +35,6 @@ private:
     void updateMaterials();
     void updateAddedMats();
     void loadActionsFromOESN();
-    void loadActions();
     bool saveKR();
 
 private slots:
@@ -52,6 +51,7 @@ private slots:
     void inputRejected(FieldEditor *editor);
     void normativeSaved(QString device, QString workType);
     void fillButtonClicked();
+    void addedMatsRowMoved();
 
 signals:
     void krSaved();

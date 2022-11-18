@@ -12,6 +12,7 @@ KRForm::KRForm(QWidget *parent) :
     ui->materialTable->setAcceptFrom(ui->addedMatTable);
     ui->addedMatTable->hideColumn(0);
     ui->materialTable->hideColumn(0);
+    ui->addedMatTable->setMovableRows(true);
     connect(ui->selectDeviceButton, &QToolButton::clicked, this, &KRForm::selectDeviceClicked);
     connect(ui->addMaterialButton, &QToolButton::clicked, this, &KRForm::addMaterialClicked);
     connect(ui->removeMaterialButton, &QToolButton::clicked, this, &KRForm::removeMaterialClicked);
@@ -22,6 +23,7 @@ KRForm::KRForm(QWidget *parent) :
     connect(ui->oesnButton, &QToolButton::clicked, this, &KRForm::oesnClicked);
     connect(ui->addedMatTable, &DragDropTable::cellDoubleClicked, this, &KRForm::cellDoubleClicked);
     connect(ui->fillButton, &QToolButton::clicked, this, &KRForm::fillButtonClicked);
+    connect(ui->addedMatTable, &DragDropTable::rowMoved, this, &KRForm::addedMatsRowMoved);
     ui->materialTable->sortByColumn(1, Qt::AscendingOrder);
 }
 
@@ -48,6 +50,7 @@ void KRForm::newKR()
     selectedSched = "0";
     matsChanged = false;
     ui->deviceEdit->clear();
+    ui->actionsEdit->clear();
     ui->oesnButton->setDisabled(true);
     ui->materialTable->setDisabled(true);
     ui->addedMatTable->setDisabled(true);
@@ -90,7 +93,10 @@ void KRForm::editKR(QString KRId)
         selectedSched = db->fetchValue(0).toString();
         selectedDevice = db->fetchValue(2).toString();
         ui->deviceEdit->setText(db->fetchValue(1).toString() + " " + db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
-        loadActions();
+        if (!db->fetchValue(4).toString().simplified().isEmpty())
+            ui->actionsEdit->document()->setPlainText(db->fetchValue(4).toString());
+        else
+            loadActionsFromOESN();
         ui->oesnButton->setDisabled(false);
     }
     else
@@ -216,7 +222,7 @@ bool KRForm::saveKR()
 
         KRId = db->lastInsertId().toString();
 
-        query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_oesn, kam_count) VALUES ('%1', '%2', '%3', '%4')";
+        query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_oesn, kam_count, kam_order) VALUES ('%1', '%2', '%3', '%4', '%5')";
 
         for (int i=0; i<ui->addedMatTable->rowCount(); i++)
         {
@@ -224,6 +230,7 @@ bool KRForm::saveKR()
             prepQuery = query.arg(KRId).arg(ui->addedMatTable->item(i, 0)->text());
             prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 2)->text().replace(",", ".").replace("-", "0"));
             prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 3)->text().replace(",", ".").replace("-", "0"));
+            prepQuery = prepQuery.arg(i);
 
             if (!db->execQuery(prepQuery)) {
                 db->showError(this);
@@ -287,7 +294,7 @@ void KRForm::updateAddedMats()
 
     query = "SELECT kam_material, mat_name, kam_oesn, kam_count FROM kradditionalmats AS k "
             "LEFT JOIN materials AS m ON k.kam_material = m.mat_id "
-            "WHERE kam_kr = '%1'";
+            "WHERE kam_kr = '%1' ORDER BY kam_order";
     query = query.arg(KRId);
 
     if (!db->execQuery(query)) {
@@ -389,6 +396,7 @@ void KRForm::fillButtonClicked()
     }
     ui->addedMatTable->resizeColumnsToContents();
     updateMaterials();
+    matsChanged = true;
 }
 
 void KRForm::loadActionsFromOESN()
@@ -406,23 +414,9 @@ void KRForm::loadActionsFromOESN()
         ui->actionsEdit->document()->setPlainText(db->fetchValue(0).toString());
     else
         ui->actionsEdit->document()->setPlainText("");
-
 }
 
-void KRForm::loadActions()
+void KRForm::addedMatsRowMoved()
 {
-    QString query = "SELECT kr_actions FROM kaprepairs WHERE kr_id ='%1'";
-    QString actions = "";
-    query = query.arg(KRId);
-
-    if (!db->execQuery(query)) {
-        db->showError(this);
-        return;
-    }
-
-    if (db->nextRecord())
-        actions = db->fetchValue(0).toString();
-
-    if (actions.simplified().isEmpty())
-        loadActionsFromOESN();
+    matsChanged = true;
 }
