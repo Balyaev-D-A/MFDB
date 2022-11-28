@@ -17,6 +17,7 @@ TRReportsForm::TRReportsForm(QWidget *parent) :
     connect(ui->editButton, &QToolButton::clicked, this, &TRReportsForm::editButtonClicked);
     connect(ui->deleteButton, &QToolButton::clicked, this, &TRReportsForm::deleteButtonClicked);
     connect(ui->saveButton, &QToolButton::clicked, this, &TRReportsForm::saveButtonClicked);
+    connect(ui->table, &QTableWidget::cellDoubleClicked, this, &TRReportsForm::tableCellDoubleClicked);
 }
 
 TRReportsForm::~TRReportsForm()
@@ -61,6 +62,7 @@ void TRReportsForm::updateReports()
     ui->table->setSortingEnabled(true);
     ui->table->sortByColumn(1, Qt::AscendingOrder);
     ui->table->resizeColumnsToContents();
+    ui->table->scrollToBottom();
 }
 
 void TRReportsForm::showEvent(QShowEvent *event)
@@ -1411,4 +1413,9 @@ QStringList TRReportsForm::makePO(QString reportId)
     }
 
     return result;
+}
+
+void TRReportsForm::tableCellDoubleClicked(int row, int column)
+{
+    editButtonClicked();
 }

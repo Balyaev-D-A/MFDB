@@ -53,6 +53,9 @@ private slots:
     void fillButtonClicked();
     void addedMatsRowMoved();
 
+protected:
+    void keyPressEvent(QKeyEvent *event);
+
 signals:
     void krSaved();
 };

@@ -85,6 +85,7 @@ void DefectForm::editDefect(QString defId)
 {
     QString query, defect, repair, actiondesc;
     int stage;
+    bool found = false;
 
     setWindowTitle("Редактировать дефект");
 
@@ -133,9 +134,36 @@ void DefectForm::editDefect(QString defId)
     updateAddedMaterials();
     updateMaterials();
     updateDefects();
+    for (int i=0; i<defectList.count(); i++)
+    {
+        if (defect.simplified() == defectList[i].description.simplified()){
+            currentDefect = i;
+            updateDefectText();
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        addDefectClicked();
+        ui->defectEdit->setText(defect.simplified());
+        saveDefectClicked();
+    }
     updateRepairs();
-    ui->defectEdit->setText(defect);
-    ui->repairEdit->setText(repair);
+    found = false;
+    for (int i=0; i<repairList.count(); i++)
+    {
+        if (repair.simplified() == repairList[i].description.simplified()) {
+            currentRepair = i;
+            updateRepairText();
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        addRepairClicked();
+        ui->repairEdit->setText(repair);
+        saveRepairClicked();
+    }
     updateActions();
     ui->actionsTextEdit->document()->setPlainText(actiondesc);
 }
@@ -709,12 +737,15 @@ void DefectForm::inputRejected(FieldEditor *editor)
 
 void DefectForm::normativeSaved(QString device, QString workType)
 {
+    int currStage;
     if ((!isVisible()) || (workType != "ТР")) return;
     if (device != this->device.type) return;
-    updateAddedMaterials();
-    updateMaterials();
     updateActions();
+    currStage = ui->stageBox->currentIndex();
     updateStages();
+    if (currStage > ui->stageBox->count()-1) currStage = ui->stageBox->count()-1;
+    if (ui->stageBox->count())
+        ui->stageBox->setCurrentIndex(currStage);
 }
 
 void DefectForm::keyPressEvent(QKeyEvent *event)
@@ -724,6 +755,8 @@ void DefectForm::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_F5)
         if (ui->oesnButton->isEnabled())
             oesnClicked();
+    if (event->key() == Qt::Key_Escape)
+        close();
     QWidget::keyPressEvent(event);
 }
 
@@ -770,6 +803,7 @@ void DefectForm::fillButtonClicked()
     }
     ui->addedMatTable->resizeColumnsToContents();
     updateMaterials();
+    matsChanged = true;
 }
 
 void DefectForm::defectTextChanged()

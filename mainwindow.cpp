@@ -435,7 +435,7 @@ void MainWindow::addDefectClicked()
 
 void MainWindow::updateDefectsTable()
 {
-    int rc;
+    int rc, selRow = ui->defectsTable->currentRow();
     QStringList inReport;
     QString query;
 
@@ -480,6 +480,11 @@ void MainWindow::updateDefectsTable()
     ui->defectsTable->setSortingEnabled(true);
     ui->defectsTable->sortItems(0);
     ui->defectsTable->resizeColumnsToContents();
+    if (ui->defectsTable->rowCount() == 0) return;
+    if (selRow < 0) selRow = 0;
+    if (selRow > ui->defectsTable->rowCount()-1) selRow = ui->defectsTable->rowCount()-1;
+    ui->defectsTable->selectRow(selRow);
+    ui->defectsTable->setCurrentCell(selRow, 1);
 }
 
 void MainWindow::dtCellDoubleClicked(int row, int column)
@@ -711,7 +716,7 @@ void MainWindow::addKRClicked()
 
 void MainWindow::updateKRTable()
 {
-    int curRow;
+    int curRow, selRow = ui->krTable->currentRow();
     QString month = "";
     QString query = "SELECT kr_id, unit_name, sch_name, sch_type, sch_kks, sch_invno, kr_begdate, kr_enddate FROM kaprepairs AS kr "
                     "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
@@ -748,6 +753,11 @@ void MainWindow::updateKRTable()
     }
     ui->krTable->setSortingEnabled(true);
     ui->krTable->resizeColumnsToContents();
+    if (ui->krTable->rowCount() == 0) return;
+    if (selRow < 0) selRow = 0;
+    if (selRow > ui->krTable->rowCount()-1) selRow = ui->krTable->rowCount()-1;
+    ui->krTable->selectRow(selRow);
+    ui->krTable->setCurrentCell(selRow, 1);
 }
 
 void MainWindow::krCellDoubleClicked(int row, int column)

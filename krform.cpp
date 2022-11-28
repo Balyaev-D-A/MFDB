@@ -420,3 +420,10 @@ void KRForm::addedMatsRowMoved()
 {
     matsChanged = true;
 }
+
+void KRForm::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+        close();
+    QWidget::keyPressEvent(event);
+}

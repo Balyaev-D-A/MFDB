@@ -40,6 +40,7 @@ private slots:
     void editButtonClicked();
     void deleteButtonClicked();
     void saveButtonClicked();
+    void tableCellDoubleClicked(int row, int column);
 
 protected:
     void showEvent(QShowEvent *event);

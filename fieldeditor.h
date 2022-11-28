@@ -29,6 +29,7 @@ private:
     QDoubleValidator *m_doublevalidator;
     int m_row;
     int m_col;
+    bool changePeriod = false;
 
 protected:
     virtual void focusOutEvent(QFocusEvent *e);

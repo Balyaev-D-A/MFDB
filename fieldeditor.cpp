@@ -27,6 +27,7 @@ void FieldEditor::setType(EType type)
     case EREAL:
         m_doublevalidator->setRange(0, 9999999, 3);
         this->setValidator(m_doublevalidator);
+        changePeriod = true;
         break;
     case EDIGIT:
         m_intvalidator->setRange(0, 9);
@@ -52,8 +53,10 @@ void FieldEditor::keyPressEvent(QKeyEvent *e)
         emit acceptInput(this);
         break;
     case Qt::Key_Period:
-        insert(",");
-        return;
+        if (changePeriod) {
+            insert(",");
+            return;
+        }
     }
 
     QLineEdit::keyPressEvent(e);

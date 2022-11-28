@@ -18,7 +18,7 @@ KRReportsForm::KRReportsForm(QWidget *parent) :
     connect(ui->editButton, &QToolButton::clicked, this, &KRReportsForm::editButtonClicked);
     connect(ui->deleteButton, &QToolButton::clicked, this, &KRReportsForm::deleteButtonClicked);
     connect(ui->saveButton, &QToolButton::clicked, this, &KRReportsForm::saveButtonClicked);
-
+    connect(ui->table, &QTableWidget::cellDoubleClicked, this, &KRReportsForm::tableCellDoubleClicked);
 }
 
 KRReportsForm::~KRReportsForm()
@@ -63,6 +63,7 @@ void KRReportsForm::updateReports()
     ui->table->setSortingEnabled(true);
     ui->table->sortByColumn(1, Qt::AscendingOrder);
     ui->table->resizeColumnsToContents();
+    ui->table->scrollToBottom();
 }
 
 void KRReportsForm::showEvent(QShowEvent *event)
@@ -513,6 +514,7 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         QString begDate;
         QString endDate;
         QString ktdDoc;
+        QString actions;
     } Work;
     Work w;
     QList<Work> workList;
@@ -542,7 +544,7 @@ QStringList KRReportsForm::makeVVR(QString reportId)
 
     reglament = db->getVariable("РегламентПолн").toString();
 
-    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate FROM krrworks "
+    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate, kr_actions FROM krrworks "
             "LEFT JOIN kaprepairs ON krw_work = kr_id "
             "LEFT JOIN schedule ON kr_sched = sch_id "
             "LEFT JOIN ktd ON sch_type = ktd_dev "
@@ -561,6 +563,7 @@ QStringList KRReportsForm::makeVVR(QString reportId)
         w.kks = db->fetchValue(2).toString();
         w.begDate = db->fetchValue(3).toString();
         w.endDate = db->fetchValue(4).toString();
+        w.actions = db->fetchValue(5).toString();
         workList.append(w);
     }
     works.chop(2);
@@ -631,14 +634,19 @@ QStringList KRReportsForm::makeVVR(QString reportId)
 
         currWork = "Капитальный ремонт: " + workList[i].name + " " + workList[i].type + ", " + workList[i].kks;
 
-        query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'КР'";
-        query = query.arg(workList[i].type);
-        if (!db->execQuery(query)) {
-            db->showError(this);
-            return result;
+        if (workList[i].actions.simplified().isEmpty()) {
+            query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'КР'";
+            query = query.arg(workList[i].type);
+            if (!db->execQuery(query)) {
+                db->showError(this);
+                return result;
+            }
+            if (db->nextRecord()) workActions = db->fetchValue(0).toString();
+            else workActions = "";
         }
-        if (db->nextRecord()) workActions = db->fetchValue(0).toString();
-        else workActions = "";
+        else {
+            workActions = workList[i].actions;
+        }
         workActions.replace("\n", "<br/>");
         query = "SELECT nw_work, nw_ktd FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР'";
         query = query.arg(workList[i].type);
@@ -1136,4 +1144,9 @@ QStringList KRReportsForm::makePO(QString reportId)
     }
 
     return result;
+}
+
+void KRReportsForm::tableCellDoubleClicked(int row, int column)
+{
+    editButtonClicked();
 }
