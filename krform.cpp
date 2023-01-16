@@ -185,13 +185,14 @@ bool KRForm::saveKR()
                 return false;
             }
 
-            query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_oesn, kam_count) VALUES ('%1', '%2', '%3', '%4')";
+            query = "INSERT INTO kradditionalmats (kam_kr, kam_material, kam_oesn, kam_count, kam_order) VALUES ('%1', '%2', '%3', '%4', '%5')";
 
             for (int i=0; i<ui->addedMatTable->rowCount(); i++)
             {
                 prepQuery = query.arg(KRId).arg(ui->addedMatTable->item(i, 0)->text());
                 prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 2)->text().replace(",", ".").replace("-", "0"));
                 prepQuery = prepQuery.arg(ui->addedMatTable->item(i, 3)->text().replace(",", ".").replace("-", "0"));
+                prepQuery = prepQuery.arg(i);
 
                 if (!db->execQuery(prepQuery)) {
                     db->showError(this);
