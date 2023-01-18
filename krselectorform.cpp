@@ -58,7 +58,8 @@ void KRSelectorForm::updateTable()
     }
 
     query = "SELECT sch_id, unit_name, sch_name, sch_type, sch_kks, sch_date from schedule AS s "
-                    "LEFT JOIN units AS u ON s.sch_unit = unit_id where sch_worktype = 'КР' AND sch_executor = 'ИТЦРК'";
+                    "LEFT JOIN units AS u ON s.sch_unit = unit_id where sch_worktype = 'КР' AND sch_executor = '%1'";
+    query = query.arg(db->getVariable("Исполнитель").toString());
     if (ui->monthBox->currentIndex() != 0) {
         query += " AND sch_date = '%1'";
         if (ui->monthBox->currentIndex() < 10)

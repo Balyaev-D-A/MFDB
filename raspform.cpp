@@ -120,8 +120,8 @@ void RaspForm::updateWorkTable()
     while (ui->workTable->rowCount()>0) ui->workTable->removeRow(0);
 
     query = "select sch_id, sch_kks, sch_type, sch_worktype, loc_location, sch_hours, sch_done from schedule left join locations on schedule.sch_kks = locations.loc_kks "
-            "where schedule.sch_executor = 'ИТЦРК' and sch_unit = '%1'";
-    query = query.arg(ui->unitBox->currentData().toString());
+            "where schedule.sch_executor = '%1' and sch_unit = '%2'";
+    query = query.arg(db->getVariable("Исполнитель").toString()).arg(ui->unitBox->currentData().toString());
     if (ui->monthBox->currentIndex() != 0) {
         if (ui->monthBox->currentIndex() == 13){
             month = "ППР-" + QString::number(QDate::currentDate().year());

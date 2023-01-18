@@ -43,8 +43,9 @@ void DeviceSelectorForm::closeEvent(QCloseEvent *event)
 void DeviceSelectorForm::fillDeviceBox()
 {
     QStringList validList;
-    QString query = "SELECT DISTINCT ON (sch_type) sch_type FROM schedule WHERE sch_executor = 'ИТЦРК' ORDER BY sch_type ASC";
+    QString query = "SELECT DISTINCT ON (sch_type) sch_type FROM schedule WHERE sch_executor = '%1' ORDER BY sch_type ASC";
 
+    query = query.arg(db->getVariable("Исполнитель").toString());
     if (!db->execQuery(query)) {
         db->showError(this);
         return;
@@ -80,8 +81,8 @@ void DeviceSelectorForm::updateDeviceTree()
     while (db->nextRecord()) usedKKS.append(db->fetchValue(0).toString());
 
     query = "SELECT DISTINCT ON (sch_kks) unit_name, sch_kks FROM schedule AS s LEFT JOIN units AS u ON s.sch_unit = u.unit_id "
-                    "WHERE sch_type = '%1' AND sch_executor = 'ИТЦРК' ORDER BY sch_kks";
-    query = query.arg(ui->deviceBox->currentText());
+                    "WHERE sch_type = '%1' AND sch_executor = '%2' ORDER BY sch_kks";
+    query = query.arg(ui->deviceBox->currentText()).arg(db->getVariable("Исполнитель").toString());
     if (!db->execQuery(query)) {
         db->showError(this);
         return;
