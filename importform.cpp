@@ -59,6 +59,17 @@ void ImportForm::readButtonClicked()
     hHeader->setSectionsClickable(true);
     connect(ui->table->horizontalHeader(), &QHeaderView::sectionClicked, this, &ImportForm::headerSectionClicked);
     reader.closeFile();
+    /* ОРБшники сделали новый график с объединенными ячейками. Теперь нужно вставить в пустые ячейки,
+     * которые образовались при разъединении, значения из ячейки выше.
+     */
+
+    for (int i=0; i<ui->table->columnCount(); i++)
+        for (int j=1; j<ui->table->rowCount(); j++)
+        {
+            QString txt = ui->table->item(j, i)->text();
+            if(ui->table->item(j, i)->text().isEmpty())
+                ui->table->item(j, i)->setText(ui->table->item(j-1, i)->text());
+        }
 }
 
 void ImportForm::cancelButtonClicked()
