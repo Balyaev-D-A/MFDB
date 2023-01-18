@@ -62,7 +62,7 @@ bool Database::deployTables()
                   "iss_default BOOL DEFAULT FALSE)")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS materials (mat_id SERIAL PRIMARY KEY, mat_name VARCHAR(150), mat_doc VARCHAR(150), "
-                  "mat_measure VARCHAR(10))")) return false;
+                  "mat_measure VARCHAR(10), mat_consumable BOOL DEFAULT 'FALSE')")) return false;
 
     if (!pq->exec("CREATE TABLE IF NOT EXISTS normativmat (nm_id SERIAL PRIMARY KEY, nm_dev VARCHAR(50), nm_worktype CHAR(2), "
                   "nm_material INTEGER REFERENCES materials(mat_id), nm_count DECIMAL(6,3))")) return false;

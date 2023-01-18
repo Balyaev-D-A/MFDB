@@ -116,7 +116,7 @@ void KRReportsForm::deleteButtonClicked()
 void KRReportsForm::saveButtonClicked()
 {
     QString body, page;
-    QStringList avr, vvr, vfzm, ado, po;
+    QStringList avr, vvr, vfzm, vfzm2, ado, po;
     QFile file;
     QTextStream *ts;
     QString reportId, fileName;
@@ -128,6 +128,7 @@ void KRReportsForm::saveButtonClicked()
     avr = makeAVR(reportId);
     vvr = makeVVR(reportId);
     vfzm = makeVFZM(reportId);
+    vfzm2 = makeVFZM(reportId, false);
 
     for (int i=0; i<avr.size(); i++)
         body += avr[i];
@@ -135,6 +136,8 @@ void KRReportsForm::saveButtonClicked()
         body += vvr[i];
     for (int i=0; i<vfzm.size(); i++)
         body += vfzm[i];
+    for (int i=0; i<vfzm2.size(); i++)
+        body += vfzm2[i];
     if (vvr.size() > 4) {
         po = makePO(reportId);
         for (int i=0; i<po.size(); i++)
@@ -695,7 +698,7 @@ QStringList KRReportsForm::makeVVR(QString reportId)
     return result;
 }
 
-QStringList KRReportsForm::makeVFZM(QString reportId)
+QStringList KRReportsForm::makeVFZM(QString reportId, bool withConsumable)
 {
     const int fillerNS = 684;
     const int fillerS = 596;
@@ -832,7 +835,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
             oesn = "";
         }
 
-        query = "SELECT kam_material, mat_name, mat_doc, mat_measure, kam_oesn, kam_count FROM kradditionalmats "
+        query = "SELECT kam_material, mat_name, mat_doc, mat_measure, kam_oesn, kam_count, mat_consumable FROM kradditionalmats "
                 "LEFT JOIN materials ON kam_material = mat_id "
                 "WHERE kam_kr = '%1' ORDER BY kam_order";
         query = query.arg(workList[i].krId);
@@ -854,6 +857,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId)
         while (db->nextRecord())
         {
             if (db->fetchValue(5).toFloat() == 0.00) continue;
+            if (db->fetchValue(6).toBool() && !withConsumable) continue;
             matRow.clear();
             matRow.append(db->fetchValue(0).toString());
             matName = db->fetchValue(1).toString();

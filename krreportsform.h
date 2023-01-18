@@ -24,7 +24,7 @@ private:
     QString lastSavedDir = "";
     QStringList makeAVR(QString reportId);
     QStringList makeVVR(QString reportId);
-    QStringList makeVFZM(QString reportId);
+    QStringList makeVFZM(QString reportId, bool withConsumable = true);
     QStringList makePO(QString reportId);
     QString minDate(QString date1, QString date2);
     QString maxDate(QString date1, QString date2);

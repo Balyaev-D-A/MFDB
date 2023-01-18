@@ -179,14 +179,17 @@ void DictionaryForm::setDictionary(Dictionary dictionary)
         fields.append("mat_name");
         fields.append("mat_doc");
         fields.append("mat_measure");
+        fields.append("mat_consumable");
         fieldTypes.append("int");
         fieldTypes.append("string");
         fieldTypes.append("string");
         fieldTypes.append("string");
+        fieldTypes.append("bool");
         headers.append("id");
         headers.append("Материал");
         headers.append("Документ");
         headers.append("Ед. Изм.");
+        headers.append("Pacх.");
         break;
     case SIGNERS:
         setWindowTitle("Справочник: Подписанты");
