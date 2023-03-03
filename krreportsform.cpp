@@ -128,7 +128,7 @@ void KRReportsForm::saveButtonClicked()
     avr = makeAVR(reportId);
     vvr = makeVVR(reportId);
     vfzm = makeVFZM(reportId);
-    vfzm2 = makeVFZM(reportId, false);
+    //vfzm2 = makeVFZM(reportId, false);
 
     for (int i=0; i<avr.size(); i++)
         body += avr[i];
@@ -136,8 +136,8 @@ void KRReportsForm::saveButtonClicked()
         body += vvr[i];
     for (int i=0; i<vfzm.size(); i++)
         body += vfzm[i];
-    for (int i=0; i<vfzm2.size(); i++)
-        body += vfzm2[i];
+//    for (int i=0; i<vfzm2.size(); i++)
+//        body += vfzm2[i];
     if (vvr.size() > 4) {
         po = makePO(reportId);
         for (int i=0; i<po.size(); i++)
