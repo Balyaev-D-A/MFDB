@@ -884,7 +884,7 @@
      <x>0</x>
      <y>0</y>
      <width>1235</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -899,6 +899,7 @@
      <addaction name="aAnother"/>
     </widget>
     <addaction name="menu_3"/>
+    <addaction name="csAction"/>
     <addaction name="aError"/>
     <addaction name="aExit"/>
    </widget>
@@ -1046,6 +1047,11 @@
   <action name="aMatReport">
    <property name="text">
     <string>Отчет по материалам</string>
+   </property>
+  </action>
+  <action name="csAction">
+   <property name="text">
+    <string>Настройки подключения...</string>
    </property>
   </action>
  </widget>

@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-//    Settings::ConnSettings cs;
+    Settings::ConnSettings cs;
 
     ui->setupUi(this);
 
@@ -81,8 +81,9 @@ MainWindow::MainWindow(QWidget *parent)
     trReportsForm->setDatabase(db);
     mrForm = new MaterialsReportForm(this);
     mrForm->setDatabase(db);
+    settingsForm = new SettingsForm(this);
 
-//    settings = Settings::instance();
+    settings = Settings::instance();
 
     connect(ui->aEmployees, &QAction::triggered, this, &MainWindow::employeesTriggered);
     connect(ui->aSchedule, &QAction::triggered, this, &MainWindow::scheduleTriggered);
@@ -125,23 +126,26 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->aTRReports, &QAction::triggered, this, &MainWindow::trReportsTriggered);
     connect(ui->woreportBox, &QCheckBox::stateChanged, this, &MainWindow::updateDefectsTable);
     connect(ui->aMatReport, &QAction::triggered, this, &MainWindow::matReportTriggered);
+    connect(settingsForm, &SettingsForm::saved, this, &MainWindow::settingsSaved);
 
-//    cs = settings->getConnSettings();
-//    if (cs.host == "") {
-//        return;
-//    }
-    if (!connectDB("rsistem.ru", "radico23", "radico", "coolpass")) {
-        db->showError(this);
+    cs = settings->getConnSettings();
+    if (cs.host == "") {
+        settingsForm->show();
+        return;
+    }
+    if (!connectDB(cs.host, cs.database, cs.user, cs.password)) {
+        QMessageBox::critical(this, "Ошибка!!!", "Ошибка подключения к базе данных!");
+        return;
     }
     ui->raspDateEdit->setDate(QDate::currentDate());
+    updateRaspTable();
+    updateDefectsTable();
+    updateKRTable();
     //ui->taskDateEdit->setDate(QDate::currentDate());
 //    db->execQuery("SELECT emp_name, emp_id FROM employees WHERE emp_metrolog = false AND emp_hidden = false ORDER BY emp_name");
 //    ui->employeeBox->addItem("Все", 0);
 //    while (db->nextRecord())
 //        ui->employeeBox->addItem(db->fetchValue(0).toString(), db->fetchValue(1));
-    updateRaspTable();
-    updateDefectsTable();
-    updateKRTable();
 }
 
 MainWindow::~MainWindow()
@@ -246,7 +250,7 @@ void MainWindow::updateRaspTable()
         ui->raspTable->setItem(i, 3, new QTableWidgetItem(db->fetchValue(3).toString()));
         ui->raspTable->setItem(i, 6, new QTableWidgetItem(db->fetchValue(4).toString()));
     }
-    query = "SELECT sch_type, re_worktype  FROM requipment AS re LEFT JOIN schedule AS sch ON re.re_equip = sch.sch_id WHERE re_rasp = ";
+    query = "SELECT sch_type, re_worktype FROM requipment AS re LEFT JOIN schedule AS sch ON re.re_equip = sch.sch_id WHERE re_rasp = ";
     QStringList equip;
     QStringList wt;
     for (int i=0; i<ui->raspTable->rowCount(); i++)
@@ -1072,4 +1076,26 @@ void MainWindow::saveRasp(QStringList raspList)
 void MainWindow::matReportTriggered()
 {
     mrForm->show();
+}
+
+void MainWindow::on_csAction_triggered()
+{
+    settingsForm->show();
+}
+
+void MainWindow::settingsSaved()
+{
+    Settings::ConnSettings cs;
+    cs = settings->getConnSettings();
+    if (cs.host == "") {
+        QMessageBox::critical(this, "Ошибка!!!", "Не задан хост для подключения!");
+        return;
+    }
+    if (!connectDB(cs.host, cs.database, cs.user, cs.password)) {
+        QMessageBox::critical(this, "Ошибка!!!", "Ошибка подключения к базе данных!");
+        return;
+    }
+    updateRaspTable();
+    updateDefectsTable();
+    updateKRTable();
 }

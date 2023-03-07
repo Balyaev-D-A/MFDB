@@ -16,7 +16,8 @@
 #include "krreportsform.h"
 #include "trreportsform.h"
 #include "materialsreportform.h"
-//#include "settings.h"
+#include "settings.h"
+#include "settingsform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -49,7 +50,8 @@ private:
     KRReportsForm *krReportsForm;
     TRReportsForm *trReportsForm;
     MaterialsReportForm *mrForm;
-//    Settings *settings;
+    SettingsForm *settingsForm;
+    Settings *settings;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
     QString groupWorks(QList<QStringList> workList);
@@ -95,6 +97,8 @@ private slots:
     void krReportsTriggered();
     void trReportsTriggered();
     void matReportTriggered();
+    void settingsSaved();
+    void on_csAction_triggered();
 
 protected:
     void showEvent(QShowEvent *event);
