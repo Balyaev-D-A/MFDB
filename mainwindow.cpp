@@ -130,7 +130,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    if (cs.host == "") {
 //        return;
 //    }
-    if (!connectDB("192.168.1.100", "radico23", "radico", "coolpass")) {
+    if (!connectDB("rsistem.ru", "radico23", "radico", "coolpass")) {
         db->showError(this);
     }
     ui->raspDateEdit->setDate(QDate::currentDate());
