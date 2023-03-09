@@ -7,6 +7,7 @@ SettingsForm::SettingsForm(QWidget *parent) :
 {
     ui->setupUi(this);
     settings = Settings::instance();
+    setWindowModality(Qt::WindowModal);
 }
 
 SettingsForm::~SettingsForm()
