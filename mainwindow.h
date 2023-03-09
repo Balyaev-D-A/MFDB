@@ -18,6 +18,7 @@
 #include "materialsreportform.h"
 #include "settings.h"
 #include "settingsform.h"
+#include "connectionform.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -52,6 +53,7 @@ private:
     MaterialsReportForm *mrForm;
     SettingsForm *settingsForm;
     Settings *settings;
+    ConnectionForm *connectionForm;
     QString makeRaspEquipments(QStringList equip);
     QString makeRaspWoktypes(QStringList wt);
     QString groupWorks(QList<QStringList> workList);
@@ -97,8 +99,12 @@ private slots:
     void krReportsTriggered();
     void trReportsTriggered();
     void matReportTriggered();
+    void connectToDefaultDB();
     void settingsSaved();
     void on_csAction_triggered();
+    void connectionFormConnectClicked(Settings::ConnSettings cs);
+    void on_aAnother_triggered();
+    void on_aDefault_triggered();
 
 protected:
     void showEvent(QShowEvent *event);

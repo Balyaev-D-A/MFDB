@@ -82,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     mrForm = new MaterialsReportForm(this);
     mrForm->setDatabase(db);
     settingsForm = new SettingsForm(this);
+    connectionForm = new ConnectionForm(this);
 
     settings = Settings::instance();
 
@@ -127,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->woreportBox, &QCheckBox::stateChanged, this, &MainWindow::updateDefectsTable);
     connect(ui->aMatReport, &QAction::triggered, this, &MainWindow::matReportTriggered);
     connect(settingsForm, &SettingsForm::saved, this, &MainWindow::settingsSaved);
+    connect(connectionForm, &ConnectionForm::connectClicked, this, &MainWindow::connectionFormConnectClicked);
 
     cs = settings->getConnSettings();
     if (cs.host == "") {
@@ -1083,7 +1085,7 @@ void MainWindow::on_csAction_triggered()
     settingsForm->show();
 }
 
-void MainWindow::settingsSaved()
+void MainWindow::connectToDefaultDB()
 {
     Settings::ConnSettings cs;
     cs = settings->getConnSettings();
@@ -1099,3 +1101,35 @@ void MainWindow::settingsSaved()
     updateDefectsTable();
     updateKRTable();
 }
+
+void MainWindow::settingsSaved()
+{
+    connectToDefaultDB();
+}
+
+void MainWindow::connectionFormConnectClicked(Settings::ConnSettings cs)
+{
+    if (cs.host == "") {
+        QMessageBox::critical(this, "Ошибка!!!", "Не задан хост для подключения!");
+        return;
+    }
+    if (!connectDB(cs.host, cs.database, cs.user, cs.password)) {
+        QMessageBox::critical(this, "Ошибка!!!", "Ошибка подключения к базе данных!");
+        return;
+    }
+    updateRaspTable();
+    updateDefectsTable();
+    updateKRTable();
+}
+
+void MainWindow::on_aAnother_triggered()
+{
+    connectionForm->show();
+}
+
+
+void MainWindow::on_aDefault_triggered()
+{
+    connectToDefaultDB();
+}
+

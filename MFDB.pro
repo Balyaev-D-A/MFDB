@@ -10,6 +10,7 @@ CONFIG += c++11 axcontainer
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    connectionform.cpp \
     csvreader.cpp \
     database.cpp \
     defectform.cpp \
@@ -49,6 +50,7 @@ SOURCES += \
     wtcheckbox.cpp
 
 HEADERS += \
+    connectionform.h \
     csvreader.h \
     database.h \
     defectform.h \
@@ -87,6 +89,7 @@ HEADERS += \
     wtcheckbox.h
 
 FORMS += \
+    connectionform.ui \
     defectform.ui \
     deviceselectorform.ui \
     dictionaryform.ui \
