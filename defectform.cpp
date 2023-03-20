@@ -24,7 +24,7 @@ DefectForm::DefectForm(QWidget *parent) :
     connect(ui->materialTable, &DragDropTable::itemDroped, this, &DefectForm::removeMaterialClicked);
     connect(ui->okButton, &QPushButton::clicked, this, &DefectForm::okClicked);
     connect(ui->cancelButton, &QPushButton::clicked, this, &DefectForm::cancelClicked);
-    connect(ui->journalDefectEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
+//    connect(ui->journalDefectEdit, &QLineEdit::textChanged, this, &DefectForm::updateActionsDesc);
     connect(ui->defectEdit, &QLineEdit::textChanged, this, &DefectForm::defectTextChanged);
     connect(ui->repairEdit, &QLineEdit::textChanged, this, &DefectForm::repairTextChanged);
     connect(ui->stageBox, &QComboBox::currentTextChanged, this, &DefectForm::defectTextChanged);
@@ -396,7 +396,7 @@ void DefectForm::updateActionsDesc()
         }
         act += actList[i] + "\n";
     }
-    act.replace("$JD$", ui->journalDefectEdit->text().simplified());
+    act.replace("$JD$", ui->defectEdit->text().simplified());
     act.replace("$REP$", ui->repairEdit->text().simplified());
 
     ui->actionsTextEdit->document()->setPlainText(act);
