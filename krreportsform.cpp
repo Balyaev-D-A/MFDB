@@ -128,7 +128,7 @@ void KRReportsForm::saveButtonClicked()
     avr = makeAVR(reportId);
     vvr = makeVVR(reportId);
     vfzm = makeVFZM(reportId);
-    //vfzm2 = makeVFZM(reportId, false);
+    vfzm2 = makeVFZM(reportId, false);
 
     for (int i=0; i<avr.size(); i++)
         body += avr[i];
@@ -136,8 +136,8 @@ void KRReportsForm::saveButtonClicked()
         body += vvr[i];
     for (int i=0; i<vfzm.size(); i++)
         body += vfzm[i];
-//    for (int i=0; i<vfzm2.size(); i++)
-//        body += vfzm2[i];
+    for (int i=0; i<vfzm2.size(); i++)
+        body += vfzm2[i];
     if (vvr.size() > 4) {
         po = makePO(reportId);
         for (int i=0; i<po.size(); i++)
@@ -835,9 +835,16 @@ QStringList KRReportsForm::makeVFZM(QString reportId, bool withConsumable)
             oesn = "";
         }
 
-        query = "SELECT kam_material, mat_name, mat_doc, mat_measure, kam_oesn, kam_count, mat_consumable FROM kradditionalmats "
-                "LEFT JOIN materials ON kam_material = mat_id "
-                "WHERE kam_kr = '%1' ORDER BY kam_order";
+        if (withConsumable) {
+            query = "SELECT kam_material, mat_name, mat_doc, mat_measure, kam_oesn, kam_count FROM kradditionalmats "
+                    "LEFT JOIN materials ON kam_material = mat_id "
+                    "WHERE kam_kr = '%1' ORDER BY kam_order";
+        }
+        else {
+            query = "SELECT kam_material, mat_name, mat_doc, mat_measure, kam_oesn, kam_count FROM kradditionalmats "
+                    "LEFT JOIN materials ON kam_material = mat_id "
+                    "WHERE kam_kr = '%1' AND mat_consumable = 'FALSE' ORDER BY kam_order";
+        }
         query = query.arg(workList[i].krId);
 
         if (!db->execQuery(query)) {
@@ -857,7 +864,7 @@ QStringList KRReportsForm::makeVFZM(QString reportId, bool withConsumable)
         while (db->nextRecord())
         {
             if (db->fetchValue(5).toFloat() == 0.00) continue;
-            if (db->fetchValue(6).toBool() && !withConsumable) continue;
+//            if (db->fetchValue(6).toBool() && !withConsumable) continue;
             matRow.clear();
             matRow.append(db->fetchValue(0).toString());
             matName = db->fetchValue(1).toString();
