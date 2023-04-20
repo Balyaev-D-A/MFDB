@@ -31,7 +31,7 @@ public:
     bool rollbackTransaction();
     QVariant lastInsertId() const;
     QVariant getVariable(QString varName);
-
+    QList<QStringList> getResults();
 
 private:
     QSqlDatabase db;

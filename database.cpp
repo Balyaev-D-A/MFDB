@@ -214,3 +214,18 @@ QVariant Database::getVariable(QString varName)
     }
     return result;
 }
+
+QList<QStringList> Database::getResults()
+{
+    QStringList resultRow;
+    QList<QStringList> result;
+
+    while (nextRecord())
+    {
+        resultRow.clear();
+        for (int i=0; i<pq->size(); i++)
+            resultRow.append(fetchValue(i).toString());
+        result.append(resultRow);
+    }
+    return result;
+}
