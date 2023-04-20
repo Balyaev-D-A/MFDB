@@ -223,7 +223,7 @@ QList<QStringList> Database::getResults()
     while (nextRecord())
     {
         resultRow.clear();
-        for (int i=0; i<pq->size(); i++)
+        for (int i=0; i<pq->record().count(); i++)
             resultRow.append(fetchValue(i).toString());
         result.append(resultRow);
     }

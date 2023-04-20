@@ -170,6 +170,14 @@ void TRReportsForm::saveButtonClicked()
     }
     file.write(page.toUtf8());
     file.close();
+
+    file.setFileName("/home/user/object.json");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
+        return;
+    }
+    file.write(makeJson(reportId).toUtf8());
+    file.close();
 }
 
 QString TRReportsForm::minDate(QString date1, QString date2)
@@ -1450,13 +1458,13 @@ QString TRReportsForm::makeJson(QString reportId)
         mainObj.insert("planbegdate", QJsonValue(db->fetchValue(3).toString()));
         mainObj.insert("planenddate", QJsonValue(db->fetchValue(4).toString()));
         mainObj.insert("signdate", QJsonValue(db->fetchValue(5).toString()));
-        mainObj.insert("docnum", QJsonValue("№" + db->fetchValue(2).toString()));
+        mainObj.insert("docnum", QJsonValue("№" + db->fetchValue(6).toString()));
     }
     mainObj.insert("orderdate", QJsonValue(db->getVariable("ДатаПриказа").toString()));
     mainObj.insert("ordernum", QJsonValue(db->getVariable("ПриказПоАЭС").toString()));
     mainObj.insert("executor", QJsonValue(db->getVariable("Исполнитель").toString()));
 
-    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_id FROM trrworks "
+    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_num FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
             "LEFT JOIN ktd ON def_devtype = ktd_dev "
             "WHERE trw_report = '%1' ORDER BY trw_order";
@@ -1477,7 +1485,8 @@ QString TRReportsForm::makeJson(QString reportId)
         workObj.insert("enddate", QJsonValue(results[i][4]));
         workObj.insert("defect", QJsonValue(results[i][5]));
         workObj.insert("repair", QJsonValue(results[i][6]));
-        workObj.insert("actions", QJsonValue(results[i][7]));
+        workObj.insert("actions", QJsonValue(results[i][7].replace("\n", "<br />")));
+        workObj.insert("defectnum", QJsonValue(results[i][8]));
         query = "SELECT nw_oesn FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
         query = query.arg(results[i][1]);
         if (!db->execQuery(query)) {
@@ -1485,7 +1494,10 @@ QString TRReportsForm::makeJson(QString reportId)
             return "";
         }
         if (db->nextRecord())
-            workObj.insert("oesn", QJsonValue(db->fetchValue(1).toString()));
+            workObj.insert("oesn", QJsonValue(db->fetchValue(0).toString()));
+        else
+            workObj.insert("oesn", QJsonValue(""));
+
         query = "SELECT mat_name, mat_doc, mat_measure, dam_oesn, dam_count FROM defadditionalmats "
                 "LEFT JOIN materials ON dam_material = mat_id "
                 "WHERE dam_defect = '%1' ORDER BY dam_order";
@@ -1596,6 +1608,6 @@ QString TRReportsForm::makeJson(QString reportId)
     signObj.insert("location", QJsonValue(chief2Loc));
     mainObj.insert("chief2", QJsonValue(signObj));
 
-
+    doc.setObject(mainObj);
     return QString(doc.toJson());
 }
