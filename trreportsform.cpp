@@ -1463,8 +1463,9 @@ QString TRReportsForm::makeJson(QString reportId)
     mainObj.insert("orderdate", QJsonValue(db->getVariable("ДатаПриказа").toString()));
     mainObj.insert("ordernum", QJsonValue(db->getVariable("ПриказПоАЭС").toString()));
     mainObj.insert("executor", QJsonValue(db->getVariable("Исполнитель").toString()));
+    mainObj.insert("ktdtext", QJsonValue("регламент РГ.0.33.01;"));
 
-    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_num FROM trrworks "
+    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_num, def_id FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
             "LEFT JOIN ktd ON def_devtype = ktd_dev "
             "WHERE trw_report = '%1' ORDER BY trw_order";
@@ -1487,6 +1488,18 @@ QString TRReportsForm::makeJson(QString reportId)
         workObj.insert("repair", QJsonValue(results[i][6]));
         workObj.insert("actions", QJsonValue(results[i][7].replace("\n", "<br />")));
         workObj.insert("defectnum", QJsonValue(results[i][8]));
+        workObj.insert("ktdDoc", QJsonValue("РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01"));
+
+        query = QString("SELECT sch_tdoc FROM schedule WHERE sch_type = '%1' LIMIT 1").arg(results[i][1]);
+        if (!db->execQuery(query)) {
+            db->showError(this);
+            return "";
+        }
+        if (db->nextRecord())
+            workObj.insert("techDoc", QJsonValue(db->fetchValue(0).toString()));
+        else
+            workObj.insert("techDoc", QJsonValue("Руководство по эксплуатации"));
+
         query = "SELECT nw_oesn FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
         query = query.arg(results[i][1]);
         if (!db->execQuery(query)) {
@@ -1494,14 +1507,14 @@ QString TRReportsForm::makeJson(QString reportId)
             return "";
         }
         if (db->nextRecord())
-            workObj.insert("oesn", QJsonValue(db->fetchValue(0).toString()));
+            workObj.insert("oesn", QJsonValue(db->fetchValue(0).toString().simplified()));
         else
             workObj.insert("oesn", QJsonValue(""));
 
         query = "SELECT mat_name, mat_doc, mat_measure, dam_oesn, dam_count FROM defadditionalmats "
                 "LEFT JOIN materials ON dam_material = mat_id "
                 "WHERE dam_defect = '%1' ORDER BY dam_order";
-        query = query.arg(results[i][8]);
+        query = query.arg(results[i][9]);
         if (!db->execQuery(query)) {
             db->showError(this);
             return "";
