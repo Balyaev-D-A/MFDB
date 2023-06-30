@@ -24,6 +24,7 @@ SOURCES += \
     fieldeditor.cpp \
     headercombobox.cpp \
     importform.cpp \
+    jsonobjectbuilder.cpp \
     krform.cpp \
     krreportform.cpp \
     krreportsform.cpp \
@@ -64,6 +65,7 @@ HEADERS += \
     fieldeditor.h \
     headercombobox.h \
     importform.h \
+    jsonobjectbuilder.h \
     krform.h \
     krreportform.h \
     krreportsform.h \
