@@ -129,26 +129,57 @@ void TRReportsForm::saveButtonClicked()
 
     reportId = ui->table->item(ui->table->currentRow(), 0)->text();
 
-    avr = makeAVR(reportId);
-    vvr = makeVVR(reportId);
-    vfzm = makeVFZM(reportId);
-    ado = makeADO(reportId);
+//    avr = makeAVR(reportId);
+//    vvr = makeVVR(reportId);
+//    vfzm = makeVFZM(reportId);
+//    ado = makeADO(reportId);
 
-    for (int i=0; i<avr.size(); i++)
-        body += avr[i];
-    for (int i=0; i<vvr.size(); i++)
-        body += vvr[i];
-    for (int i=0; i<vfzm.size(); i++)
-        body += vfzm[i];
-    for (int i=0; i<ado.size(); i++)
-        body += ado[i];
-    if (vvr.size() > 4) {
-        po = makePO(reportId);
-        for (int i=0; i<po.size(); i++)
-            body += po[i];
-    }
+//    for (int i=0; i<avr.size(); i++)
+//        body += avr[i];
+//    for (int i=0; i<vvr.size(); i++)
+//        body += vvr[i];
+//    for (int i=0; i<vfzm.size(); i++)
+//        body += vfzm[i];
+//    for (int i=0; i<ado.size(); i++)
+//        body += ado[i];
+//    if (vvr.size() > 4) {
+//        po = makePO(reportId);
+//        for (int i=0; i<po.size(); i++)
+//            body += po[i];
+//    }
 
-    file.setFileName(QApplication::applicationDirPath() + "/templates/reports/report.html");
+//    file.setFileName(QApplication::applicationDirPath() + "/templates/reports/report.html");
+//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
+//                              QApplication::applicationDirPath() + "/templates/reports/report.html\n" + file.errorString());
+//        return;
+//    }
+//    ts = new QTextStream(&file);
+//    page = ts->readAll();
+//    delete ts;
+//    file.close();
+
+//    page.replace("$BODY$", body);
+
+//    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", lastSavedDir + "ТР " + ui->table->item(ui->table->currentRow(), 2)->text() + ".htm", "HTML файлы (*.htm *.html)");
+//    file.setFileName(fileName);
+//    lastSavedDir = QFileInfo(fileName).absolutePath() + "/";
+//    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+//        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
+//        return;
+//    }
+//    file.write(page.toUtf8());
+//    file.close();
+
+//    file.setFileName("/home/user/object.json");
+//    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+//        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
+//        return;
+//    }
+//    file.write(makeJson(reportId).toUtf8());
+//    file.close();
+
+    file.setFileName(QApplication::applicationDirPath() + "/templates/reports-js/template.html");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
                               QApplication::applicationDirPath() + "/templates/reports/report.html\n" + file.errorString());
@@ -159,7 +190,7 @@ void TRReportsForm::saveButtonClicked()
     delete ts;
     file.close();
 
-    page.replace("$BODY$", body);
+    page.replace("%INFO%", makeJson(reportId).toUtf8());
 
     fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", lastSavedDir + "ТР " + ui->table->item(ui->table->currentRow(), 2)->text() + ".htm", "HTML файлы (*.htm *.html)");
     file.setFileName(fileName);
@@ -169,14 +200,6 @@ void TRReportsForm::saveButtonClicked()
         return;
     }
     file.write(page.toUtf8());
-    file.close();
-
-    file.setFileName("/home/user/object.json");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
-        return;
-    }
-    file.write(makeJson(reportId).toUtf8());
     file.close();
 }
 
@@ -1468,7 +1491,7 @@ QString TRReportsForm::makeJson(QString reportId)
     query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_num, def_id FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
             "LEFT JOIN ktd ON def_devtype = ktd_dev "
-            "WHERE trw_report = '%1' ORDER BY trw_order";
+            "WHERE trw_report = '%1' ORDER BY trw_order DESC";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -1513,7 +1536,7 @@ QString TRReportsForm::makeJson(QString reportId)
 
         query = "SELECT mat_name, mat_doc, mat_measure, dam_oesn, dam_count FROM defadditionalmats "
                 "LEFT JOIN materials ON dam_material = mat_id "
-                "WHERE dam_defect = '%1' ORDER BY dam_order";
+                "WHERE dam_defect = '%1' ORDER BY dam_order DESC";
         query = query.arg(results[i][9]);
         if (!db->execQuery(query)) {
             db->showError(this);
