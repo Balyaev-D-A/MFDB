@@ -5,7 +5,7 @@
 #include <QDate>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include<QJsonArray>
+#include <QJsonArray>
 #include "trreportsform.h"
 #include "ui_trreportsform.h"
 
@@ -1477,7 +1477,7 @@ QString TRReportsForm::makeJson(QString reportId)
         mainObj.insert("worktype", QJsonValue("ТР"));
         mainObj.insert("unit", QJsonValue(db->fetchValue(0).toString()));
         mainObj.insert("subsys", QJsonValue(db->fetchValue(1).toString()));
-        mainObj.insert("shednum", QJsonValue(db->fetchValue(2).toString()));
+        mainObj.insert("schednum", QJsonValue(db->fetchValue(2).toString()));
         mainObj.insert("planbegdate", QJsonValue(db->fetchValue(3).toString()));
         mainObj.insert("planenddate", QJsonValue(db->fetchValue(4).toString()));
         mainObj.insert("signdate", QJsonValue(db->fetchValue(5).toString()));
@@ -1491,7 +1491,7 @@ QString TRReportsForm::makeJson(QString reportId)
     query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_num, def_id FROM trrworks "
             "LEFT JOIN defects ON trw_work = def_id "
             "LEFT JOIN ktd ON def_devtype = ktd_dev "
-            "WHERE trw_report = '%1' ORDER BY trw_order DESC";
+            "WHERE trw_report = '%1' ORDER BY trw_order";
     query = query.arg(reportId);
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -1536,7 +1536,7 @@ QString TRReportsForm::makeJson(QString reportId)
 
         query = "SELECT mat_name, mat_doc, mat_measure, dam_oesn, dam_count FROM defadditionalmats "
                 "LEFT JOIN materials ON dam_material = mat_id "
-                "WHERE dam_defect = '%1' ORDER BY dam_order DESC";
+                "WHERE dam_defect = '%1' ORDER BY dam_order";
         query = query.arg(results[i][9]);
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -1550,11 +1550,11 @@ QString TRReportsForm::makeJson(QString reportId)
             matObj.insert("unit", QJsonValue(db->fetchValue(2).toString()));
             matObj.insert("quantityOESN", QJsonValue(db->fetchValue(3).toString()));
             matObj.insert("quantity", QJsonValue(db->fetchValue(4).toString()));
-            matsArray.push_front(QJsonObject(matObj));
+            matsArray.append(QJsonObject(matObj));
         }
         workObj.insert("materials", QJsonValue(matsArray));
         while (!matsArray.isEmpty()) matsArray.removeFirst();
-        worksArray.push_front(QJsonValue(workObj));
+        worksArray.append(QJsonValue(workObj));
     }
     mainObj.insert("works", QJsonValue(worksArray));
 

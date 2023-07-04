@@ -335,9 +335,11 @@
         let accordingdoc ='';
         if (info.worktype == 'ТР') {
             if (info.works.length == 1) accordingdoc = 'записью в общестанционном журнале дефектов "SAP Logon" №';
-            else accordingdoc = 'записями в общестанционном журнале дефектов "SAP Logon" №№';
-            info.works.forEach(work => { accordingdoc += `${work.defectnum}, ` });
-            accordingdoc.slice(0, -2);
+            else { 
+                accordingdoc = 'записями в общестанционном журнале дефектов "SAP Logon" №№';
+                info.works.forEach(work => { accordingdoc += `${work.defectnum}, ` });
+                accordingdoc = accordingdoc.slice(0, -2);
+            }
         }
         else accordingdoc = `годовым графиком ремонта оборудования технологических систем №${info.schednum}`;
         document.body.innerHTML += avrp1;
@@ -456,6 +458,8 @@
         let heightBefore = document.getElementById(currid).offsetHeight;
         for (let i=0; i<info.works.length; i++)
         {
+            if (!info.works[i].materials.length) continue;
+            
             let htmlblock = "" + headertempl.replace('%1', info.works[i].deviceDescription + ' ' + info.works[i].deviceType + ', ' + info.works[i].deviceKKS).replace('%2', info.works[i].oesn);
             
             let matnum = 1;

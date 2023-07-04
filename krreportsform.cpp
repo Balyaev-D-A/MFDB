@@ -3,6 +3,9 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QDate>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "krreportsform.h"
 #include "ui_krreportsform.h"
 
@@ -125,26 +128,49 @@ void KRReportsForm::saveButtonClicked()
 
     reportId = ui->table->item(ui->table->currentRow(), 0)->text();
 
-    avr = makeAVR(reportId);
-    vvr = makeVVR(reportId);
-    vfzm = makeVFZM(reportId);
-    vfzm2 = makeVFZM(reportId, false);
+//    avr = makeAVR(reportId);
+//    vvr = makeVVR(reportId);
+//    vfzm = makeVFZM(reportId);
+//    vfzm2 = makeVFZM(reportId, false);
 
-    for (int i=0; i<avr.size(); i++)
-        body += avr[i];
-    for (int i=0; i<vvr.size(); i++)
-        body += vvr[i];
-    for (int i=0; i<vfzm.size(); i++)
-        body += vfzm[i];
-    for (int i=0; i<vfzm2.size(); i++)
-        body += vfzm2[i];
-    if (vvr.size() > 4) {
-        po = makePO(reportId);
-        for (int i=0; i<po.size(); i++)
-            body += po[i];
-    }
+//    for (int i=0; i<avr.size(); i++)
+//        body += avr[i];
+//    for (int i=0; i<vvr.size(); i++)
+//        body += vvr[i];
+//    for (int i=0; i<vfzm.size(); i++)
+//        body += vfzm[i];
+//    for (int i=0; i<vfzm2.size(); i++)
+//        body += vfzm2[i];
+//    if (vvr.size() > 4) {
+//        po = makePO(reportId);
+//        for (int i=0; i<po.size(); i++)
+//            body += po[i];
+//    }
 
-    file.setFileName(QApplication::applicationDirPath() + "/templates/reports/report.html");
+//    file.setFileName(QApplication::applicationDirPath() + "/templates/reports/report.html");
+//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
+//                              QApplication::applicationDirPath() + "/templates/reports/report.html\n" + file.errorString());
+//        return;
+//    }
+//    ts = new QTextStream(&file);
+//    page = ts->readAll();
+//    delete ts;
+//    file.close();
+
+//    page.replace("$BODY$", body);
+
+//    fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", lastSavedDir + "КР " + ui->table->item(ui->table->currentRow(), 2)->text() + ".htm", "HTML файлы (*.htm *.html)");
+//    file.setFileName(fileName);
+//    lastSavedDir = QFileInfo(fileName).absolutePath() + "/";
+//    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+//        QMessageBox::critical(this, "Ошибка!", "Невозможно открыть файл: \n" + file.errorString());
+//        return;
+//    }
+//    file.write(page.toUtf8());
+//    file.close();
+
+    file.setFileName(QApplication::applicationDirPath() + "/templates/reports-js/template.html");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Ошибка!", "Невозможно открыть шаблон по пути: " +
                               QApplication::applicationDirPath() + "/templates/reports/report.html\n" + file.errorString());
@@ -155,7 +181,7 @@ void KRReportsForm::saveButtonClicked()
     delete ts;
     file.close();
 
-    page.replace("$BODY$", body);
+    page.replace("%INFO%", makeJson(reportId).toUtf8());
 
     fileName = QFileDialog::getSaveFileName(this, "Выберите файл для сохранения", lastSavedDir + "КР " + ui->table->item(ui->table->currentRow(), 2)->text() + ".htm", "HTML файлы (*.htm *.html)");
     file.setFileName(fileName);
@@ -1160,4 +1186,191 @@ QStringList KRReportsForm::makePO(QString reportId)
 void KRReportsForm::tableCellDoubleClicked(int row, int column)
 {
     editButtonClicked();
+}
+
+QString KRReportsForm::makeJson(QString reportId)
+{
+    QJsonDocument doc;
+    QJsonObject mainObj;
+    QJsonArray worksArray;
+    QJsonObject workObj;
+    QJsonArray matsArray;
+    QJsonObject matObj;
+    QJsonObject signObj;
+    QList<QStringList> results;
+    QString material;
+    QString query = "SELECT unit_shortname, unit_subsys, unit_schednum, krr_planbeg, krr_planend, krr_date, krr_docnum FROM krreports "
+                    "LEFT JOIN units ON krr_unit = unit_id "
+                    "WHERE krr_id = '%1'";
+    query = query.arg(reportId);
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return "";
+    }
+    if (db->nextRecord()) {
+        mainObj.insert("worktype", QJsonValue("КР"));
+        mainObj.insert("unit", QJsonValue(db->fetchValue(0).toString()));
+        mainObj.insert("subsys", QJsonValue(db->fetchValue(1).toString()));
+        mainObj.insert("schednum", QJsonValue(db->fetchValue(2).toString()));
+        mainObj.insert("planbegdate", QJsonValue(db->fetchValue(3).toString()));
+        mainObj.insert("planenddate", QJsonValue(db->fetchValue(4).toString()));
+        mainObj.insert("signdate", QJsonValue(db->fetchValue(5).toString()));
+        mainObj.insert("docnum", QJsonValue("№" + db->fetchValue(6).toString()));
+    }
+    mainObj.insert("orderdate", QJsonValue(db->getVariable("ДатаПриказа").toString()));
+    mainObj.insert("ordernum", QJsonValue(db->getVariable("ПриказПоАЭС").toString()));
+    mainObj.insert("executor", QJsonValue(db->getVariable("Исполнитель").toString()));
+    mainObj.insert("ktdtext", QJsonValue("регламент РГ.0.33.01;"));
+
+    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_num, def_id FROM trrworks "
+            "LEFT JOIN defects ON trw_work = def_id "
+            "LEFT JOIN ktd ON def_devtype = ktd_dev "
+            "WHERE trw_report = '%1' ORDER BY trw_order";
+
+    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate, kr_actions, kr_id FROM krrworks "
+            "LEFT JOIN kaprepairs ON krw_work = kr_id "
+            "LEFT JOIN schedule ON kr_sched = sch_id "
+            "WHERE krw_report = '%1' ORDER BY krw_order";
+
+    query = query.arg(reportId);
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return "";
+    }
+
+    results = db->getResults();
+
+    for (int i=0; i<results.size(); i++)
+    {
+        workObj.insert("deviceDescription", QJsonValue(results[i][0]));
+        workObj.insert("deviceType", QJsonValue(results[i][1]));
+        workObj.insert("deviceKKS", QJsonValue(results[i][2]));
+        workObj.insert("begdate", QJsonValue(results[i][3]));
+        workObj.insert("enddate", QJsonValue(results[i][4]));
+        workObj.insert("actions", QJsonValue(results[i][5].replace("\n", "<br />")));
+        workObj.insert("ktdDoc", QJsonValue("РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01"));
+
+        query = "SELECT nw_oesn FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР'";
+        query = query.arg(results[i][1]);
+        if (!db->execQuery(query)) {
+            db->showError(this);
+            return "";
+        }
+        if (db->nextRecord())
+            workObj.insert("oesn", QJsonValue(db->fetchValue(0).toString().simplified()));
+        else
+            workObj.insert("oesn", QJsonValue(""));
+
+        query = "SELECT mat_name, mat_doc, mat_measure, kam_oesn, kam_count FROM kradditionalmats "
+                "LEFT JOIN materials ON kam_material = mat_id "
+                "WHERE kam_kr = '%1' ORDER BY kam_order";
+        query = query.arg(results[i][6]);
+        if (!db->execQuery(query)) {
+            db->showError(this);
+            return "";
+        }
+        while (db->nextRecord())
+        {
+            material = db->fetchValue(0).toString();
+            if (!material.endsWith(".")) material += ".";
+            matObj.insert("name", QJsonValue(material + " " + db->fetchValue(1).toString()));
+            matObj.insert("unit", QJsonValue(db->fetchValue(2).toString()));
+            matObj.insert("quantityOESN", QJsonValue(db->fetchValue(3).toString()));
+            matObj.insert("quantity", QJsonValue(db->fetchValue(4).toString()));
+            matsArray.append(QJsonObject(matObj));
+        }
+        workObj.insert("materials", QJsonValue(matsArray));
+        while (!matsArray.isEmpty()) matsArray.removeFirst();
+        worksArray.append(QJsonValue(workObj));
+    }
+    mainObj.insert("works", QJsonValue(worksArray));
+
+    query = "SELECT sig_loc, sig_name, krs_role FROM krsigners "
+            "LEFT JOIN signers ON krs_signer = sig_id "
+            "WHERE krs_report = '%1'";
+    query = query.arg(reportId);
+
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return "";
+    }
+
+    QString ownerLoc, ownerName, member1Loc, member1Name, member2Loc, member2Name, member3Loc, member3Name, member4Loc, member4Name;
+    QString member5Loc, member5Name, repairerLoc, repairerName, chief1Loc, chief1Name, chief2Loc, chief2Name;
+    while (db->nextRecord())
+    {
+        switch (db->fetchValue(2).toInt()) {
+        case KRSOWNER:
+            ownerLoc = db->fetchValue(0).toString();
+            ownerName = db->fetchValue(1).toString();
+            break;
+        case KRSMEMBER1:
+            member1Loc = db->fetchValue(0).toString();
+            member1Name = db->fetchValue(1).toString();
+            break;
+        case KRSMEMBER2:
+            member2Loc = db->fetchValue(0).toString();
+            member2Name = db->fetchValue(1).toString();
+            break;
+        case KRSMEMBER3:
+            member3Loc = db->fetchValue(0).toString();
+            member3Name = db->fetchValue(1).toString();
+            break;
+        case KRSMEMBER4:
+            member4Loc = db->fetchValue(0).toString();
+            member4Name = db->fetchValue(1).toString();
+            break;
+        case KRSMEMBER5:
+            member5Loc = db->fetchValue(0).toString();
+            member5Name = db->fetchValue(1).toString();
+            break;
+        case KRSREPAIRER:
+            repairerLoc = db->fetchValue(0).toString();
+            repairerName = db->fetchValue(1).toString();
+            break;
+        case KRSCHIEF:
+            chief1Loc = db->fetchValue(0).toString();
+            chief1Name = db->fetchValue(1).toString();
+            break;
+        }
+    }
+
+    signObj.insert("name", QJsonValue(ownerName));
+    signObj.insert("location", QJsonValue(ownerLoc));
+    mainObj.insert("owner", QJsonValue(signObj));
+
+    signObj.insert("name", QJsonValue(member1Name));
+    signObj.insert("location", QJsonValue(member1Loc));
+    mainObj.insert("member1", QJsonValue(signObj));
+
+    signObj.insert("name", QJsonValue(member2Name));
+    signObj.insert("location", QJsonValue(member2Loc));
+    mainObj.insert("member2", QJsonValue(signObj));
+
+    signObj.insert("name", QJsonValue(member3Name));
+    signObj.insert("location", QJsonValue(member3Loc));
+    mainObj.insert("member3", QJsonValue(signObj));
+
+    signObj.insert("name", QJsonValue(member4Name));
+    signObj.insert("location", QJsonValue(member4Loc));
+    mainObj.insert("member4", QJsonValue(signObj));
+
+    signObj.insert("name", QJsonValue(member5Name));
+    signObj.insert("location", QJsonValue(member5Loc));
+    mainObj.insert("member5", QJsonValue(signObj));
+
+    signObj.insert("name", QJsonValue(repairerName));
+    signObj.insert("location", QJsonValue(repairerLoc));
+    mainObj.insert("repairer", QJsonValue(signObj));
+
+    signObj.insert("name", QJsonValue(chief1Name));
+    signObj.insert("location", QJsonValue(chief1Loc));
+    mainObj.insert("chief1", QJsonValue(signObj));
+
+    signObj.insert("name", QJsonValue(chief2Name));
+    signObj.insert("location", QJsonValue(chief2Loc));
+    mainObj.insert("chief2", QJsonValue(signObj));
+
+    doc.setObject(mainObj);
+    return QString(doc.toJson());
 }

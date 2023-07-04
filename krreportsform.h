@@ -29,6 +29,7 @@ private:
     QString minDate(QString date1, QString date2);
     QString maxDate(QString date1, QString date2);
     int maxInt(int first, int second);
+    QString makeJson(QString reportId);
 
 protected:
     void showEvent(QShowEvent *event);
