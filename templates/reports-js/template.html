@@ -245,6 +245,7 @@
     .ut {text-decoration: underline; text-decoration-skip-ink: none; text-underline-offset: 2px;}
     .it {font-style: italic;}
     .ov {overflow: visible;}
+    .breakword {word-break: break-word;}
     .border-none {border-style: hidden hidden hidden hidden;}
     .border-trb {border-style: solid solid solid hidden;}
     .border-rbl {border-style: hidden solid solid solid;}
@@ -269,155 +270,7 @@
 <body>
 </body>
 <script>
-    const info = {
-        unit: '№3',
-        worktype: 'ТР',
-        planbegdate: '01.03.2023',
-        planenddate: '31.03.2023',
-        docnum: '№33-19/60',
-        subsys: "АСРК-02",
-        schednum: "",
-        orderdate: '15.12.2022',
-        ordernum: '№9/Ф10/674-Пх',
-        ktdtext: 'регламент РГ.0.33.01;',
-        executor: 'РСИСТЕМ',
-        signdate: '20.03.2023',
-        works: [
-            {
-                begdate: '13.03.2023',
-                enddate: '14.03.2023',
-                defectnum: "5480",
-                deviceDescription: 'Устройство коммутационное',
-                deviceType: 'УКК-56Р27',
-                deviceKKS: '3XQ22R000V',
-                actions: '1. Внешний осмотр, проверка состояния разъемов. Замечаний нет.<br/>2. Снятие, разборка.<br/>3. Проверка электрических параметров функциональных блоков. Неисправность вторичного БП +27в.<br/>4. Дефектация: Отсутствует индикация "+27В" Устройство не работает.<br/>5. Восстановление работоспособности БП +27в.<br/>6. Чистка спиртом, восстановление защитного лакового покрытия.<br/>7. Сборка узлов, проверка работоспособности. Замечаний нет.<br/>8. Сдача в эксплуатацию.',
-                ktdDoc: 'РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01',
-                techDoc: 'АБЛК.468347.404 РЭ',
-                oesn: 'ОЭСН-81-26-09-2014 09-01-02-02 применительно',
-                defect: 'Неисправность вторичного БП +27в.',
-                repair: 'Восстановление работоспособности БП +27в.',
-                materials: [
-                    {
-                        name: 'Спирт изопропиловый. Акт ВК № 07/23 от 19.01.2023',
-                        units: 'кг',
-                        quantityOESN: '0,4',
-                        quantity: '0,004'
-                    },
-                    {
-                        name: 'Припой ПОС-61. Акт ВК № 08/23 от 19.01.2023',
-                        units: 'кг',
-                        quantityOESN: '0,1',
-                        quantity: '0,001'
-                    },
-                    {
-                        name: 'Лак изоляционный Plastic 70. Акт ВК № 08/23 от 19.01.2023',
-                        units: 'кг',
-                        quantityOESN: '0,05',
-                        quantity: '0,005'
-                    }
-                ]
-            },
-            {
-                begdate: '13.03.2023',
-                enddate: '14.03.2023',
-                defectnum: "5483",
-                deviceDescription: 'Блок детектирования',
-                deviceType: 'БДРГ-17С2',
-                deviceKKS: '3XQ13R02RB',
-                actions: '1. Внешний осмотр. Замечаний нет.<br/>2. Проверка состояния внешних разъемов. Замечаний нет.<br/>3. Снятие блока детектирования, разборка узлов, осмотр состояния монтажа. Замечаний нет.<br/>4. Проверка электрических параметров функциональных блоков. Сбой в работе узла формирования ПФМ-01С.<br/>5. Дефектация: Недостоверные показания.<br/>6. Восстановление работоспособности узла формирования ПФМ-01С.<br/>7. Чистка спиртом. Сборка узлов. Измерение метрологических характеристик. Настройка и регулировка. <br/>8. Проверка работоспособности. Замечаний нет. <br/>9. Сдача в эксплуатацию.',
-                ktdDoc: 'РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01',
-                techDoc: 'ЖШ2.328.663 РЭ',
-                oesn: 'ОЭСН-81-26-09-2014 09-01-12-02 применительно',
-                defect: 'Сбой в работе узла формирования ПФМ-01С.',
-                repair: 'Восстановление работоспособности узла формирования ПФМ-01С.',
-                materials: [
-                    {
-                        name: 'Спирт изопропиловый. Акт ВК № 07/23 от 19.01.2023',
-                        units: 'кг',
-                        quantityOESN: '0,01',
-                        quantity: '0,001'
-                    },
-                    {
-                        name: 'Припой ПОС-61. Акт ВК № 08/23 от 19.01.2023',
-                        units: 'кг',
-                        quantityOESN: '0,01',
-                        quantity: '0,001'
-                    },
-                    {
-                        name: 'Лак изоляционный Plastic 70. Акт ВК № 08/23 от 19.01.2023',
-                        units: 'кг',
-                        quantityOESN: '0,05',
-                        quantity: '0,005'
-                    }
-                ]
-            },
-            {
-                begdate: '09.03.2023',
-                enddate: '10.03.2023',
-                defectnum: "5485",
-                deviceDescription: 'Блок детектирования',
-                deviceType: 'БДРГ-17С2',
-                deviceKKS: '3XQ33R08RB',
-                actions: '1. Внешний осмотр. Замечаний нет.<br>2. Проверка состояния внешних разъемов. Замечаний нет.<br>3. Снятие блока детектирования, разборка узлов, осмотр состояния монтажа. Замечаний нет.<br>4. Проверка электрических параметров функциональных блоков. Неисправена схема регистрации импульсов.<br>5. Дефектация: Заниженные показания по ИК.<br>6. Восстановление работоспособности схемы регистрации импульсов.<br>7. Чистка спиртом. Сборка узлов. Измерение метрологических характеристик. Настройка и регулировка. <br>8. Проверка работоспособности. Замечаний нет. <br>9. Сдача в эксплуатацию.',
-                ktdDoc: 'РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01',
-                techDoc: 'ЖШ2.328.663 РЭ',
-                oesn: 'ОЭСН-81-26-09-2014 09-01-12-02 применительно',
-                defect: 'Неисправена схема регистрации импульсов.',
-                repair: 'Восстановление работоспособности схемы регистрации импульсов.',
-                materials: [
-                    {
-                        name: 'Спирт изопропиловый. Акт ВК № 07/23 от 19.01.2023',
-                        units: 'кг',
-                        quantityOESN: '0,01',
-                        quantity: '0,001'
-                    },
-                    {
-                        name: 'Припой ПОС-61. Акт ВК № 08/23 от 19.01.2023',
-                        units: 'кг',
-                        quantityOESN: '0,01',
-                        quantity: '0,001'
-                    }
-                ]
-            }
-        ],
-        owner: {
-            name: 'А. Ф. Меркулов',
-            location: 'Начальник ОРБ'
-        },
-        member1: {
-            name: 'Д. В. Сергеев',
-            location: 'ЗНОРБр'
-        },
-        member2: {
-            name: 'В. В. Яковлев',
-            location: 'Инженер ОРБ'
-        },
-        member3: {
-            name: '',
-            location: ''
-        },
-        member4: {
-            name: '',
-            location: ''
-        },
-        member5: {
-            name: '',
-            location: ''
-        },
-        repairer: {
-            name: 'С. Г. Лысенко',
-            location: 'Начальник УРСРК ЦЦР'
-        },
-        chief1: {
-            name: 'Д. В. Косых',
-            location: 'Зам. НУНТОиР РСИСТЕМ'
-        },
-        chief2: {
-            name: '',
-            location: ''
-        }
-    };
-
+    const info = %INFO%;
     function setHTML(selector, html)
     {
         elements = document.querySelectorAll(selector);
@@ -482,9 +335,11 @@
         let accordingdoc ='';
         if (info.worktype == 'ТР') {
             if (info.works.length == 1) accordingdoc = 'записью в общестанционном журнале дефектов "SAP Logon" №';
-            else accordingdoc = 'записями в общестанционном журнале дефектов "SAP Logon" №№';
-            info.works.forEach(work => { accordingdoc += `${work.defectnum}, ` });
-            accordingdoc.slice(0, -2);
+            else { 
+                accordingdoc = 'записями в общестанционном журнале дефектов "SAP Logon" №№';
+                info.works.forEach(work => { accordingdoc += `${work.defectnum}, ` });
+                accordingdoc = accordingdoc.slice(0, -2);
+            }
         }
         else accordingdoc = `годовым графиком ремонта оборудования технологических систем №${info.schednum}`;
         document.body.innerHTML += avrp1;
@@ -539,7 +394,7 @@
             row.after(createElementFromHTML(preprow));
             lastadded = 'member3';
         }
-        if (info.member3.name.length) {
+        if (info.member4.name.length) {
             let preprow = signrow.replace('%1', 'member4').replace('%2', 'member4loc').replace('%3', 'member4name');
             let row = document.querySelector(`#avrp2 [${lastadded}]`);
             row.after(createElementFromHTML(preprow));
@@ -567,11 +422,18 @@
         {
             let currid = `vvrp${i+1}`;
             let newpage = vvrtempl.replace('%1', currid);
+            let workTypeFull = "";
+            if (info.worktype == "ТР") {
+                workTypeFull = "Текущий ремонт";
+            } 
+            else if (info.worktype == "КР") {
+                workTypeFull = "Капитальный ремонт";
+            }
             document.body.innerHTML += newpage;
             setHTML(`#${currid} [workbegdate]`, info.works[i].begdate);
             setHTML(`#${currid} [workenddate]`, info.works[i].enddate);
             setHTML(`#${currid} [page]`, i+1);
-            setHTML(`#${currid} [workandactions]`, `${info.works[i].deviceDescription} ${info.works[i].deviceType}, ${info.works[i].deviceKKS}<br/>${info.works[i].actions}`);
+            setHTML(`#${currid} [workandactions]`, `${workTypeFull}: ${info.works[i].deviceDescription} ${info.works[i].deviceType}, ${info.works[i].deviceKKS}<br/>${info.works[i].actions}`);
             setHTML(`#${currid} [ktdtext]`, info.works[i].ktdDoc);
             if (i == info.works.length-1) {
                 afterElem = document.querySelector(`#${currid} .expanding`);
@@ -596,11 +458,13 @@
         let heightBefore = document.getElementById(currid).offsetHeight;
         for (let i=0; i<info.works.length; i++)
         {
+            if (!info.works[i].materials.length) continue;
+            
             let htmlblock = "" + headertempl.replace('%1', info.works[i].deviceDescription + ' ' + info.works[i].deviceType + ', ' + info.works[i].deviceKKS).replace('%2', info.works[i].oesn);
             
             let matnum = 1;
             info.works[i].materials.forEach(material => {
-                htmlblock += rowtempl.replace('%1', matnum++).replace('%2', material.name).replace('%3', material.units).replace('%4', material.quantityOESN).replace('%5', material.quantity);
+                htmlblock += rowtempl.replace('%1', matnum++).replace('%2', material.name).replace('%3', material.unit).replace('%4', material.quantityOESN).replace('%5', material.quantity);
             });
             let fragment = createFragmentFromHTML(htmlblock);
             let afterElem = document.querySelector(`#${currid} .expanding`).previousElementSibling;
@@ -635,8 +499,8 @@
     function makeADO()
     {
         const adotempl = '<table id="%1" type="ado"><colgroup><col class="adocol1"><col class="adocol2"><col class="adocol3"><col class="adocol4"><col class="adocol5"><col class="adocol6"><col class="adocol7"><col class="adocol8"><col class="adocol9"><col class="adocol10"></colgroup><tbody><tr class="adorow1"><td colspan="3">Ростовская АЭС</td><td class="hc border-trl">Дата</td><td colspan="4" class="hc border-trl">АКТ О ДЕФЕКТАХ ОБОРУДОВАНИЯ</td><td class="border-tbl">Лист</td><td class="border-trb" page></td></tr><tr class="adorow2"><td colspan="2" class="border-tbl">Энергоблок</td><td class="border-trb" usn></td><td class="hc border-rbl" date></td><td colspan="2" class="vb border-bl" docnum></td><td colspan="2" class="vb border-rb">АД</td><td class="border-tbl">Листов</td><td class="border-trb" pagecount></td></tr><tr class="adorow3"><td colspan="8" class="border-trl">Обозначение, наименование установки / системы:</td><td colspan="2" rowspan="2" class="border-trl">Подразделение- владелец</td></tr><tr class="adorow4"><td colspan="8" class="ut border-rbl">XQ, <span subsys></span>, оборудование РК</td></tr><tr class="adorow5"><td colspan="8" class="border-trl">Обозначение, наименование, марка оборудования:</td><td colspan="2" rowspan="2" class="vt border-rbl">ОРБ</td></tr><tr class="adorow6"><td colspan="8" class="ut border-rbl" works></td></tr><tr class="adorow7"><td colspan="3" class="hc">Обозначение, наименование детали, сборочной единицы</td><td colspan="2" class="hc">Размер, требования по чертежу, ТУ</td><td colspan="2" class="hc">Фактический размер, описание дефекта</td><td colspan="3" class="hc">Способ устранения дефекта</td></tr><tr class="expanding"><td colspan="10"></td></tr><tr class="tfooter"><td colspan="10" class="hr vb border-t ov"><div style="font-size:10pt;position:relative;bottom:0;right:-.5cm;color:transparent;text-shadow:2px 0 #b4b4b4">П.00.52 Д.4.8.1</div></td></tr></tbody></table>'
-        const signhtml = '<tr class="adorow8" sign><td colspan="10" class="border-trl">Председатель комиссии:</td></tr><tr class="adorow9" sign><td class="border-l"></td><td colspan="3" class="border-none" ownerloc></td><td colspan="2" class="border-b"></td><td class="hc border-none" date></td><td colspan="3" class="border-r" ownername></td></tr><tr class="adorow10" sign><td colspan="4" class="border-l">Члены комиссии:</td><td colspan="2" class="hc f6 vt border-t">(подпись)</td><td colspan="4" class="border-r"></td></tr><tr class="adorow11" sign member1><td class="border-l"></td><td colspan="3" class="border-none" member1loc></td><td colspan="2" class="border-b"></td><td class="hc border-none" date></td><td colspan="3" class="border-r" member1name></td></tr><tr class="adorow13" sign><td class="border-l"></td><td colspan="3" class="border-none" repairerloc></td><td colspan="2" class="hc f6 vt border-tb">(подпись)</td><td class="border-none" date></td><td colspan="3" class="border-r" repairername></td></tr><tr class="adorow14" sign><td colspan="4" class="border-l"></td><td colspan="2" class="hc f6 vt border-t">(подпись)</td><td colspan="4" class="border-r"></td></tr><tr class="adorow15" sign><td colspan="10" class="vt border-rl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Руководитель работ по ремонту оборудования:</td></tr><tr class="adorow16" sign><td class="border-l"></td><td colspan="3" class="border-none" chief1loc></td><td colspan="2" class="border-b"></td><td class="hc border-none" date></td><td colspan="3" class="border-r" chief1name></td></tr><tr class="adorow17"><td colspan="4" class="border-bl"></td><td colspan="2" class="hc f6 vt border-tb">(подпись)</td><td colspan="4" class="border-rb"></td></tr>'
-        const rowtempl = '<tr class="adorow"><td colspan="3" class="hc">%1</td><td colspan="2" class="hc">Обеспечение работоспособности в соответствии с %2</td><td colspan="2" class="hc">%3</td><td colspan="3" class="hc">%4</td></tr>'
+        const signhtml = '<tr class="adorow8" sign><td colspan="10" class="border-trl">Председатель комиссии:</td></tr><tr class="adorow9" sign><td class="border-l"></td><td colspan="3" class="border-none" ownerloc></td><td colspan="2" class="border-b"></td><td class="hc border-none" date></td><td colspan="3" class="border-r" ownername></td></tr><tr class="adorow10" sign><td colspan="4" class="border-l">Члены комиссии:</td><td colspan="2" class="hc f6 vt border-t">(подпись)</td><td colspan="4" class="border-r"></td></tr><tr class="adorow11" sign member1><td class="border-l"></td><td colspan="3" class="border-none" member1loc></td><td colspan="2" class="border-b"></td><td class="hc border-none" date></td><td colspan="3" class="border-r" member1name></td></tr><tr class="adorow13" sign><td class="border-l"></td><td colspan="3" class="border-none" repairerloc></td><td colspan="2" class="hc f6 vt border-tb">(подпись)</td><td class="border-none" date></td><td colspan="3" class="border-r" repairername></td></tr><tr class="adorow14" sign><td colspan="4" class="border-l"></td><td colspan="2" class="hc f6 vt border-t">(подпись)</td><td colspan="4" class="border-r"></td></tr><tr class="adorow15" sign><td colspan="10" class="vt border-rl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Руководитель работ по ремонту оборудования:</td></tr><tr class="adorow16" sign><td class="border-l"></td><td colspan="3" class="border-none" chief1loc></td><td colspan="2" class="border-b"></td><td class="hc border-none" date></td><td colspan="3" class="border-r" chief1name></td></tr><tr class="adorow17" sign><td colspan="4" class="border-bl"></td><td colspan="2" class="hc f6 vt border-tb">(подпись)</td><td colspan="4" class="border-rb"></td></tr>'
+        const rowtempl = '<tr class="adorow"><td colspan="3" class="hc">%1</td><td colspan="2" class="hc breakword">Обеспечение работоспособности в соответствии с %2</td><td colspan="2" class="hc">%3</td><td colspan="3" class="hc">%4</td></tr>'
         const signrow = '<tr class="adorow12" sign %1><td class="border-l"></td><td colspan="3" class="border-none" %2></td><td colspan="2" class="hc f6 vt border-tb">(подпись)</td><td class="border-none" date></td><td colspan="3" class="border-r" %3></td></tr>'
 
         let page = 1;
@@ -660,7 +524,7 @@
             row.after(createElementFromHTML(preprow));
             lastadded = 'member3';
         }
-        if (info.member3.name.length) {
+        if (info.member4.name.length) {
             let preprow = signrow.replace('%1', 'member4').replace('%2', 'member4loc').replace('%3', 'member4name');
             let row = signfragment.querySelector(`[${lastadded}]`);
             row.after(createElementFromHTML(preprow));
@@ -672,7 +536,7 @@
             row.after(createElementFromHTML(preprow));
             lastadded = 'member5';
         }
-        let signblock = signfragment.innerHTML;
+        let signfragmentbackup = signfragment.cloneNode(true);
 
         for (let i=0; i<info.works.length; i++)
         {
@@ -680,6 +544,7 @@
             htmlblock = rowtempl.replace('%1', work).replace('%2', info.works[i].techDoc).replace('%3', info.works[i].defect).replace('%4', info.works[i].repair);
             document.querySelector(`#${currid} .expanding`).before(createElementFromHTML(htmlblock));
             if (i == info.works.length-1) document.querySelector(`#${currid} .expanding`).after(signfragment);
+            signfragment = signfragmentbackup.cloneNode(true);
             if (document.getElementById(currid).offsetHeight > heightBefore) {
                 document.querySelector(`#${currid} .expanding`).previousElementSibling.remove();
                 if (i == info.works.length-1) removeElements(`#${currid} [sign]`);
@@ -688,7 +553,7 @@
                 document.body.innerHTML += newpage;
                 setHTML(`#${currid} [page]`, page);
                 document.querySelector(`#${currid} .expanding`).before(createElementFromHTML(htmlblock));  
-                if (i == info.works.length-1) document.querySelector(`#${currid} .expanding`).after(createFragmentFromHTML(signblock));
+                if (i == info.works.length-1) document.querySelector(`#${currid} .expanding`).after(signfragment);
             }
         }
         setHTML('[type="ado"] [pagecount]', page);
@@ -713,7 +578,7 @@
                 document.querySelector(`#${currid} .expanding`).after(createFragmentFromHTML(signhtml));
             }
             if (document.getElementById(currid).offsetHeight > heightBefore) {
-                document.querySelector(`#${currid} .expanding`).previousElementSibling.remove;
+                document.querySelector(`#${currid} .expanding`).previousElementSibling.remove();
                 let previd = currid;
                 currid = `pop${++page}`;
                 newpage = potempl.replace('%1', currid);
