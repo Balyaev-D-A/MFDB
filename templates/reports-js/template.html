@@ -288,7 +288,7 @@
         if (parseInt(date1arr[1]) < parseInt(date2arr[1])) return date1;
         if (parseInt(date1arr[1]) > parseInt(date2arr[1])) return date2;
         if (parseInt(date1arr[0]) < parseInt(date2arr[0])) return date1;
-        if (parseInt(date1arr[0]) > parseInt(date2arr[1])) return date2;
+        if (parseInt(date1arr[0]) > parseInt(date2arr[0])) return date2;
         return date1;
     }
 
@@ -301,7 +301,7 @@
         if (parseInt(date1arr[1]) > parseInt(date2arr[1])) return date1;
         if (parseInt(date1arr[1]) < parseInt(date2arr[1])) return date2;
         if (parseInt(date1arr[0]) > parseInt(date2arr[0])) return date1;
-        if (parseInt(date1arr[0]) < parseInt(date2arr[1])) return date2;
+        if (parseInt(date1arr[0]) < parseInt(date2arr[0])) return date2;
         return date1;
     }
 
