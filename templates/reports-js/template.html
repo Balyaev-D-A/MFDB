@@ -434,7 +434,7 @@
             setHTML(`#${currid} [workenddate]`, info.works[i].enddate);
             setHTML(`#${currid} [page]`, i+1);
             setHTML(`#${currid} [workandactions]`, `${workTypeFull}: ${info.works[i].deviceDescription} ${info.works[i].deviceType}, ${info.works[i].deviceKKS}<br/>${info.works[i].actions}`);
-            setHTML(`#${currid} [ktdtext]`, info.works[i].ktdDoc);
+            setHTML(`#${currid} [ktdtext]`, info.works[i].ktdDoc + ';<br />' + info.works[i].techDoc);
             if (i == info.works.length-1) {
                 afterElem = document.querySelector(`#${currid} .expanding`);
                 afterElem.after(sign);
@@ -632,12 +632,21 @@
     let begdate = '99.99.9999';
     let enddate = '00.00.0000';
     let works = '';
+    let techDocs = '';
+    let docsArr = [];
+    docsArr.push(info.ktdtext);
     for (work of info.works)
     {
+        if (!docsArr.includes(work.techDoc)) docsArr.push(work.techDoc);
         begdate = minDate(begdate, work.begdate);
         enddate = maxDate(enddate, work.enddate);
         works += work.deviceDescription + ' ' + work.deviceType + ', ' + work.deviceKKS + '; '; 
     }
+    docsArr.forEach(doc => {
+        techDocs += doc;
+        if (!techDocs.endsWith(';')) techDocs += '; '
+        else techDocs += ' ';
+    });
     works = works.slice(0, -2); // Удаляем последний '; '
     if (info.works.length > 4) works = `Согласно перечню оборудования к акту ${info.docnum} (Количество ${info.works.length} шт.).`;
     makeAVRp1();
