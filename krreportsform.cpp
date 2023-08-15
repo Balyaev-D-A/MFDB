@@ -1250,6 +1250,16 @@ QString KRReportsForm::makeJson(QString reportId)
         workObj.insert("actions", QJsonValue(results[i][5].replace("\n", "<br />")));
         workObj.insert("ktdDoc", QJsonValue("РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01"));
 
+        query = QString("SELECT sch_tdoc FROM schedule WHERE sch_type = '%1' LIMIT 1").arg(results[i][1]);
+        if (!db->execQuery(query)) {
+            db->showError(this);
+            return "";
+        }
+        if (db->nextRecord())
+            workObj.insert("techDoc", QJsonValue(db->fetchValue(0).toString()));
+        else
+            workObj.insert("techDoc", QJsonValue("Руководство по эксплуатации"));
+
         query = "SELECT nw_oesn FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР'";
         query = query.arg(results[i][1]);
         if (!db->execQuery(query)) {
