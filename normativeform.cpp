@@ -5,10 +5,9 @@
 #include "stringlistvalidator.h"
 
 NormativeForm::NormativeForm(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::NormativeForm)
 {
-    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     ui->materialsTable->hideColumn(0);

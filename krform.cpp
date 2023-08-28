@@ -2,10 +2,9 @@
 #include "ui_krform.h"
 
 KRForm::KRForm(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::KRForm)
 {
-    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     ui->addedMatTable->setAcceptFrom(ui->materialTable);

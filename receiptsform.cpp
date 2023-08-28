@@ -2,10 +2,9 @@
 #include "ui_receiptsform.h"
 
 ReceiptsForm::ReceiptsForm(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::ReceiptsForm)
 {
-    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     ui->receiptsTable->hideColumn(0);

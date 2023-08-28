@@ -7,10 +7,9 @@
 #include "csvreader.h"
 
 ImportForm::ImportForm(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::ImportForm)
 {
-    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
     connect(ui->fileButton, &QToolButton::clicked, this, &ImportForm::fileButtonClicked);
     connect(ui->readButton, &QPushButton::clicked, this, &ImportForm::readButtonClicked);

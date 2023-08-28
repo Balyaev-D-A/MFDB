@@ -4,10 +4,9 @@
 #include <QShowEvent>
 
 WorkTypeWidget::WorkTypeWidget(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window | Qt::Popup),
     ui(new Ui::WorkTypeWidget)
 {
-    setWindowFlags(Qt::Window | Qt::Popup);
     ui->setupUi(this);
     connect(ui->TOBox, &WTCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);
     connect(ui->TRBox, &WTCheckBox::stateChanged, this, &WorkTypeWidget::checkBoxStateChanged);

@@ -3,10 +3,9 @@
 #include "ui_receiptform.h"
 
 ReceiptForm::ReceiptForm(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::ReceiptForm)
 {
-    setWindowFlag(Qt::Window, true);
     ui->setupUi(this);
 
     ui->addedMatTable->hideColumn(0);
