@@ -1534,7 +1534,7 @@ QString TRReportsForm::makeJson(QString reportId)
         else
             workObj.insert("oesn", QJsonValue(""));
 
-        query = "SELECT mat_name, mat_doc, mat_measure, dam_oesn, dam_count FROM defadditionalmats "
+        query = "SELECT mat_name, mat_doc, mat_measure, dam_oesn, dam_count, mat_consumable FROM defadditionalmats "
                 "LEFT JOIN materials ON dam_material = mat_id "
                 "WHERE dam_defect = '%1' ORDER BY dam_order";
         query = query.arg(results[i][9]);
@@ -1550,6 +1550,7 @@ QString TRReportsForm::makeJson(QString reportId)
             matObj.insert("unit", QJsonValue(db->fetchValue(2).toString()));
             matObj.insert("quantityOESN", QJsonValue(db->fetchValue(3).toString()));
             matObj.insert("quantity", QJsonValue(db->fetchValue(4).toString()));
+            matObj.insert("consumable", QJsonValue(db->fetchValue(5).toBool()));
             matsArray.append(QJsonObject(matObj));
         }
         workObj.insert("materials", QJsonValue(matsArray));

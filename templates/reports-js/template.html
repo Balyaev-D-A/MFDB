@@ -458,12 +458,20 @@
         let heightBefore = document.getElementById(currid).offsetHeight;
         for (let i=0; i<info.works.length; i++)
         {
+            let consumables = 0;
             if (!info.works[i].materials.length) continue;
+            if (!withConsumables) {
+                info.works[i].materials.forEach(material => {
+                    if (material.consumable) consumables++;
+                });
+                if (info.works[i].materials.length == consumables) continue;
+            }
             
             let htmlblock = "" + headertempl.replace('%1', info.works[i].deviceDescription + ' ' + info.works[i].deviceType + ', ' + info.works[i].deviceKKS).replace('%2', info.works[i].oesn);
             
             let matnum = 1;
             info.works[i].materials.forEach(material => {
+                if (!withConsumables && material.consumable) return;
                 if (parseFloat(material.quantityOESN) == 0) material.quantityOESN = '-';
                 htmlblock += rowtempl.replace('%1', matnum++).replace('%2', material.name).replace('%3', material.unit).replace('%4', material.quantityOESN).replace('%5', material.quantity);
             });
@@ -628,12 +636,37 @@
         setHTML('[date]', info.signdate);
     }
 
+    function clearDocument()
+    {
+        document.body.innerHTML = "";
+    }
+
+    function makeDocument()
+    {
+        makeAVRp1();
+        makeAVRp2();
+        makeVVR();
+        makeVFZM();
+        if (info.worktype == 'ТР') makeADO();
+        if (info.works.length > 4) makePO();
+        fillCommonFields();
+    }
+
+    function eventHandler(event)
+    {
+        if (event.code == 'KeyM' && (event.ctrlKey || event.metaKey) && event.altKey) {
+            withConsumables = !withConsumables;
+            clearDocument();
+            makeDocument();
+        }
+    }
     ///////////////////////////////////////////////////////////Основной код///////////////////////////////////////////////////////////////////////////
     let begdate = '99.99.9999';
     let enddate = '00.00.0000';
     let works = '';
     let techDocs = '';
     let docsArr = [];
+    let withConsumables = true;
     docsArr.push(info.ktdtext);
     for (work of info.works)
     {
@@ -649,12 +682,7 @@
     });
     works = works.slice(0, -2); // Удаляем последний '; '
     if (info.works.length > 4) works = `Согласно перечню оборудования к акту ${info.docnum} (Количество ${info.works.length} шт.).`;
-    makeAVRp1();
-    makeAVRp2();
-    makeVVR();
-    makeVFZM();
-    if (info.worktype == 'ТР') makeADO();
-    if (info.works.length > 4) makePO();
-    fillCommonFields();
+    makeDocument();
+    document.addEventListener('keydown', eventHandler);
 </script>
 </html>
