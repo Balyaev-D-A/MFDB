@@ -1523,14 +1523,17 @@ QString TRReportsForm::makeJson(QString reportId)
         else
             workObj.insert("techDoc", QJsonValue("Руководство по эксплуатации"));
 
-        query = "SELECT nw_oesn FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
+        query = "SELECT nw_oesn, nw_ktd, nw_ktdshort FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР'";
         query = query.arg(results[i][1]);
         if (!db->execQuery(query)) {
             db->showError(this);
             return "";
         }
-        if (db->nextRecord())
+        if (db->nextRecord()) {
             workObj.insert("oesn", QJsonValue(db->fetchValue(0).toString().simplified()));
+            workObj.insert("ktd", QJsonValue(db->fetchValue(1).toString().simplified()));
+            workObj.insert("ktdshort", QJsonValue(db->fetchValue(2).toString().simplified()));
+        }
         else
             workObj.insert("oesn", QJsonValue(""));
 
