@@ -401,6 +401,7 @@ void KRForm::fillButtonClicked()
 
 void KRForm::loadActionsFromOESN()
 {
+    QStringList strings;
     QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'КР'";
     query = query.arg(selectedDevice);
 
@@ -410,8 +411,14 @@ void KRForm::loadActionsFromOESN()
         return;
     }
 
-    if (db->nextRecord())
-        ui->actionsEdit->document()->setPlainText(db->fetchValue(0).toString());
+    if (db->nextRecord()) {
+        strings = db->fetchValue(0).toString().split("\n");
+        for (int i = 0; i<strings.size(); i++)
+        {
+            strings[i].prepend(QString("%1. ").arg(i+1));
+        }
+        ui->actionsEdit->document()->setPlainText(strings.join("\n"));
+    }
     else
         ui->actionsEdit->document()->setPlainText("");
 }
