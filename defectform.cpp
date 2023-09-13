@@ -388,16 +388,22 @@ void DefectForm::updateActionsDesc()
     {
         if (actList[i].startsWith('@')){
             if (actList[i].remove(0, 1) == ui->stageBox->currentText()) {
-                actList[i] = actList[i] + " " + ui->defectEdit->text().simplified();
+                actList[i] = actList[i] + " " + ui->defectEdit->text().simplified() + "\nДефектация: " + ui->defectEdit->text().simplified() +
+                        "\n" + ui->repairEdit->text().simplified();
             }
             else {
                 actList[i] = actList[i] + " Замечаний нет.";
             }
         }
-        act += actList[i] + "\n";
     }
-    act.replace("$JD$", ui->defectEdit->text().simplified());
-    act.replace("$REP$", ui->repairEdit->text().simplified());
+    act = actList.join("\n");
+    actList = act.split("\n");
+    for (int i=0; i<actList.size(); i++)
+    {
+        actList[i].prepend(QString("%1. ").arg(i+1));
+    }
+
+    act = actList.join("\n");
 
     ui->actionsTextEdit->document()->setPlainText(act);
 }
