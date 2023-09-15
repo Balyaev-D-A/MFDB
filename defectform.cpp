@@ -578,6 +578,7 @@ void DefectForm::updateMaterials()
 
 void DefectForm::addMaterialClicked()
 {
+    if (ui->materialTable->currentRow() < 0) return;
     ui->addedMatTable->insertRow(ui->addedMatTable->rowCount());
     ui->addedMatTable->setItem(ui->addedMatTable->rowCount() - 1, 0, new QTableWidgetItem(
                                    ui->materialTable->item(ui->materialTable->currentRow(), 0)->text()));
