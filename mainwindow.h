@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QCalendarWidget>
 #include <QListWidget>
+#include <QTimer>
 #include "database.h"
 #include "dictionaryform.h"
 #include "raspform.h"
@@ -34,6 +35,7 @@ public:
     bool connectDB(QString host, QString dbname, QString user, QString password);
 
 private:
+    QTimer pingTimer;
     Ui::MainWindow *ui;
     Database *db;
     bool adminMode;
@@ -105,6 +107,7 @@ private slots:
     void connectionFormConnectClicked(Settings::ConnSettings cs);
     void on_aAnother_triggered();
     void on_aDefault_triggered();
+    void pingTimerTimeout();
 
 protected:
     void showEvent(QShowEvent *event);

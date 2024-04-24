@@ -129,7 +129,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->aMatReport, &QAction::triggered, this, &MainWindow::matReportTriggered);
     connect(settingsForm, &SettingsForm::saved, this, &MainWindow::settingsSaved);
     connect(connectionForm, &ConnectionForm::connectClicked, this, &MainWindow::connectionFormConnectClicked);
-
+    connect(&pingTimer, &QTimer::timeout, this, &MainWindow::pingTimerTimeout);
     cs = settings->getConnSettings();
     if (cs.host == "") {
         settingsForm->show();
@@ -168,6 +168,7 @@ bool MainWindow::connectDB(QString host, QString dbname, QString user, QString p
     //TODO: нужно сделать авторизацию пользователя по ТЛД, если админов в базе нет, перейти в режим админа
     //db->pq->exec("select * from employees where emp_admin=true");
     adminMode = true;
+    pingTimer.start(60000);
     return true;
 }
 
@@ -1133,3 +1134,7 @@ void MainWindow::on_aDefault_triggered()
     connectToDefaultDB();
 }
 
+void MainWindow::pingTimerTimeout()
+{
+    db->execQuery("SELECT version()");
+}
