@@ -553,7 +553,7 @@ void MainWindow::dtCellDoubleClicked(int row, int column)
         itemRect = ui->defectsTable->visualItemRect(ui->defectsTable->item(row, column));
         calOrigin = ui->defectsTable->mapToGlobal(itemRect.bottomLeft());
         datePicker->move(calOrigin.x() + leftFrameWidth, calOrigin.y() + topFrameHeight);
-        datePicker->setDateRange(minDate, maxDate);
+        //datePicker->setDateRange(minDate, maxDate);
         if (QDate::currentDate() < minDate)
             datePicker->setSelectedDate(minDate);
         else if (QDate::currentDate() > maxDate)
