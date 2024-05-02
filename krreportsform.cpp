@@ -1222,12 +1222,13 @@ QString KRReportsForm::makeJson(QString reportId)
     mainObj.insert("executor", QJsonValue(db->getVariable("Исполнитель").toString()));
     mainObj.insert("ktdtext", QJsonValue("регламент РГ.0.33.01;"));
 
-    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_num, def_id FROM trrworks "
-            "LEFT JOIN defects ON trw_work = def_id "
-            "LEFT JOIN ktd ON def_devtype = ktd_dev "
-            "WHERE trw_report = '%1' ORDER BY trw_order";
+//    query = "SELECT def_devname, def_devtype, def_kks, def_begdate, def_enddate, def_realdesc, def_repairdesc, def_actionsdesc, def_num, def_id FROM trrworks "
+//            "LEFT JOIN defects ON trw_work = def_id "
+//            "LEFT JOIN ktd ON def_devtype = ktd_dev "
+//            "WHERE trw_report = '%1' ORDER BY trw_order";
 
-    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate, kr_actions, kr_id FROM krrworks "
+    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate, kr_actions, kr_id, "
+            "kr_hasdefects, kr_defectdesc, kr_repairdesc FROM krrworks "
             "LEFT JOIN kaprepairs ON krw_work = kr_id "
             "LEFT JOIN schedule ON kr_sched = sch_id "
             "WHERE krw_report = '%1' ORDER BY krw_order";
@@ -1249,6 +1250,11 @@ QString KRReportsForm::makeJson(QString reportId)
         workObj.insert("enddate", QJsonValue(results[i][4]));
         workObj.insert("actions", QJsonValue(results[i][5].replace("\n", "<br />")));
         workObj.insert("ktdDoc", QJsonValue("РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01"));
+        bool hasDefects = false;
+        if (results[i][7].toLower() == "true") hasDefects = true;
+        workObj.insert("hasdefects", QJsonValue(hasDefects));
+        workObj.insert("defect", QJsonValue(results[i][8]));
+        workObj.insert("repair", QJsonValue(results[i][9]));
 
         query = QString("SELECT sch_tdoc FROM schedule WHERE sch_type = '%1' LIMIT 1").arg(results[i][1]);
         if (!db->execQuery(query)) {

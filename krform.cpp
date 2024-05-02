@@ -59,6 +59,10 @@ void KRForm::newKR()
     ui->fillButton->setDisabled(true);
     ui->actionsEdit->setDisabled(true);
     while (ui->addedMatTable->rowCount()) ui->addedMatTable->removeRow(0);
+    ui->checkBox->setChecked(false);
+    ui->defectBox->setVisible(false);
+    ui->defectEdit->clear();
+    ui->repairEdit->clear();
     updateMaterials();
 }
 
@@ -78,7 +82,8 @@ void KRForm::editKR(QString KRId)
     ui->oesnButton->setDisabled(false);
     ui->fillButton->setDisabled(false);
     ui->actionsEdit->setDisabled(false);
-    query = "SELECT kr_sched, sch_name, sch_type, sch_kks, kr_actions FROM kaprepairs AS kr "
+    query = "SELECT kr_sched, sch_name, sch_type, sch_kks, kr_actions, kr_hasdefects, "
+            "kr_defectdesc, kr_repairdesc FROM kaprepairs AS kr "
             "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
             "WHERE kr_id = '%1'";
     query = query.arg(KRId);
@@ -96,6 +101,18 @@ void KRForm::editKR(QString KRId)
             ui->actionsEdit->document()->setPlainText(db->fetchValue(4).toString());
         else
             loadActionsFromOESN();
+        if (db->fetchValue(5).toBool()) {
+            ui->checkBox->setChecked(true);
+            ui->defectBox->setVisible(true);
+            ui->defectEdit->setText(db->fetchValue(6).toString());
+            ui->repairEdit->setText(db->fetchValue(7).toString());
+        }
+        else {
+            ui->checkBox->setChecked(false);
+            ui->defectBox->setVisible(false);
+            ui->defectEdit->clear();
+            ui->repairEdit->clear();
+        }
         ui->oesnButton->setDisabled(false);
     }
     else
@@ -173,6 +190,10 @@ bool KRForm::saveKR()
     QString query;
     QString prepQuery;
     float oesn, real;
+    if (!ui->checkBox->isChecked()) {
+        ui->defectEdit->clear();
+        ui->repairEdit->clear();
+    }
     db->startTransaction();
     if (KRId != "0") {
         if (matsChanged) {
@@ -201,8 +222,10 @@ bool KRForm::saveKR()
             }
         }
 
-        query = "UPDATE kaprepairs SET kr_sched = '%1', kr_actions = '%2' WHERE kr_id = '%3'";
-        query = query.arg(selectedSched).arg(ui->actionsEdit->document()->toPlainText()).arg(KRId);
+        query = "UPDATE kaprepairs SET kr_sched = '%1', kr_actions = '%2', kr_hasdefects = '%3', kr_defectdesc = '%4', "
+                "kr_repairdesc = '%5' WHERE kr_id = '%6'";
+        query = query.arg(selectedSched).arg(ui->actionsEdit->document()->toPlainText()).arg(ui->checkBox->isChecked())
+                .arg(ui->defectEdit->text().simplified()).arg(ui->repairEdit->text().simplified()).arg(KRId);
 
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -211,8 +234,10 @@ bool KRForm::saveKR()
         }
     }
     else {
-        query = "INSERT INTO kaprepairs (kr_sched, kr_actions) VALUES ('%1', '%2')";
-        query = query.arg(selectedSched).arg(ui->actionsEdit->document()->toPlainText());
+        query = "INSERT INTO kaprepairs (kr_sched, kr_actions, kr_hasdefects, kr_defectdesc, kr_repairdesc) "
+                "VALUES ('%1', '%2', '%3', '%4', '%5')";
+        query = query.arg(selectedSched).arg(ui->actionsEdit->document()->toPlainText()).arg(ui->checkBox->isChecked())
+                .arg(ui->defectEdit->text().simplified()).arg(ui->repairEdit->text().simplified());
 
         if (!db->execQuery(query)) {
             db->showError(this);
@@ -434,3 +459,12 @@ void KRForm::keyPressEvent(QKeyEvent *event)
         close();
     QWidget::keyPressEvent(event);
 }
+
+void KRForm::on_checkBox_stateChanged(int state)
+{
+    if (state == Qt::Checked)
+        ui->defectBox->setVisible(true);
+    else
+        ui->defectBox->setVisible(false);
+}
+

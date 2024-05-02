@@ -53,6 +53,8 @@ private slots:
     void fillButtonClicked();
     void addedMatsRowMoved();
 
+    void on_checkBox_stateChanged(int state);
+
 protected:
     void keyPressEvent(QKeyEvent *event);
 
