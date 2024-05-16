@@ -336,11 +336,9 @@
         let accordingdoc ='';
         if (info.worktype == 'ТР') {
             if (info.works.length == 1) accordingdoc = 'записью в общестанционном журнале дефектов ИС ПЭ АЭС "ТОРЭКС" №';
-            else { 
-                accordingdoc = 'записями в общестанционном журнале дефектов ИС ПЭ АЭС "ТОРЭКС" №№';
-                info.works.forEach(work => { accordingdoc += `${work.defectnum}, ` });
-                accordingdoc = accordingdoc.slice(0, -2);
-            }
+            else accordingdoc = 'записями в общестанционном журнале дефектов ИС ПЭ АЭС "ТОРЭКС" №№';
+            info.works.forEach(work => { accordingdoc += `${work.defectnum}, ` });
+            accordingdoc = accordingdoc.slice(0, -2);
         }
         else accordingdoc = `годовым графиком ремонта оборудования технологических систем №${info.schednum}`;
         document.body.innerHTML += avrp1;
