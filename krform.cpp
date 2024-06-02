@@ -437,12 +437,13 @@ void KRForm::loadActionsFromOESN()
     }
 
     if (db->nextRecord()) {
-        strings = db->fetchValue(0).toString().split("\n");
-        for (int i = 0; i<strings.size(); i++)
-        {
-            strings[i].prepend(QString("%1. ").arg(i+1));
-        }
-        ui->actionsEdit->document()->setPlainText(strings.join("\n"));
+//        strings = db->fetchValue(0).toString().split("\n");
+//        for (int i = 0; i<strings.size(); i++)
+//        {
+//            strings[i].prepend(QString("%1. ").arg(i+1));
+//        }
+//        ui->actionsEdit->document()->setPlainText(strings.join("\n"));
+        ui->actionsEdit->document()->setPlainText(db->fetchValue(0).toString().simplified());
     }
     else
         ui->actionsEdit->document()->setPlainText("");

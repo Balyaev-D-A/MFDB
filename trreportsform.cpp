@@ -1509,7 +1509,7 @@ QString TRReportsForm::makeJson(QString reportId)
         workObj.insert("enddate", QJsonValue(results[i][4]));
         workObj.insert("defect", QJsonValue(results[i][5]));
         workObj.insert("repair", QJsonValue(results[i][6]));
-        workObj.insert("actions", QJsonValue(results[i][7].replace("\n", "<br />")));
+        workObj.insert("actions", QJsonValue(results[i][7].simplified()));
         workObj.insert("defectnum", QJsonValue(results[i][8]));
         workObj.insert("ktdDoc", QJsonValue("РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01"));
 

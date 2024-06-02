@@ -397,13 +397,13 @@ void DefectForm::updateActionsDesc()
         }
     }
     act = actList.join("\n");
-    actList = act.split("\n");
-    for (int i=0; i<actList.size(); i++)
-    {
-        actList[i].prepend(QString("%1. ").arg(i+1));
-    }
+//    actList = act.split("\n");
+//    for (int i=0; i<actList.size(); i++)
+//    {
+//        actList[i].prepend(QString("%1. ").arg(i+1));
+//    }
 
-    act = actList.join("\n");
+//    act = actList.join("\n");
 
     ui->actionsTextEdit->document()->setPlainText(act);
 }

@@ -1248,7 +1248,7 @@ QString KRReportsForm::makeJson(QString reportId)
         workObj.insert("deviceKKS", QJsonValue(results[i][2]));
         workObj.insert("begdate", QJsonValue(results[i][3]));
         workObj.insert("enddate", QJsonValue(results[i][4]));
-        workObj.insert("actions", QJsonValue(results[i][5].replace("\n", "<br />")));
+        workObj.insert("actions", QJsonValue(results[i][5].simplified()));
         workObj.insert("ktdDoc", QJsonValue("РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01"));
         bool hasDefects = false;
         if (results[i][7].toLower() == "true") hasDefects = true;

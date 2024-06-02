@@ -414,32 +414,65 @@
 
     function makeVVR()
     {
-        const vvrtempl = '<table id="%1" type="vvr"><colgroup><col class="vvrcol1"><col class="vvrcol2"><col class="vvrcol3"><col class="vvrcol4"><col class="vvrcol5"><col class="vvrcol6"><col class="vvrcol7"><col class="vvrcol8"><col class="vvrcol9"><col class="vvrcol10"><col class="vvrcol11"><col class="vvrcol12"><col class="vvrcol13"></colgroup><tr class="vvrrow1"><td colspan="3">Ростовская АЭС</td><td colspan="8" class="border-trl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ВЕДОМОСТЬ ВЫПОЛНЕННЫХ РАБОТ</td><td class="border-tbl">Лист</td><td class="border-trb hc" page></td></tr><tr class="vvrrow2"><td colspan="2" class="border-tbl">Энергоблок</td><td class="border-trb" usn></td><td colspan="2" class="border-bl hr">ПО РЕМОНТУ</td><td colspan="3" class="border-b" docnum></td><td class="hc border-b">ВР</td><td colspan="2" class="border-rb"></td><td class="border-tbl">Листов</td><td class="border-trb hc" pagecount></td></tr><tr class="vvrrow3"><td colspan="11" class="border-trl">Обозначение, наименование системы/установки:</td><td colspan="2" rowspan="2" class="border-trl">Подразделение-владелец:</td></tr><tr class="vvrrow4"><td colspan="11" class="border-rbl ut">XQ, <span subsys></span>, оборудование РК</td></tr><tr class="vvrrow5"><td colspan="11" class="border-trl">Обозначение, наименование оборудования:</td><td class="border-l hc ut">ОРБ</td><td class="border-r"></td></tr><tr class="vvrrow6"><td colspan="11" class="vt ut border-rbl" works></td><td class="border-bl"></td><td class="border-rb"></td></tr><tr class="vvrrow7"><td class="hc">№ п/п</td><td colspan="2" class="hc">Дата начала/<br>окончания работ</td><td colspan="6" class="hc">Вид ремонта. Перечень выполненных работ. Наименование сборочных единиц (узлов).</td><td colspan="4" class="hc">Обоснование работ (регистрационное обозначение и наименование технологической документации на ТОиР)</td></tr><tr class="vvrrow8"><td rowspan="4" class="border-trl hc" page></td><td colspan="2" class="border-trl"></td><td colspan="6" rowspan="2" class="border-trl hc ut" wt></td><td colspan="4" rowspan="6" class="hc vc breakword" ktdtext></td></tr><tr class="vvrrow9"><td colspan="2" class="border-rl hc">с</td></tr><tr class="vvrrow10"><td colspan="2" class="border-rl hc ut" workbegdate></td><td colspan="6" rowspan="4" class="border-rbl" style="vertical-align:top" workandactions></td></tr><tr class="vvrrow11"><td colspan="2" class="border-rl hc">по</td></tr><tr class="vvrrow12"><td class="border-rl"></td><td colspan="2" class="border-rl hc ut" workenddate></td></tr><tr class="expanding"><td class="border-rbl"></td><td colspan="2" class="border-rbl"></td></tr><tr class="tfooter"><td colspan="13" class="hr vb border-t ov"><div style="font-size:10pt;position:relative;bottom:0;right:-.5cm;color:transparent;text-shadow:2px 0 #b4b4b4">П.00.52 Д.5.2</div></td></tr></table>'
-        const signhtml = '<tr class="vvrrow13 f11"><td colspan="6" class="border-tl">Подразделение-владелец:</td><td class="border-t"></td><td colspan="6" class="border-tr">Подразделение АС, ответственное за ремонт</td></tr><tr class="vvrrow14 f11"><td colspan="6" class="border-l" ownerloc></td><td class="border-none"></td><td colspan="6" class="border-r" repairerloc></td></tr><tr class="vvrrow15 f11"><td colspan="3" class="border-bl"></td><td class="border-b hc" date></td><td colspan="2" class="border-b hc" ownername></td><td class="border-none"></td><td colspan="2" class="border-b"></td><td colspan="2" class="border-b hc" date></td><td colspan="2" class="border-rb hc" repairername></td></tr><tr class="vvrrow16 f11"><td colspan="3" class="border-tl hc vt f9">(подпись)</td><td class="border-t hc vt f9">(дата)</td><td colspan="2" class="border-t hc vt f9">(И. О. Фамилия)</td><td class="border-none"></td><td colspan="2" class="border-t hc vt f9">(подпись)</td><td colspan="2" class="border-t hc vt f9">(дата)</td><td colspan="2" class="border-tr hc vt f9">(И. О. Фамилия)</td></tr><tr class="vvrrow17 f11"><td colspan="6" rowspan="4" class="border-bl"></td><td class="border-none"></td><td colspan="6" class="border-r">Руководитель работ по наряду-допуску</td></tr><tr class="vvrrow18 f11"><td class="border-none"></td><td colspan="4" class="border-none hc" chief1loc></td><td colspan="2" rowspan="2" class="border-rb hc" chief1name></td></tr><tr class="vvrrow19 f11"><td class="border-none"></td><td colspan="2" class="border-b"></td><td colspan="2" class="border-b hc" date></td></tr><tr class="vvrrow20 f11"><td class="border-b"></td><td colspan="2" class="border-tb hc vt f9">(подпись)</td><td colspan="2" class="border-tb hc vt f9">(дата)</td><td colspan="2" class="border-trb hc vt f9">(И. О. Фамилия)</td></tr>'
-        let sign = createFragmentFromHTML(signhtml);
+        const vvrtempl = '<table id="%1" type="vvr"><colgroup><col class="vvrcol1"><col class="vvrcol2"><col class="vvrcol3"><col class="vvrcol4"><col class="vvrcol5"><col class="vvrcol6"><col class="vvrcol7"><col class="vvrcol8"><col class="vvrcol9"><col class="vvrcol10"><col class="vvrcol11"><col class="vvrcol12"><col class="vvrcol13"></colgroup><tr class="vvrrow1"><td colspan="3">Ростовская АЭС</td><td colspan="8" class="border-trl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ВЕДОМОСТЬ ВЫПОЛНЕННЫХ РАБОТ</td><td class="border-tbl">Лист</td><td class="border-trb hc" page></td></tr><tr class="vvrrow2"><td colspan="2" class="border-tbl">Энергоблок</td><td class="border-trb" usn></td><td colspan="2" class="border-bl hr">ПО РЕМОНТУ</td><td colspan="3" class="border-b" docnum></td><td class="hc border-b">ВР</td><td colspan="2" class="border-rb"></td><td class="border-tbl">Листов</td><td class="border-trb hc" pagecount></td></tr><tr class="vvrrow3"><td colspan="11" class="border-trl">Обозначение, наименование системы/установки:</td><td colspan="2" rowspan="2" class="border-trl">Подразделение-владелец:</td></tr><tr class="vvrrow4"><td colspan="11" class="border-rbl ut">XQ, <span subsys></span>, оборудование РК</td></tr><tr class="vvrrow5"><td colspan="11" class="border-trl">Обозначение, наименование оборудования:</td><td class="border-l hc ut">ОРБ</td><td class="border-r"></td></tr><tr class="vvrrow6"><td colspan="11" class="vt ut border-rbl" works></td><td class="border-bl"></td><td class="border-rb"></td></tr><tr class="vvrrow7"><td class="hc">№ п/п</td><td colspan="2" class="hc">Дата начала/<br>окончания работ</td><td colspan="6" class="hc">Вид ремонта. Перечень выполненных работ. Наименование сборочных единиц (узлов).</td><td colspan="4" class="hc">Обоснование работ (регистрационное обозначение и наименование технологической документации на ТОиР)</td></tr><tr class="vvrrow8"><td rowspan="4" class="border-trl hc" worknum></td><td colspan="2" class="border-trl"></td><td colspan="6" rowspan="2" class="border-trl hc ut" wt></td><td colspan="4" rowspan="6" class="hc vc breakword" ktdtext></td></tr><tr class="vvrrow9"><td colspan="2" class="border-rl hc">с</td></tr><tr class="vvrrow10"><td colspan="2" class="border-rl hc ut" workbegdate></td><td colspan="6" rowspan="4" class="border-rbl" style="vertical-align:top" workandactions></td></tr><tr class="vvrrow11"><td colspan="2" class="border-rl hc">по</td></tr><tr class="vvrrow12"><td class="border-rl"></td><td colspan="2" class="border-rl hc ut" workenddate></td></tr><tr class="expanding"><td class="border-rbl"></td><td colspan="2" class="border-rbl"></td></tr><tr class="tfooter"><td colspan="13" class="hr vb border-t ov"><div style="font-size:10pt;position:relative;bottom:0;right:-.5cm;color:transparent;text-shadow:2px 0 #b4b4b4">П.00.52 Д.5.2</div></td></tr></table>'
+        const signhtml = '<tr class="vvrrow13 f11" signelement><td colspan="6" class="border-tl">Подразделение-владелец:</td><td class="border-t"></td><td colspan="6" class="border-tr">Подразделение АС, ответственное за ремонт</td></tr><tr class="vvrrow14 f11" signelement><td colspan="6" class="border-l" ownerloc></td><td class="border-none"></td><td colspan="6" class="border-r" repairerloc></td></tr><tr class="vvrrow15 f11" signelement><td colspan="3" class="border-bl"></td><td class="border-b hc" date></td><td colspan="2" class="border-b hc" ownername></td><td class="border-none"></td><td colspan="2" class="border-b"></td><td colspan="2" class="border-b hc" date></td><td colspan="2" class="border-rb hc" repairername></td></tr><tr class="vvrrow16 f11" signelement><td colspan="3" class="border-tl hc vt f9">(подпись)</td><td class="border-t hc vt f9">(дата)</td><td colspan="2" class="border-t hc vt f9">(И. О. Фамилия)</td><td class="border-none"></td><td colspan="2" class="border-t hc vt f9">(подпись)</td><td colspan="2" class="border-t hc vt f9">(дата)</td><td colspan="2" class="border-tr hc vt f9">(И. О. Фамилия)</td></tr><tr class="vvrrow17 f11" signelement><td colspan="6" rowspan="4" class="border-bl"></td><td class="border-none"></td><td colspan="6" class="border-r">Руководитель работ по наряду-допуску</td></tr><tr class="vvrrow18 f11" signelement><td class="border-none"></td><td colspan="4" class="border-none hc" chief1loc></td><td colspan="2" rowspan="2" class="border-rb hc" chief1name></td></tr><tr class="vvrrow19 f11" signelement><td class="border-none"></td><td colspan="2" class="border-b"></td><td colspan="2" class="border-b hc" date></td></tr><tr class="vvrrow20 f11" signelement><td class="border-b"></td><td colspan="2" class="border-tb hc vt f9">(подпись)</td><td colspan="2" class="border-tb hc vt f9">(дата)</td><td colspan="2" class="border-trb hc vt f9">(И. О. Фамилия)</td></tr>'
+        let page = 0;
         for (let i=0; i<info.works.length; i++)
         {
-            let currid = `vvrp${i+1}`;
+            page++;
+            let currid = `vvrp${page}`;
             let newpage = vvrtempl.replace('%1', currid);
-            let workTypeFull = "";
-            if (info.worktype == "ТР") {
-                workTypeFull = "Текущий ремонт";
+            let workTypeFull = '';
+            if (info.worktype == 'ТР') {
+                workTypeFull = 'Текущий ремонт';
             } 
-            else if (info.worktype == "КР") {
-                workTypeFull = "Капитальный ремонт";
+            else if (info.worktype == 'КР') {
+                workTypeFull = 'Капитальный ремонт';
             }
             document.body.innerHTML += newpage;
+            let heightBefore = document.getElementById(currid).offsetHeight;
             setHTML(`#${currid} [workbegdate]`, info.works[i].begdate);
             setHTML(`#${currid} [workenddate]`, info.works[i].enddate);
-            setHTML(`#${currid} [page]`, i+1);
-            setHTML(`#${currid} [workandactions]`, `${workTypeFull}: ${info.works[i].deviceDescription} ${info.works[i].deviceType}, ${info.works[i].deviceKKS}<br/>${info.works[i].actions}`);
+            setHTML(`#${currid} [worknum]`, i+1);
+            setHTML(`#${currid} [page]`, page);
             setHTML(`#${currid} [ktdtext]`, info.works[i].ktdDoc + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
+            let actionsStrings = info.works[i].actions.split('\n');
+            let oldActionsText = '';
+            let actionsText = '';
             if (i == info.works.length-1) {
                 afterElem = document.querySelector(`#${currid} .expanding`);
-                afterElem.after(sign);
+                afterElem.after(createFragmentFromHTML(signhtml));
             }
+            for (let strnum = 0; strnum < actionsStrings.length; strnum++)
+            {
+                oldActionsText = actionsText;
+                actionsText += strnum+1 + '. ' + actionsStrings[strnum] + '<br />';
+                setHTML(`#${currid} [workandactions]`, `${workTypeFull}: ${info.works[i].deviceDescription} ${info.works[i].deviceType}, ${info.works[i].deviceKKS}<br/>${actionsText}`);
+                if (document.getElementById(currid).offsetHeight > heightBefore) {
+                    if (i == info.works.length-1) {
+                        removeElements(`#${currid} [signelement]`);
+                    }
+                    setHTML(`#${currid} [workandactions]`, `${workTypeFull}: ${info.works[i].deviceDescription} ${info.works[i].deviceType}, ${info.works[i].deviceKKS}<br/>${oldActionsText}`);
+                    page++;
+                    currid = `vvrp${page}`;
+                    newpage = vvrtempl.replace('%1', currid);
+                    document.body.innerHTML += newpage;
+                    setHTML(`#${currid} [workbegdate]`, info.works[i].begdate);
+                    setHTML(`#${currid} [workenddate]`, info.works[i].enddate);
+                    setHTML(`#${currid} [worknum]`, i+1);
+                    setHTML(`#${currid} [page]`, page);
+                    setHTML(`#${currid} [ktdtext]`, info.works[i].ktdDoc + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
+                    if (i == info.works.length-1) {
+                        afterElem = document.querySelector(`#${currid} .expanding`);
+                        afterElem.after(createFragmentFromHTML(signhtml));
+                    }
+                    actionsText = "";
+                    strnum--;
+                }
+            }
+            
         }
-        setHTML('[type="vvr"] [pagecount]', info.works.length);
+        setHTML('[type="vvr"] [pagecount]', page);
     }
 
     function makeVFZM()
