@@ -443,7 +443,7 @@ void KRForm::loadActionsFromOESN()
 //            strings[i].prepend(QString("%1. ").arg(i+1));
 //        }
 //        ui->actionsEdit->document()->setPlainText(strings.join("\n"));
-        ui->actionsEdit->document()->setPlainText(db->fetchValue(0).toString().simplified());
+        ui->actionsEdit->document()->setPlainText(db->fetchValue(0).toString());
     }
     else
         ui->actionsEdit->document()->setPlainText("");
