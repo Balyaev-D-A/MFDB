@@ -76,6 +76,21 @@ void NormativeForm::showEvent(QShowEvent *event)
     validator->setList(validList);
     ui->deviceBox->setValidator(validator);
     ui->deviceBox->setCurrentIndex(-1);
+
+    ui->unitBox->blockSignals(true);
+    ui->unitBox->clear();
+    ui->unitBox->addItem("Все", 0);
+    query = "SELECT unit_id, unit_name FROM units ORDER BY unit_id";
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+    while (db->nextRecord())
+    {
+        ui->unitBox->addItem(db->fetchValue(1).toString(), db->fetchValue(0).toUInt());
+    }
+    ui->unitBox->blockSignals(false);
+
     updateNormatives();
 }
 
@@ -260,5 +275,4 @@ void NormativeForm::removeMatClicked()
 void NormativeForm::okClicked()
 {
     if (saveNormatives()) close();
-
 }
