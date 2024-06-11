@@ -18,6 +18,7 @@ NormativeForm::NormativeForm(QWidget *parent) :
 
     connect(ui->deviceBox, &QComboBox::currentTextChanged, this, &NormativeForm::updateNormatives);
     connect(ui->workBox, &QComboBox::currentTextChanged, this, &NormativeForm::updateNormatives);
+    connect(ui->unitBox, &QComboBox::currentTextChanged, this, &NormativeForm::unitChanged);
     connect(ui->addMatButton, &QToolButton::clicked, this, &NormativeForm::addMatClicked);
     connect(ui->removeMatButton, &QToolButton::clicked, this, &NormativeForm::removeMatClicked);
     connect(ui->normativeTable, &DragDropTable::itemDroped, this, &NormativeForm::addMatClicked);
@@ -99,9 +100,9 @@ void NormativeForm::updateNormTable()
     QString query;
 
     while (ui->normativeTable->rowCount() > 0) ui->normativeTable->removeRow(0);
-    query = "SELECT nm_material, mat_name, nm_count FROM normativmat AS nm LEFT JOIN materials AS mat ON nm.nm_material = mat.mat_id "
-            "WHERE nm_dev = '%1' AND nm_worktype = '%2'";
-    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    query = "SELECT nm_material, mat_name, nm_count FROM normativmat LEFT JOIN materials ON nm_material = mat_id "
+            "WHERE nm_dev = '%1' AND nm_worktype = '%2' AND nm_unit = '%3'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->unitBox->currentData().toUInt());
 
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -158,8 +159,9 @@ void NormativeForm::updateNormatives()
     ui->ktdShortEdit->clear();
     ui->actionsTextEdit->document()->clear();
 
-    QString query = "SELECT nw_oesn, nw_ktd, nw_ktdshort, nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'";
-    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    QString query = "SELECT nw_oesn, nw_ktd, nw_ktdshort, nw_work FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'"
+                    " AND nw_unit = '%3'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->unitBox->currentData().toUInt());
     if (!db->execQuery(query)) {
         db->showError(this);
         return;
@@ -174,8 +176,9 @@ void NormativeForm::updateNormatives()
     updateNormTable();
     updateMatTable();
 
-    query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'";
-    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'"
+            " AND na_unit = '%3'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->unitBox->currentData().toUInt());
 
     if (!db->execQuery(query)) {
         db->showError(this);
@@ -192,51 +195,56 @@ bool NormativeForm::saveNormatives()
 
     db->startTransaction();
 
-    query = "DELETE FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2'";
-    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    query = "DELETE FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2' AND nw_unit = '%3'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->unitBox->currentData().toUInt());
     if (!db->execQuery(query)) {
         db->showError(this);
         db->rollbackTransaction();
         return false;
     }
 
-    query = "DELETE FROM normativmat WHERE nm_dev = '%1' AND nm_worktype = '%2'";
-    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    query = "DELETE FROM normativmat WHERE nm_dev = '%1' AND nm_worktype = '%2' AND nm_unit = '%3'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->unitBox->currentData().toUInt());
     if (!db->execQuery(query)) {
         db->showError(this);
         db->rollbackTransaction();
         return false;
     }
 
-    query = "DELETE FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'";
-    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    query = "DELETE FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2' AND na_unit = '%3'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->unitBox->currentData().toUInt());
     if (!db->execQuery(query)) {
         db->showError(this);
         db->rollbackTransaction();
         return false;
     }
 
-    query = "INSERT INTO normativwork (nw_dev, nw_worktype, nw_oesn, nw_ktd, nw_ktdshort, nw_work) VALUES ('%1' , '%2', '%3', '%4', '%5', '%6')";
+    query = "INSERT INTO normativwork (nw_dev, nw_worktype, nw_oesn, nw_ktd, nw_ktdshort, nw_work, nw_unit) "
+            "VALUES ('%1' , '%2', '%3', '%4', '%5', '%6', '%7')";
     query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->oesnEdit->text());
     query = query.arg(ui->ktdEdit->text().simplified());
     query = query.arg(ui->ktdShortEdit->text().simplified());
     query = query.arg(ui->workEdit->text().replace(',', '.'));
+    query = query.arg(ui->unitBox->currentData().toUInt());
     if (!db->execQuery(query)) {
         db->showError(this);
         db->rollbackTransaction();
         return false;
     }
 
-    query = "INSERT INTO normativactions (na_dev, na_worktype, na_actions) VALUES ('%1' , '%2', '%3')";
-    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->actionsTextEdit->document()->toPlainText());
+    query = "INSERT INTO normativactions (na_dev, na_worktype, na_actions, na_unit) VALUES ('%1' , '%2', '%3', '%4')";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText())
+            .arg(ui->actionsTextEdit->document()->toPlainText())
+            .arg(ui->unitBox->currentData().toUInt());
     if (!db->execQuery(query)) {
         db->showError(this);
         db->rollbackTransaction();
         return false;
     }
 
-    query = "INSERT INTO normativmat (nm_dev, nm_worktype, nm_material, nm_count) VALUES ('%1', '%2', '%3', '%4')";
-    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText());
+    query = "INSERT INTO normativmat (nm_dev, nm_worktype, nm_unit, nm_material, nm_count) "
+            "VALUES ('%1', '%2', '%3', '%4', '%5')";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->unitBox->currentData().toUInt());
     for (int i=0; i<ui->normativeTable->rowCount(); i++)
     {
         q = query.arg(ui->normativeTable->item(i, 0)->text()).arg(ui->normativeTable->item(i,2)->text().replace(',','.'));
@@ -275,4 +283,30 @@ void NormativeForm::removeMatClicked()
 void NormativeForm::okClicked()
 {
     if (saveNormatives()) close();
+}
+
+void NormativeForm::unitChanged()
+{
+    QString query = "SELECT nw_oesn FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = '%2' AND nw_unit = '%3'";
+    query = query.arg(ui->deviceBox->currentText()).arg(ui->workBox->currentText()).arg(ui->unitBox->currentData().toUInt());
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+    if (!db->affectedRows()) {
+        ui->warningLabel->setStyleSheet("color: rgb(255, 0, 0);");
+        ui->warningLabel->setText("Не найдены записи для текущих значений Блок/Устройство.");
+        startTimer(3000);
+        return;
+    }
+    updateNormatives();
+    ui->warningLabel->setStyleSheet("color: rgb(0, 255, 0);");
+    ui->warningLabel->setText("Нормативы загружены.");
+    startTimer(3000);
+}
+
+void NormativeForm::timerEvent(QTimerEvent *event)
+{
+    ui->warningLabel->setText("");
+    killTimer(event->timerId());
 }

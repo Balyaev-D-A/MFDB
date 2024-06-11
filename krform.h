@@ -31,6 +31,7 @@ private:
     QString KRId;
     QString selectedSched;
     QString selectedDevice;
+    uint deviceUnit;
     bool matsChanged;
     void updateMaterials();
     void updateAddedMats();

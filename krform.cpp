@@ -83,7 +83,7 @@ void KRForm::editKR(QString KRId)
     ui->fillButton->setDisabled(false);
     ui->actionsEdit->setDisabled(false);
     query = "SELECT kr_sched, sch_name, sch_type, sch_kks, kr_actions, kr_hasdefects, "
-            "kr_defectdesc, kr_repairdesc FROM kaprepairs AS kr "
+            "kr_defectdesc, kr_repairdesc, sch_unit FROM kaprepairs AS kr "
             "LEFT JOIN schedule AS sch ON kr.kr_sched = sch.sch_id "
             "WHERE kr_id = '%1'";
     query = query.arg(KRId);
@@ -96,6 +96,7 @@ void KRForm::editKR(QString KRId)
     if (db->nextRecord()) {
         selectedSched = db->fetchValue(0).toString();
         selectedDevice = db->fetchValue(2).toString();
+        deviceUnit = db->fetchValue(8).toUInt();
         ui->deviceEdit->setText(db->fetchValue(1).toString() + " " + db->fetchValue(2).toString() + " " + db->fetchValue(3).toString());
         if (!db->fetchValue(4).toString().simplified().isEmpty())
             ui->actionsEdit->document()->setPlainText(db->fetchValue(4).toString());
@@ -290,6 +291,16 @@ void KRForm::deviceSelected(const KRDevice &device)
 {
     selectedSched = device.sched;
     selectedDevice = device.type;
+    QString query = "SELECT sch_unit FROM schedule WHERE sch_id = '%1'";
+    query = query.arg(selectedSched);
+    if (!db->execQuery(query)) {
+        db->showError(this);
+        return;
+    }
+    if (db->nextRecord())
+        deviceUnit = db->fetchValue(0).toUInt();
+    else
+        deviceUnit = 0;
     ui->deviceEdit->setText(device.device + " " + device.type + " " + device.kks);
     ui->materialTable->setDisabled(false);
     ui->addedMatTable->setDisabled(false);
@@ -316,6 +327,7 @@ void KRForm::updateAddedMats()
     int curRow;
     QString query;
     while (ui->addedMatTable->rowCount() > 0) ui->addedMatTable->removeRow(0);
+    if (KRId == "0") return;
 
     query = "SELECT kam_material, mat_name, kam_oesn, kam_count FROM kradditionalmats AS k "
             "LEFT JOIN materials AS m ON k.kam_material = m.mat_id "
@@ -384,12 +396,20 @@ void KRForm::fillButtonClicked()
     QStringList mat;
     QStringList addedMats;
     QString query = "SELECT nm_material, mat_name, nm_count FROM normativmat AS nm LEFT JOIN materials AS mat ON nm.nm_material = mat.mat_id "
-            "WHERE nm_dev = '%1' AND nm_worktype = 'КР'";
-    query = query.arg(selectedDevice);
+            "WHERE nm_dev = '%1' AND nm_worktype = 'КР' AND nm_unit = '%2'";
+    QString q = query.arg(selectedDevice).arg(deviceUnit);
 
-    if (!db->execQuery(query)) {
+    if (!db->execQuery(q)) {
         db->showError(this);
         return;
+    }
+
+    if (!db->affectedRows()) {
+        q = query.arg(selectedDevice).arg(0);
+        if (!db->execQuery(q)) {
+            db->showError(this);
+            return;
+        }
     }
 
     while (db->nextRecord()) {
@@ -427,15 +447,22 @@ void KRForm::fillButtonClicked()
 void KRForm::loadActionsFromOESN()
 {
     QStringList strings;
-    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'КР'";
-    query = query.arg(selectedDevice);
+    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'КР' AND na_unit = '%2'";
+    QString q = query.arg(selectedDevice).arg(deviceUnit);
 
-    if (!db->execQuery(query))
+    if (!db->execQuery(q))
     {
         db->showError(this);
         return;
     }
-
+    if (!db->affectedRows()) {
+        q = query.arg(selectedDevice).arg(0);
+        if (!db->execQuery(q))
+        {
+            db->showError(this);
+            return;
+        }
+    }
     if (db->nextRecord()) {
 //        strings = db->fetchValue(0).toString().split("\n");
 //        for (int i = 0; i<strings.size(); i++)

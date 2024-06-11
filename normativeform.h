@@ -26,6 +26,7 @@ private:
     void updateNormTable();
     void updateMatTable();
     void updateNormatives();
+    void unitChanged();
 
 private slots:
     bool saveNormatives();
@@ -35,6 +36,7 @@ private slots:
 
 protected:
     void showEvent(QShowEvent *event);
+    void timerEvent(QTimerEvent *event);
 
 signals:
     void saved(QString device, QString workType);

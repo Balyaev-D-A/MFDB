@@ -337,9 +337,9 @@ void DefectForm::updateStages()
 {
     QString actions;
     QStringList actList;
-    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'";
+    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'ТР'";
 
-    query = query.arg(device.type).arg("ТР");
+    query = query.arg(device.type);
 
     if (!db->execQuery(query)){
         db->showError(this);
@@ -360,21 +360,28 @@ void DefectForm::updateStages()
 
 void DefectForm::updateActions()
 {
-    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = '%2'";
+    QString query = "SELECT na_actions FROM normativactions WHERE na_dev = '%1' AND na_worktype = 'ТР' "
+                    "AND na_unit = '%2'";
 
-    query = query.arg(device.type).arg("ТР");
+    QString q = query.arg(device.type).arg(device.unitId);
 
-    if (!db->execQuery(query)){
+    if (!db->execQuery(q)){
         db->showError(this);
         return;
+    }
+
+    if (!db->affectedRows()) {
+        q = query.arg(device.type).arg(0);
+        if (!db->execQuery(q)){
+            db->showError(this);
+            return;
+        }
     }
 
     if (db->nextRecord())
         actions = db->fetchValue(0).toString();
     else
         actions = "";
-
-
 }
 
 void DefectForm::updateActionsDesc()
@@ -773,12 +780,20 @@ void DefectForm::fillButtonClicked()
     QStringList mat;
     QStringList addedMats;
     QString query = "SELECT nm_material, mat_name, nm_count FROM normativmat AS nm LEFT JOIN materials AS mat ON nm.nm_material = mat.mat_id "
-            "WHERE nm_dev = '%1' AND nm_worktype = 'ТР'";
-    query = query.arg(device.type);
+            "WHERE nm_dev = '%1' AND nm_worktype = 'ТР' AND nm_unit = '%2'";
+    QString q = query.arg(device.type).arg(device.unitId);
 
-    if (!db->execQuery(query)) {
+    if (!db->execQuery(q)) {
         db->showError(this);
         return;
+    }
+
+    if (!db->affectedRows()) {
+        q = query.arg(device.type).arg(0);
+        if (!db->execQuery(q)) {
+            db->showError(this);
+            return;
+        }
     }
 
     while (db->nextRecord()) {

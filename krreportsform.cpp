@@ -1190,6 +1190,7 @@ void KRReportsForm::tableCellDoubleClicked(int row, int column)
 
 QString KRReportsForm::makeJson(QString reportId)
 {
+    uint unitId = 0;
     QJsonDocument doc;
     QJsonObject mainObj;
     QJsonArray worksArray;
@@ -1199,7 +1200,7 @@ QString KRReportsForm::makeJson(QString reportId)
     QJsonObject signObj;
     QList<QStringList> results;
     QString material;
-    QString query = "SELECT unit_shortname, unit_subsys, unit_schednum, krr_planbeg, krr_planend, krr_date, krr_docnum FROM krreports "
+    QString query = "SELECT unit_shortname, unit_subsys, unit_schednum, krr_planbeg, krr_planend, krr_date, krr_docnum, unit_id FROM krreports "
                     "LEFT JOIN units ON krr_unit = unit_id "
                     "WHERE krr_id = '%1'";
     query = query.arg(reportId);
@@ -1216,6 +1217,7 @@ QString KRReportsForm::makeJson(QString reportId)
         mainObj.insert("planenddate", QJsonValue(db->fetchValue(4).toString()));
         mainObj.insert("signdate", QJsonValue(db->fetchValue(5).toString()));
         mainObj.insert("docnum", QJsonValue("№" + db->fetchValue(6).toString()));
+        unitId = db->fetchValue(7).toUInt();
     }
     mainObj.insert("orderdate", QJsonValue(db->getVariable("ДатаПриказа").toString()));
     mainObj.insert("ordernum", QJsonValue(db->getVariable("ПриказПоАЭС").toString()));
@@ -1266,12 +1268,22 @@ QString KRReportsForm::makeJson(QString reportId)
         else
             workObj.insert("techDoc", QJsonValue("Руководство по эксплуатации"));
 
-        query = "SELECT nw_oesn, nw_ktd, nw_ktdshort FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР'";
-        query = query.arg(results[i][1]);
-        if (!db->execQuery(query)) {
+        query = "SELECT nw_oesn, nw_ktd, nw_ktdshort FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР' "
+                "AND nw_unit = '%2'";
+        QString q = query.arg(results[i][1]).arg(unitId);
+        if (!db->execQuery(q)) {
             db->showError(this);
             return "";
         }
+        // Если не найдено по блоку ищем для всех блоков
+        if (!db->affectedRows()) {
+            q = query.arg(results[i][1]).arg(0);
+            if (!db->execQuery(q)) {
+                db->showError(this);
+                return "";
+            }
+        }
+
         if (db->nextRecord()) {
             workObj.insert("oesn", QJsonValue(db->fetchValue(0).toString().simplified()));
             workObj.insert("ktd", QJsonValue(db->fetchValue(1).toString().simplified()));
