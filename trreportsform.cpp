@@ -1513,7 +1513,6 @@ QString TRReportsForm::makeJson(QString reportId)
         workObj.insert("repair", QJsonValue(results[i][6]));
         workObj.insert("actions", QJsonValue(results[i][7]));
         workObj.insert("defectnum", QJsonValue(results[i][8]));
-        workObj.insert("ktdDoc", QJsonValue("РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01"));
 
         query = QString("SELECT sch_tdoc FROM schedule WHERE sch_type = '%1' LIMIT 1").arg(results[i][1]);
         if (!db->execQuery(query)) {
@@ -1525,7 +1524,7 @@ QString TRReportsForm::makeJson(QString reportId)
         else
             workObj.insert("techDoc", QJsonValue("Руководство по эксплуатации"));
 
-        query = "SELECT nw_oesn, nw_ktd, nw_ktdshort FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР' "
+        query = "SELECT nw_oesn, nw_ktd, nw_ktdshort, nw_reglament FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР' "
                 "AND nw_unit = '%2'";
         QString q = query.arg(results[i][1]).arg(unitId);
         if (!db->execQuery(q)) {
@@ -1545,6 +1544,7 @@ QString TRReportsForm::makeJson(QString reportId)
             workObj.insert("oesn", QJsonValue(db->fetchValue(0).toString().simplified()));
             workObj.insert("ktd", QJsonValue(db->fetchValue(1).toString().simplified()));
             workObj.insert("ktdshort", QJsonValue(db->fetchValue(2).toString().simplified()));
+            workObj.insert("reglament", QJsonValue(db->fetchValue(3).toString()));
         }
         else
             workObj.insert("oesn", QJsonValue(""));

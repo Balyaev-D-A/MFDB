@@ -1251,7 +1251,6 @@ QString KRReportsForm::makeJson(QString reportId)
         workObj.insert("begdate", QJsonValue(results[i][3]));
         workObj.insert("enddate", QJsonValue(results[i][4]));
         workObj.insert("actions", QJsonValue(results[i][5]));
-        workObj.insert("ktdDoc", QJsonValue("РЕГЛАМЕНТ<br/>Техническое обслуживание и ремонт дозиметрических приборов и оборудования радиационного контроля отдела радиационной безопасности РГ.0.33.01"));
         bool hasDefects = false;
         if (results[i][7].toLower() == "true") hasDefects = true;
         workObj.insert("hasdefects", QJsonValue(hasDefects));
@@ -1268,7 +1267,7 @@ QString KRReportsForm::makeJson(QString reportId)
         else
             workObj.insert("techDoc", QJsonValue("Руководство по эксплуатации"));
 
-        query = "SELECT nw_oesn, nw_ktd, nw_ktdshort FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР' "
+        query = "SELECT nw_oesn, nw_ktd, nw_ktdshort, nw_reglament FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'КР' "
                 "AND nw_unit = '%2'";
         QString q = query.arg(results[i][1]).arg(unitId);
         if (!db->execQuery(q)) {
@@ -1288,10 +1287,14 @@ QString KRReportsForm::makeJson(QString reportId)
             workObj.insert("oesn", QJsonValue(db->fetchValue(0).toString().simplified()));
             workObj.insert("ktd", QJsonValue(db->fetchValue(1).toString().simplified()));
             workObj.insert("ktdshort", QJsonValue(db->fetchValue(2).toString().simplified()));
+            workObj.insert("reglament", QJsonValue(db->fetchValue(3).toString()));
         }
-        else
+        else {
             workObj.insert("oesn", QJsonValue(""));
-
+            workObj.insert("ktd", QJsonValue(""));
+            workObj.insert("ktdshort", QJsonValue(""));
+            workObj.insert("reglament", QJsonValue(""));
+        }
         query = "SELECT mat_name, mat_doc, mat_measure, kam_oesn, kam_count, mat_consumable FROM kradditionalmats "
                 "LEFT JOIN materials ON kam_material = mat_id "
                 "WHERE kam_kr = '%1' ORDER BY kam_order";

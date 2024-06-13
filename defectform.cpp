@@ -612,6 +612,10 @@ bool DefectForm::saveDefect()
 {
     QString query;
     QString prepQuery;
+    QString actions = ui->actionsTextEdit->document()->toPlainText();
+    //Удаляем переносы строки в конце
+    while (actions.endsWith("\n") || actions.endsWith("\r")) actions.chop(1);
+
     db->startTransaction();
     if (defId != "0") {
         if (matsChanged) {
@@ -646,7 +650,7 @@ bool DefectForm::saveDefect()
         query = query.arg(ui->defectEdit->text()).arg(ui->stageBox->currentIndex()).arg(ui->repairEdit->text());
         query = query.arg(device.unitId);
         query = query.arg(device.name);
-        query = query.arg(ui->actionsTextEdit->toPlainText());
+        query = query.arg(actions);
         query = query.arg(defId);
 
         if (!db->execQuery(query)) {
@@ -663,7 +667,7 @@ bool DefectForm::saveDefect()
         query = query.arg(ui->stageBox->currentIndex()).arg(ui->repairEdit->text());
         query = query.arg(device.unitId);
         query = query.arg(device.name);
-        query = query.arg(ui->actionsTextEdit->toPlainText());
+        query = query.arg(actions);
 
         if (!db->execQuery(query)) {
             db->showError(this);

@@ -190,7 +190,10 @@ bool KRForm::saveKR()
 {
     QString query;
     QString prepQuery;
-    float oesn, real;
+    QString actions = ui->actionsEdit->document()->toPlainText();
+    //Удаляем переносы строки в конце
+    while (actions.endsWith("\n") || actions.endsWith("\r")) actions.chop(1);
+
     if (!ui->checkBox->isChecked()) {
         ui->defectEdit->clear();
         ui->repairEdit->clear();
@@ -225,7 +228,7 @@ bool KRForm::saveKR()
 
         query = "UPDATE kaprepairs SET kr_sched = '%1', kr_actions = '%2', kr_hasdefects = '%3', kr_defectdesc = '%4', "
                 "kr_repairdesc = '%5' WHERE kr_id = '%6'";
-        query = query.arg(selectedSched).arg(ui->actionsEdit->document()->toPlainText()).arg(ui->checkBox->isChecked())
+        query = query.arg(selectedSched).arg(actions).arg(ui->checkBox->isChecked())
                 .arg(ui->defectEdit->text().simplified()).arg(ui->repairEdit->text().simplified()).arg(KRId);
 
         if (!db->execQuery(query)) {
@@ -237,7 +240,7 @@ bool KRForm::saveKR()
     else {
         query = "INSERT INTO kaprepairs (kr_sched, kr_actions, kr_hasdefects, kr_defectdesc, kr_repairdesc) "
                 "VALUES ('%1', '%2', '%3', '%4', '%5')";
-        query = query.arg(selectedSched).arg(ui->actionsEdit->document()->toPlainText()).arg(ui->checkBox->isChecked())
+        query = query.arg(selectedSched).arg(actions).arg(ui->checkBox->isChecked())
                 .arg(ui->defectEdit->text().simplified()).arg(ui->repairEdit->text().simplified());
 
         if (!db->execQuery(query)) {

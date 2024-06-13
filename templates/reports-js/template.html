@@ -452,7 +452,7 @@
             setHTML(`#${currid} [workenddate]`, info.works[i].enddate);
             setHTML(`#${currid} [worknum]`, num);
             setHTML(`#${currid} [page]`, page);
-            setHTML(`#${currid} [ktdtext]`, info.works[i].ktdDoc + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
+            setHTML(`#${currid} [ktdtext]`, info.works[i].reglament + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
             let actionsStrings = info.works[i].actions.split('\n');
             let oldActionsText = '';
             let actionsText = '';
@@ -487,7 +487,7 @@
                     setHTML(`#${currid} [workenddate]`, info.works[i].enddate);
                     setHTML(`#${currid} [worknum]`, num);
                     setHTML(`#${currid} [page]`, page);
-                    setHTML(`#${currid} [ktdtext]`, info.works[i].ktdDoc + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
+                    setHTML(`#${currid} [ktdtext]`, info.works[i].reglament + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
                     if (i == info.works.length-1) {
                         afterElem = document.querySelector(`#${currid} .expanding`);
                         afterElem.after(createFragmentFromHTML(signhtml));
