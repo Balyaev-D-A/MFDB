@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tasksTab">
        <property name="enabled">
@@ -581,23 +581,6 @@
               <property name="icon">
                <iconset resource="resource.qrc">
                 <normaloff>:/icons/delete.png</normaloff>:/icons/delete.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="saveDefectButton">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="resource.qrc">
-                <normaloff>:/icons/savereport.png</normaloff>:/icons/savereport.png</iconset>
               </property>
               <property name="iconSize">
                <size>
