@@ -430,6 +430,11 @@
                 }
             }
         }
+
+        let lastWork = 0; // Определяем где вставлять подписантов
+        for (i=0; i<info.works.length; i++)
+            if (!skipArr.includes(i)) lastWork = i;
+        
         let page = 0;
         let num = 0;
         for (let i=0; i<info.works.length; i++)
@@ -437,6 +442,15 @@
             if (skipArr.includes(i)) continue;
             page++;
             num++;
+
+            let bdate = info.works[i].begdate;
+            let edate = info.works[i].enddate;
+            if (joinArr[i].length) {
+                joinArr[i].forEach(joined => {
+                    bdate = minDate(bdate, info.works[joined].begdate);
+                    edate = maxDate(edate, info.works[joined].enddate);
+                });
+            }
             let currid = `vvrp${page}`;
             let newpage = vvrtempl.replace('%1', currid);
             let workTypeFull = '';
@@ -448,8 +462,8 @@
             }
             document.body.innerHTML += newpage;
             let heightBefore = document.getElementById(currid).offsetHeight;
-            setHTML(`#${currid} [workbegdate]`, info.works[i].begdate);
-            setHTML(`#${currid} [workenddate]`, info.works[i].enddate);
+            setHTML(`#${currid} [workbegdate]`, bdate);
+            setHTML(`#${currid} [workenddate]`, edate);
             setHTML(`#${currid} [worknum]`, num);
             setHTML(`#${currid} [page]`, page);
             setHTML(`#${currid} [ktdtext]`, info.works[i].reglament + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
@@ -464,7 +478,7 @@
             }
             actionsHeader = actionsHeader.slice(0,-2) + ';';
          
-            if (i == info.works.length-1) {
+            if (i == lastWork) {
                 afterElem = document.querySelector(`#${currid} .expanding`);
                 afterElem.after(createFragmentFromHTML(signhtml));
             }
@@ -475,7 +489,7 @@
                 actionsText += strnum+1 + '. ' + actionsStrings[strnum] + '<br />';
                 setHTML(`#${currid} [workandactions]`, `${actionsHeader}<br/>${actionsText}`);
                 if (document.getElementById(currid).offsetHeight > heightBefore) {
-                    if (i == info.works.length-1) {
+                    if (i == lastWork) {
                         removeElements(`#${currid} [signelement]`);
                     }
                     setHTML(`#${currid} [workandactions]`, `${actionsHeader}<br/>${oldActionsText}`);
@@ -483,12 +497,12 @@
                     currid = `vvrp${page}`;
                     newpage = vvrtempl.replace('%1', currid);
                     document.body.innerHTML += newpage;
-                    setHTML(`#${currid} [workbegdate]`, info.works[i].begdate);
-                    setHTML(`#${currid} [workenddate]`, info.works[i].enddate);
+                    setHTML(`#${currid} [workbegdate]`, bdate);
+                    setHTML(`#${currid} [workenddate]`, edate);
                     setHTML(`#${currid} [worknum]`, num);
                     setHTML(`#${currid} [page]`, page);
                     setHTML(`#${currid} [ktdtext]`, info.works[i].reglament + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
-                    if (i == info.works.length-1) {
+                    if (i == lastWork) {
                         afterElem = document.querySelector(`#${currid} .expanding`);
                         afterElem.after(createFragmentFromHTML(signhtml));
                     }
