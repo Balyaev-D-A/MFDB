@@ -466,7 +466,7 @@
             setHTML(`#${currid} [workenddate]`, edate);
             setHTML(`#${currid} [worknum]`, num);
             setHTML(`#${currid} [page]`, page);
-            setHTML(`#${currid} [ktdtext]`, info.works[i].reglament + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
+            setHTML(`#${currid} [ktdtext]`, (info.works[i].reglament ? info.works[i].reglament + ';<br />' : "") + info.works[i].ktd);
             let actionsStrings = info.works[i].actions.split('\n');
             let oldActionsText = '';
             let actionsText = '';
@@ -501,7 +501,7 @@
                     setHTML(`#${currid} [workenddate]`, edate);
                     setHTML(`#${currid} [worknum]`, num);
                     setHTML(`#${currid} [page]`, page);
-                    setHTML(`#${currid} [ktdtext]`, info.works[i].reglament + ';<br />' + (info.works[i].ktd ? info.works[i].ktd : info.works[i].techDoc));
+                    setHTML(`#${currid} [ktdtext]`, (info.works[i].reglament ? info.works[i].reglament + ';<br />' : "") + info.works[i].ktd);
                     if (i == lastWork) {
                         afterElem = document.querySelector(`#${currid} .expanding`);
                         afterElem.after(createFragmentFromHTML(signhtml));
