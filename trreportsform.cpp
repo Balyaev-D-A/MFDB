@@ -1514,15 +1514,19 @@ QString TRReportsForm::makeJson(QString reportId)
         workObj.insert("actions", QJsonValue(results[i][7]));
         workObj.insert("defectnum", QJsonValue(results[i][8]));
 
-        query = QString("SELECT sch_tdoc FROM schedule WHERE sch_type = '%1' LIMIT 1").arg(results[i][1]);
+        query = QString("SELECT sch_tdoc, sch_invno FROM schedule WHERE sch_kks = '%1' LIMIT 1").arg(results[i][2]);
         if (!db->execQuery(query)) {
             db->showError(this);
             return "";
         }
-        if (db->nextRecord())
+        if (db->nextRecord()) {
             workObj.insert("techDoc", QJsonValue(db->fetchValue(0).toString()));
-        else
+            workObj.insert("invno", QJsonValue(db->fetchValue(1).toString()));
+        }
+        else {
             workObj.insert("techDoc", QJsonValue("Руководство по эксплуатации"));
+            workObj.insert("invno", QJsonValue("б/н"));
+        }
 
         query = "SELECT nw_oesn, nw_ktd, nw_ktdshort, nw_reglament FROM normativwork WHERE nw_dev = '%1' AND nw_worktype = 'ТР' "
                 "AND nw_unit = '%2'";

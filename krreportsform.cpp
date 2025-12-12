@@ -1229,7 +1229,7 @@ QString KRReportsForm::makeJson(QString reportId)
 //            "LEFT JOIN ktd ON def_devtype = ktd_dev "
 //            "WHERE trw_report = '%1' ORDER BY trw_order";
 
-    query = "SELECT sch_name, sch_type, sch_kks, kr_begdate, kr_enddate, kr_actions, kr_id, "
+    query = "SELECT sch_name, sch_type, sch_kks, sch_invno, kr_begdate, kr_enddate, kr_actions, kr_id, "
             "kr_hasdefects, kr_defectdesc, kr_repairdesc FROM krrworks "
             "LEFT JOIN kaprepairs ON krw_work = kr_id "
             "LEFT JOIN schedule ON kr_sched = sch_id "
@@ -1248,14 +1248,15 @@ QString KRReportsForm::makeJson(QString reportId)
         workObj.insert("deviceDescription", QJsonValue(results[i][0]));
         workObj.insert("deviceType", QJsonValue(results[i][1]));
         workObj.insert("deviceKKS", QJsonValue(results[i][2]));
-        workObj.insert("begdate", QJsonValue(results[i][3]));
-        workObj.insert("enddate", QJsonValue(results[i][4]));
-        workObj.insert("actions", QJsonValue(results[i][5]));
+        workObj.insert("invno", QJsonValue(results[i][3]));
+        workObj.insert("begdate", QJsonValue(results[i][4]));
+        workObj.insert("enddate", QJsonValue(results[i][5]));
+        workObj.insert("actions", QJsonValue(results[i][6]));
         bool hasDefects = false;
-        if (results[i][7].toLower() == "true") hasDefects = true;
+        if (results[i][8].toLower() == "true") hasDefects = true;
         workObj.insert("hasdefects", QJsonValue(hasDefects));
-        workObj.insert("defect", QJsonValue(results[i][8]));
-        workObj.insert("repair", QJsonValue(results[i][9]));
+        workObj.insert("defect", QJsonValue(results[i][9]));
+        workObj.insert("repair", QJsonValue(results[i][10]));
 
         query = QString("SELECT sch_tdoc FROM schedule WHERE sch_type = '%1' LIMIT 1").arg(results[i][1]);
         if (!db->execQuery(query)) {
