@@ -1299,7 +1299,7 @@ QString KRReportsForm::makeJson(QString reportId)
         query = "SELECT mat_name, mat_doc, mat_measure, kam_oesn, kam_count, mat_consumable FROM kradditionalmats "
                 "LEFT JOIN materials ON kam_material = mat_id "
                 "WHERE kam_kr = '%1' ORDER BY kam_order";
-        query = query.arg(results[i][6]);
+        query = query.arg(results[i][7]);
         if (!db->execQuery(query)) {
             db->showError(this);
             return "";
